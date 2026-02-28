@@ -158,7 +158,7 @@
   }
 
   .sidebar-btn {
-    @apply flex items-center justify-center w-full py-2.5 text-muted-foreground
+    @apply flex items-center gap-2.5 w-full px-3 py-2 text-muted-foreground
            hover:text-foreground hover:bg-accent/10 transition-colors duration-150 cursor-pointer;
   }
   .sidebar-btn-active {

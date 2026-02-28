@@ -37,9 +37,12 @@ const sections = [
 
 export default function Sidebar({ mode, searchOpen, onMode, onSearch }: SidebarProps) {
   return (
-    <aside className="flex flex-col w-12 shrink-0 border-r border-border bg-[hsl(var(--toolbar))] overflow-y-auto overflow-x-hidden">
+    <aside className="flex flex-col w-44 shrink-0 border-r border-border bg-[hsl(var(--toolbar))] overflow-y-auto overflow-x-hidden">
       {sections.map((section, si) => (
-        <div key={si} className={`flex flex-col py-1 ${si > 0 ? "border-t border-border/60" : ""}`}>
+        <div key={si} className={`flex flex-col ${si > 0 ? "border-t border-border/60" : ""}`}>
+          <span className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/50 select-none">
+            {section.label}
+          </span>
           {section.items.map((item) => {
             const Icon = item.icon;
             const isActive = mode === item.mode;
@@ -51,19 +54,28 @@ export default function Sidebar({ mode, searchOpen, onMode, onSearch }: SidebarP
                 title={title}
                 className={`sidebar-btn ${isActive ? "sidebar-btn-active" : ""}`}
               >
-                <Icon className="w-[18px] h-[18px]" />
+                <Icon className="w-[15px] h-[15px] shrink-0" />
+                <span className="text-xs truncate">{item.label}</span>
+                {"shortcut" in item && item.shortcut && (
+                  <span className="ml-auto text-[9px] opacity-40 font-mono shrink-0">{item.shortcut}</span>
+                )}
               </button>
             );
           })}
         </div>
       ))}
-      <div className="flex flex-col py-1 border-t border-border/60">
+      <div className="flex flex-col border-t border-border/60">
+        <span className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/50 select-none">
+          UTILITY
+        </span>
         <button
           onClick={() => { if (mode !== "tree") onMode("tree"); onSearch(!searchOpen); }}
           title="Search (⌘K)"
           className={`sidebar-btn ${searchOpen ? "sidebar-btn-active" : ""}`}
         >
-          <Search className="w-[18px] h-[18px]" />
+          <Search className="w-[15px] h-[15px] shrink-0" />
+          <span className="text-xs">Search</span>
+          <span className="ml-auto text-[9px] opacity-40 font-mono shrink-0">⌘K</span>
         </button>
       </div>
     </aside>
