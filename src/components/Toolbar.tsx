@@ -1,7 +1,7 @@
 "use client";
 import {
   Braces, Copy, Download, Upload, Minimize2, ArrowUpDown, Sun, Moon,
-  ChevronsDownUp, ChevronsUpDown, Check, Sparkles, Link,
+  ChevronsDownUp, ChevronsUpDown, Check, Sparkles, Share2,
 } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -28,10 +28,8 @@ export default function Toolbar({
 }: ToolbarProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [copied, setCopied] = useState(false);
-  const [shared, setShared] = useState(false);
 
   const handleCopy = () => { onCopy(); setCopied(true); setTimeout(() => setCopied(false), 1500); };
-  const handleShare = () => { onShare(); setShared(true); setTimeout(() => setShared(false), 1500); };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,8 +84,8 @@ export default function Toolbar({
 
       <div className="flex-1" />
 
-      {/* Share */}
-      <ToolBtn onClick={handleShare} icon={<Link className="w-3.5 h-3.5" />} label={shared ? "Copied!" : "Share"} accent={shared} disabled={!hasJson} />
+      {/* Share shortcut */}
+      <ToolBtn onClick={onShare} icon={<Share2 className="w-3.5 h-3.5" />} label="Share" disabled={!hasJson} />
 
       <Divider />
 

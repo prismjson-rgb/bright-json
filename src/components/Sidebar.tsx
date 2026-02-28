@@ -1,5 +1,5 @@
 "use client";
-import { TreePine, Columns2, Wand2, Bug, Scissors, Eraser, PackageMinus, BarChart3, Lightbulb, Hash, ArrowLeftRight, StickyNote, Search, BookOpen } from "lucide-react";
+import { TreePine, Columns2, Wand2, Bug, Scissors, Eraser, PackageMinus, BarChart3, Lightbulb, Hash, ArrowLeftRight, StickyNote, Search, BookOpen, Share2 } from "lucide-react";
 import type { PanelMode } from "./JsonViewerClient";
 
 interface SidebarProps {
@@ -29,6 +29,7 @@ const sections = [
   { label: "TRANSFORM", items: [
     { mode: "convert" as PanelMode, icon: ArrowLeftRight, label: "Convert" },
     { mode: "notes" as PanelMode, icon: StickyNote, label: "Notes" },
+    { mode: "share" as PanelMode, icon: Share2, label: "Share & Export" },
   ]},
   { label: "LEARN", items: [
     { mode: "learn" as PanelMode, icon: BookOpen, label: "Learn JSON" },

@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
-import { toast } from "sonner";
 import Toolbar from "@/components/Toolbar";
 import Sidebar from "@/components/Sidebar";
 import JsonEditor from "@/components/JsonEditor";
@@ -21,9 +20,11 @@ import JsonStructureAnalyzer from "@/components/JsonStructureAnalyzer";
 import JsonBestPractices from "@/components/JsonBestPractices";
 import JsonTokenEstimator from "@/components/JsonTokenEstimator";
 import JsonLearnPanel from "@/components/JsonLearnPanel";
+import JsonSharePanel from "@/components/JsonSharePanel";
+import { safeDecodeJson } from "@/lib/share";
 
 export type PanelMode = "tree" | "diff" | "mock" | "debug" | "trim" | "clean"
-  | "minimal" | "structure" | "practices" | "tokens" | "convert" | "notes" | "learn";
+  | "minimal" | "structure" | "practices" | "tokens" | "convert" | "notes" | "learn" | "share";
 
 const SAMPLE = JSON.stringify({
   name: "JSON Prism",
@@ -44,7 +45,7 @@ const MODE_LABELS: Partial<Record<PanelMode, string>> = {
   trim: "JSON Trimmer", clean: "AI Cleaner", minimal: "Minimal Mode",
   structure: "Structure Analyzer", practices: "Best Practices",
   tokens: "Token Estimator", convert: "Convert Mode", notes: "Notes Mode",
-  learn: "Learn JSON",
+  learn: "Learn JSON", share: "Share & Export",
 };
 
 export default function JsonViewerClient() {
@@ -57,14 +58,12 @@ export default function JsonViewerClient() {
 
   const { query, setQuery, matchCount } = useJsonSearch(parsed);
 
-  // Load from URL hash on mount
+  // Load from URL hash on mount (supports lz-string and legacy btoa)
   useEffect(() => {
     const m = window.location.hash.match(/^#json=(.+)/);
     if (m) {
-      try {
-        const decoded = decodeURIComponent(escape(atob(m[1])));
-        setJson(decoded);
-      } catch {}
+      const decoded = safeDecodeJson(m[1]);
+      if (decoded) setJson(decoded);
     }
   }, [setJson]);
 
@@ -84,15 +83,8 @@ export default function JsonViewerClient() {
   }, [setJson]);
 
   const handleShare = useCallback(() => {
-    if (json.length > 50000) {
-      toast.warning("JSON is too large for a shareable link (>50KB)");
-      return;
-    }
-    const b64 = btoa(unescape(encodeURIComponent(json)));
-    const url = window.location.href.split("#")[0] + "#json=" + b64;
-    navigator.clipboard.writeText(url);
-    toast.success("Link copied to clipboard!");
-  }, [json]);
+    setMode("share");
+  }, []);
 
   const handleMode = useCallback((m: PanelMode) => {
     setMode(m);
@@ -215,6 +207,7 @@ export default function JsonViewerClient() {
               {mode === "convert" && <JsonConvertPanel parsed={parsed} dark={dark} />}
               {mode === "notes" && <JsonNoteEditor />}
               {mode === "learn" && <JsonLearnPanel />}
+              {mode === "share" && <JsonSharePanel json={json} onDownloadJson={handleDownload} />}
             </section>
           </main>
         )}
