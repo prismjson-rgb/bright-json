@@ -1,0 +1,92 @@
+import { Suspense, lazy, useCallback, useEffect, useRef } from "react";
+
+const Editor = lazy(() => import("@monaco-editor/react"));
+
+interface JsonEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+  error: string | null;
+  dark: boolean;
+}
+
+export default function JsonEditor({ value, onChange, error, dark }: JsonEditorProps) {
+  const editorRef = useRef<any>(null);
+
+  const handleMount = useCallback((editor: any) => {
+    editorRef.current = editor;
+    editor.focus();
+  }, []);
+
+  // Update markers for errors
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    const model = editor.getModel();
+    if (!model) return;
+    const monaco = (window as any).monaco;
+    if (!monaco) return;
+
+    if (error) {
+      // Try to extract line/col from error message
+      const match = error.match(/position (\d+)/);
+      let line = 1, col = 1;
+      if (match) {
+        const pos = parseInt(match[1]);
+        const text = value.substring(0, pos);
+        line = (text.match(/\n/g) || []).length + 1;
+        col = pos - text.lastIndexOf("\n");
+      }
+      monaco.editor.setModelMarkers(model, "json", [
+        {
+          severity: monaco.MarkerSeverity.Error,
+          message: error,
+          startLineNumber: line,
+          startColumn: col,
+          endLineNumber: line,
+          endColumn: col + 1,
+        },
+      ]);
+    } else {
+      monaco.editor.setModelMarkers(model, "json", []);
+    }
+  }, [error, value]);
+
+  return (
+    <div className="h-full w-full relative">
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">
+            Loading editor…
+          </div>
+        }
+      >
+        <Editor
+          height="100%"
+          language="json"
+          theme={dark ? "vs-dark" : "vs"}
+          value={value}
+          onChange={(v) => onChange(v || "")}
+          onMount={handleMount}
+          options={{
+            fontSize: 13,
+            fontFamily: "'JetBrains Mono', monospace",
+            minimap: { enabled: false },
+            lineNumbers: "on",
+            scrollBeyondLastLine: false,
+            wordWrap: "on",
+            automaticLayout: true,
+            padding: { top: 12 },
+            renderLineHighlight: "line",
+            bracketPairColorization: { enabled: true },
+            tabSize: 2,
+          }}
+        />
+      </Suspense>
+      {error && (
+        <div className="absolute bottom-0 left-0 right-0 bg-destructive/90 text-destructive-foreground text-xs px-3 py-1.5 font-mono truncate animate-slide-up">
+          ⚠ {error}
+        </div>
+      )}
+    </div>
+  );
+}
