@@ -157,6 +157,14 @@
     box-shadow: 0 0 6px 1px hsl(var(--destructive) / 0.4);
   }
 
+  .sidebar-btn {
+    @apply flex items-center justify-center w-full py-2.5 text-muted-foreground
+           hover:text-foreground hover:bg-accent/10 transition-colors duration-150 cursor-pointer;
+  }
+  .sidebar-btn-active {
+    @apply bg-primary/10 text-primary;
+  }
+
   /* Tiptap note editor styles */
   .tiptap-editor .ProseMirror {
     @apply outline-none min-h-full p-4 font-sans text-sm leading-relaxed text-foreground;
