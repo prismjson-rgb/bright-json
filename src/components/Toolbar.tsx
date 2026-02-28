@@ -11,6 +11,7 @@ import {
   ChevronsUpDown,
   Check,
   Sparkles,
+  Columns2,
 } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -24,8 +25,10 @@ interface ToolbarProps {
   onToggleTheme: () => void;
   onExpandAll: () => void;
   onCollapseAll: () => void;
+  onToggleDiff: () => void;
   dark: boolean;
   hasJson: boolean;
+  diffMode: boolean;
 }
 
 export default function Toolbar({
@@ -38,8 +41,10 @@ export default function Toolbar({
   onToggleTheme,
   onExpandAll,
   onCollapseAll,
+  onToggleDiff,
   dark,
   hasJson,
+  diffMode,
 }: ToolbarProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [copied, setCopied] = useState(false);
@@ -80,9 +85,9 @@ export default function Toolbar({
 
       {/* Format group */}
       <div className="flex items-center gap-0.5 bg-secondary/50 rounded-lg p-0.5">
-        <ToolBtn onClick={onFormat} icon={<Sparkles className="w-3.5 h-3.5" />} label="Beautify" shortcut="⌘⇧F" disabled={!hasJson} accent />
-        <ToolBtn onClick={onMinify} icon={<Minimize2 className="w-3.5 h-3.5" />} label="Minify" shortcut="⌘M" disabled={!hasJson} />
-        <ToolBtn onClick={onSortKeys} icon={<ArrowUpDown className="w-3.5 h-3.5" />} label="Sort" disabled={!hasJson} />
+        <ToolBtn onClick={onFormat} icon={<Sparkles className="w-3.5 h-3.5" />} label="Beautify" shortcut="⌘⇧F" disabled={!hasJson || diffMode} accent />
+        <ToolBtn onClick={onMinify} icon={<Minimize2 className="w-3.5 h-3.5" />} label="Minify" shortcut="⌘M" disabled={!hasJson || diffMode} />
+        <ToolBtn onClick={onSortKeys} icon={<ArrowUpDown className="w-3.5 h-3.5" />} label="Sort" disabled={!hasJson || diffMode} />
       </div>
 
       <Divider />
@@ -93,21 +98,33 @@ export default function Toolbar({
           onClick={handleCopy}
           icon={copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
           label={copied ? "Copied!" : "Copy"}
-          disabled={!hasJson}
+          disabled={!hasJson || diffMode}
           accent={copied}
         />
-        <ToolBtn onClick={onDownload} icon={<Download className="w-3.5 h-3.5" />} label="Export" disabled={!hasJson} />
-        <ToolBtn onClick={() => fileRef.current?.click()} icon={<Upload className="w-3.5 h-3.5" />} label="Import" />
+        <ToolBtn onClick={onDownload} icon={<Download className="w-3.5 h-3.5" />} label="Export" disabled={!hasJson || diffMode} />
+        <ToolBtn onClick={() => fileRef.current?.click()} icon={<Upload className="w-3.5 h-3.5" />} label="Import" disabled={diffMode} />
         <input ref={fileRef} type="file" accept=".json,.txt" onChange={handleFileChange} className="hidden" />
       </div>
 
       <Divider />
 
-      {/* Tree controls */}
+      {/* View controls */}
       <div className="flex items-center gap-0.5">
-        <ToolBtn onClick={onExpandAll} icon={<ChevronsUpDown className="w-3.5 h-3.5" />} label="Expand" disabled={!hasJson} />
-        <ToolBtn onClick={onCollapseAll} icon={<ChevronsDownUp className="w-3.5 h-3.5" />} label="Collapse" disabled={!hasJson} />
+        <ToolBtn onClick={onExpandAll} icon={<ChevronsUpDown className="w-3.5 h-3.5" />} label="Expand" disabled={!hasJson || diffMode} />
+        <ToolBtn onClick={onCollapseAll} icon={<ChevronsDownUp className="w-3.5 h-3.5" />} label="Collapse" disabled={!hasJson || diffMode} />
       </div>
+
+      <Divider />
+
+      {/* Diff toggle */}
+      <ToolBtn
+        onClick={onToggleDiff}
+        icon={<Columns2 className="w-3.5 h-3.5" />}
+        label="Diff"
+        shortcut="⌘D"
+        active={diffMode}
+        accent={diffMode}
+      />
 
       <div className="flex-1" />
 
@@ -134,6 +151,7 @@ function ToolBtn({
   shortcut,
   disabled,
   accent,
+  active,
 }: {
   onClick: () => void;
   icon: React.ReactNode;
@@ -141,15 +159,18 @@ function ToolBtn({
   shortcut?: string;
   disabled?: boolean;
   accent?: boolean;
+  active?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       className={`toolbar-btn ${
-        accent
-          ? "text-primary"
-          : "text-muted-foreground"
+        active
+          ? "bg-primary/10 text-primary"
+          : accent
+            ? "text-primary"
+            : "text-muted-foreground"
       }`}
       title={shortcut ? `${label} (${shortcut})` : label}
     >
