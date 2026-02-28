@@ -10,6 +10,7 @@ import {
   ChevronsDownUp,
   ChevronsUpDown,
   Check,
+  Sparkles,
 } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -61,41 +62,69 @@ export default function Toolbar({
   };
 
   return (
-    <div className="flex items-center gap-1 px-3 py-2 bg-toolbar border-b border-border sticky top-0 z-10 flex-wrap">
-      <div className="flex items-center gap-1 mr-2">
-        <Braces className="w-5 h-5 text-primary" />
-        <span className="font-semibold text-sm tracking-tight text-foreground">JSON Viewer</span>
+    <header className="flex items-center gap-0.5 px-4 py-2.5 bg-toolbar border-b border-border sticky top-0 z-10">
+      {/* Logo */}
+      <div className="flex items-center gap-2 mr-4">
+        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Braces className="w-4 h-4 text-primary" />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-semibold text-sm tracking-tight text-foreground leading-none">
+            JSON Viewer
+          </span>
+          <span className="text-[10px] text-muted-foreground leading-tight">Format · Validate · Explore</span>
+        </div>
       </div>
 
-      <div className="h-5 w-px bg-border mx-1" />
+      <Divider />
 
-      <ToolBtn onClick={onFormat} icon={<Braces className="w-3.5 h-3.5" />} label="Format" shortcut="⌘⇧F" disabled={!hasJson} />
-      <ToolBtn onClick={onMinify} icon={<Minimize2 className="w-3.5 h-3.5" />} label="Minify" shortcut="⌘M" disabled={!hasJson} />
-      <ToolBtn onClick={onSortKeys} icon={<ArrowUpDown className="w-3.5 h-3.5" />} label="Sort Keys" disabled={!hasJson} />
+      {/* Format group */}
+      <div className="flex items-center gap-0.5 bg-secondary/50 rounded-lg p-0.5">
+        <ToolBtn onClick={onFormat} icon={<Sparkles className="w-3.5 h-3.5" />} label="Beautify" shortcut="⌘⇧F" disabled={!hasJson} accent />
+        <ToolBtn onClick={onMinify} icon={<Minimize2 className="w-3.5 h-3.5" />} label="Minify" shortcut="⌘M" disabled={!hasJson} />
+        <ToolBtn onClick={onSortKeys} icon={<ArrowUpDown className="w-3.5 h-3.5" />} label="Sort" disabled={!hasJson} />
+      </div>
 
-      <div className="h-5 w-px bg-border mx-1" />
+      <Divider />
 
-      <ToolBtn onClick={handleCopy} icon={copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />} label={copied ? "Copied!" : "Copy"} disabled={!hasJson} />
-      <ToolBtn onClick={onDownload} icon={<Download className="w-3.5 h-3.5" />} label="Download" disabled={!hasJson} />
-      <ToolBtn onClick={() => fileRef.current?.click()} icon={<Upload className="w-3.5 h-3.5" />} label="Upload" />
-      <input ref={fileRef} type="file" accept=".json,.txt" onChange={handleFileChange} className="hidden" />
+      {/* Actions group */}
+      <div className="flex items-center gap-0.5">
+        <ToolBtn
+          onClick={handleCopy}
+          icon={copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+          label={copied ? "Copied!" : "Copy"}
+          disabled={!hasJson}
+          accent={copied}
+        />
+        <ToolBtn onClick={onDownload} icon={<Download className="w-3.5 h-3.5" />} label="Export" disabled={!hasJson} />
+        <ToolBtn onClick={() => fileRef.current?.click()} icon={<Upload className="w-3.5 h-3.5" />} label="Import" />
+        <input ref={fileRef} type="file" accept=".json,.txt" onChange={handleFileChange} className="hidden" />
+      </div>
 
-      <div className="h-5 w-px bg-border mx-1" />
+      <Divider />
 
-      <ToolBtn onClick={onExpandAll} icon={<ChevronsUpDown className="w-3.5 h-3.5" />} label="Expand" disabled={!hasJson} />
-      <ToolBtn onClick={onCollapseAll} icon={<ChevronsDownUp className="w-3.5 h-3.5" />} label="Collapse" disabled={!hasJson} />
+      {/* Tree controls */}
+      <div className="flex items-center gap-0.5">
+        <ToolBtn onClick={onExpandAll} icon={<ChevronsUpDown className="w-3.5 h-3.5" />} label="Expand" disabled={!hasJson} />
+        <ToolBtn onClick={onCollapseAll} icon={<ChevronsDownUp className="w-3.5 h-3.5" />} label="Collapse" disabled={!hasJson} />
+      </div>
 
       <div className="flex-1" />
 
+      {/* Theme toggle */}
       <button
         onClick={onToggleTheme}
-        className="p-1.5 rounded-md hover:bg-accent/20 text-muted-foreground hover:text-foreground transition-colors"
+        className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-all duration-150"
         title="Toggle theme (⌘L)"
       >
         {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
       </button>
-    </div>
+    </header>
   );
+}
+
+function Divider() {
+  return <div className="h-6 w-px bg-border mx-2 shrink-0" />;
 }
 
 function ToolBtn({
@@ -104,22 +133,28 @@ function ToolBtn({
   label,
   shortcut,
   disabled,
+  accent,
 }: {
   onClick: () => void;
   icon: React.ReactNode;
   label: string;
   shortcut?: string;
   disabled?: boolean;
+  accent?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className="flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium text-toolbar-foreground hover:bg-accent/20 hover:text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      className={`toolbar-btn ${
+        accent
+          ? "text-primary"
+          : "text-muted-foreground"
+      }`}
       title={shortcut ? `${label} (${shortcut})` : label}
     >
       {icon}
-      <span className="hidden sm:inline">{label}</span>
+      <span className="hidden md:inline">{label}</span>
     </button>
   );
 }

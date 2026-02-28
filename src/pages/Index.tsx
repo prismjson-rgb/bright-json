@@ -4,15 +4,28 @@ import { useTheme } from "@/hooks/useTheme";
 import Toolbar from "@/components/Toolbar";
 import JsonEditor from "@/components/JsonEditor";
 import JsonTreeView from "@/components/JsonTreeView";
+import { Code2, TreePine } from "lucide-react";
 
 const SAMPLE = JSON.stringify(
   {
     name: "JSON Viewer",
     version: "1.0.0",
-    features: ["format", "minify", "validate", "tree view"],
-    settings: { theme: "dark", fontSize: 13, wordWrap: true },
-    stats: { users: 12500, rating: 4.9 },
+    description: "A modern, blazing-fast JSON formatter",
+    features: ["format", "minify", "validate", "tree view", "syntax highlighting"],
+    config: {
+      theme: "dark",
+      fontSize: 13,
+      wordWrap: true,
+      lineNumbers: true,
+    },
+    stats: { users: 12500, rating: 4.9, downloads: 98200 },
+    metadata: {
+      author: "Developer",
+      license: "MIT",
+      repository: "https://github.com/example/json-viewer",
+    },
     isAwesome: true,
+    deprecated: false,
     notes: null,
   },
   null,
@@ -41,7 +54,6 @@ export default function Index() {
   const handleUpload = useCallback(
     (content: string) => {
       setJson(content);
-      // Auto-format if valid
       try {
         const obj = JSON.parse(content);
         setJson(JSON.stringify(obj, null, 2));
@@ -50,7 +62,6 @@ export default function Index() {
     [setJson]
   );
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
@@ -69,6 +80,8 @@ export default function Index() {
     return () => window.removeEventListener("keydown", handler);
   }, [format, minify, toggle]);
 
+  const lineCount = json.split("\n").length;
+
   return (
     <div className="flex flex-col h-screen bg-background">
       <Toolbar
@@ -85,32 +98,62 @@ export default function Index() {
         hasJson={!!json.trim()}
       />
 
-      <div className="flex flex-1 min-h-0">
+      <main className="flex flex-1 min-h-0">
         {/* Editor Pane */}
-        <div className="flex-1 min-w-0 border-r border-border">
-          <JsonEditor value={json} onChange={setJson} error={error} dark={dark} />
-        </div>
+        <section className="flex-1 min-w-0 flex flex-col border-r border-border">
+          <div className="pane-header">
+            <Code2 className="w-3.5 h-3.5" />
+            <span>Editor</span>
+            <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">
+              {lineCount} lines
+            </span>
+          </div>
+          <div className="flex-1 min-h-0">
+            <JsonEditor value={json} onChange={setJson} error={error} dark={dark} />
+          </div>
+        </section>
 
         {/* Tree View Pane */}
-        <div className="flex-1 min-w-0 bg-surface overflow-auto">
-          <JsonTreeView data={parsed} expandAll={expandAll} />
-        </div>
-      </div>
+        <section className="flex-1 min-w-0 flex flex-col bg-surface">
+          <div className="pane-header">
+            <TreePine className="w-3.5 h-3.5" />
+            <span>Tree View</span>
+            {parsed !== null && (
+              <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">
+                {Array.isArray(parsed) ? `${(parsed as unknown[]).length} items` : `${Object.keys(parsed as object).length} keys`}
+              </span>
+            )}
+          </div>
+          <div className="flex-1 min-h-0 overflow-auto">
+            <JsonTreeView data={parsed} expandAll={expandAll} />
+          </div>
+        </section>
+      </main>
 
       {/* Status Bar */}
-      <div className="flex items-center justify-between px-3 py-1 text-[11px] text-muted-foreground bg-toolbar border-t border-border font-mono">
-        <span>{json.length.toLocaleString()} chars</span>
-        <span>
+      <footer className="status-bar">
+        <div className="flex items-center gap-3">
+          <span>{json.length.toLocaleString()} chars</span>
+          <span className="text-border">·</span>
+          <span>{lineCount} lines</span>
+        </div>
+        <div className="flex items-center gap-2">
           {parsed !== null ? (
-            <span className="text-primary">✓ Valid JSON</span>
+            <>
+              <span className="glow-dot" />
+              <span className="text-primary font-medium">Valid JSON</span>
+            </>
           ) : error ? (
-            <span className="text-destructive">✗ Invalid</span>
+            <>
+              <span className="glow-dot-error" />
+              <span className="text-destructive font-medium">Invalid</span>
+            </>
           ) : (
-            "No input"
+            <span>No input</span>
           )}
-        </span>
+        </div>
         <span>UTF-8 · JSON</span>
-      </div>
+      </footer>
     </div>
   );
 }
