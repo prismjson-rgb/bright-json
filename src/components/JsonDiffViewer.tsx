@@ -1,39 +1,27 @@
-import { Suspense, lazy, useMemo } from "react";
+"use client";
+import dynamic from "next/dynamic";
+import { useMemo, useState } from "react";
 
-const MonacoDiffEditor = lazy(() =>
-  import("@monaco-editor/react").then((mod) => ({ default: mod.DiffEditor }))
+const MonacoDiffEditor = dynamic(
+  () => import("@monaco-editor/react").then((mod) => ({ default: mod.DiffEditor })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">
+        Loading diff editor…
+      </div>
+    ),
+  }
 );
 
 interface JsonDiffViewerProps {
   dark: boolean;
+  originalJson: string;
 }
 
-const LEFT_SAMPLE = JSON.stringify(
-  {
-    name: "JSON Viewer",
-    version: "1.0.0",
-    features: ["format", "minify", "validate"],
-    config: { theme: "dark", fontSize: 13 },
-    isAwesome: true,
-  },
-  null,
-  2
-);
+export default function JsonDiffViewer({ dark, originalJson }: JsonDiffViewerProps) {
+  const [modifiedJson, setModifiedJson] = useState("");
 
-const RIGHT_SAMPLE = JSON.stringify(
-  {
-    name: "JSON Viewer",
-    version: "2.0.0",
-    features: ["format", "minify", "validate", "diff", "tree view"],
-    config: { theme: "light", fontSize: 14, wordWrap: true },
-    isAwesome: true,
-    newField: "hello",
-  },
-  null,
-  2
-);
-
-export default function JsonDiffViewer({ dark }: JsonDiffViewerProps) {
   const options = useMemo(
     () => ({
       fontSize: 13,
@@ -51,23 +39,21 @@ export default function JsonDiffViewer({ dark }: JsonDiffViewerProps) {
   );
 
   return (
-    <div className="flex-1 min-h-0 w-full">
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">
-            Loading diff editor…
-          </div>
-        }
-      >
+    <div className="flex-1 min-h-0 w-full flex flex-col">
+      <div className="flex text-[10px] font-mono text-muted-foreground border-b border-border">
+        <div className="flex-1 px-4 py-1.5 border-r border-border">Original (current editor)</div>
+        <div className="flex-1 px-4 py-1.5">Modified (paste to compare)</div>
+      </div>
+      <div className="flex-1 min-h-0">
         <MonacoDiffEditor
           height="100%"
           language="json"
           theme={dark ? "vs-dark" : "vs"}
-          original={LEFT_SAMPLE}
-          modified={RIGHT_SAMPLE}
+          original={originalJson}
+          modified={modifiedJson}
           options={options}
         />
-      </Suspense>
+      </div>
     </div>
   );
 }

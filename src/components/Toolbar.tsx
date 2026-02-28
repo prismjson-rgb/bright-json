@@ -1,3 +1,4 @@
+"use client";
 import {
   Braces,
   Copy,
@@ -12,6 +13,9 @@ import {
   Check,
   Sparkles,
   Columns2,
+  ArrowLeftRight,
+  Search,
+  StickyNote,
 } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -26,9 +30,15 @@ interface ToolbarProps {
   onExpandAll: () => void;
   onCollapseAll: () => void;
   onToggleDiff: () => void;
+  onToggleConvert: () => void;
+  onToggleSearch: () => void;
+  onToggleNote: () => void;
   dark: boolean;
   hasJson: boolean;
   diffMode: boolean;
+  convertMode: boolean;
+  searchMode: boolean;
+  noteMode: boolean;
 }
 
 export default function Toolbar({
@@ -42,9 +52,15 @@ export default function Toolbar({
   onExpandAll,
   onCollapseAll,
   onToggleDiff,
+  onToggleConvert,
+  onToggleSearch,
+  onToggleNote,
   dark,
   hasJson,
   diffMode,
+  convertMode,
+  searchMode,
+  noteMode,
 }: ToolbarProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [copied, setCopied] = useState(false);
@@ -66,8 +82,10 @@ export default function Toolbar({
     e.target.value = "";
   };
 
+  const inSpecialMode = diffMode || convertMode || noteMode;
+
   return (
-    <header className="flex items-center gap-0.5 px-4 py-2.5 bg-toolbar border-b border-border sticky top-0 z-10">
+    <header className="flex items-center gap-0.5 px-4 py-2.5 bg-toolbar border-b border-border sticky top-0 z-10 flex-wrap">
       {/* Logo */}
       <div className="flex items-center gap-2 mr-4">
         <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -77,7 +95,9 @@ export default function Toolbar({
           <span className="font-semibold text-sm tracking-tight text-foreground leading-none">
             JSON Viewer
           </span>
-          <span className="text-[10px] text-muted-foreground leading-tight">Format · Validate · Explore</span>
+          <span className="text-[10px] text-muted-foreground leading-tight">
+            Format · Validate · Explore
+          </span>
         </div>
       </div>
 
@@ -85,9 +105,27 @@ export default function Toolbar({
 
       {/* Format group */}
       <div className="flex items-center gap-0.5 bg-secondary/50 rounded-lg p-0.5">
-        <ToolBtn onClick={onFormat} icon={<Sparkles className="w-3.5 h-3.5" />} label="Beautify" shortcut="⌘⇧F" disabled={!hasJson || diffMode} accent />
-        <ToolBtn onClick={onMinify} icon={<Minimize2 className="w-3.5 h-3.5" />} label="Minify" shortcut="⌘M" disabled={!hasJson || diffMode} />
-        <ToolBtn onClick={onSortKeys} icon={<ArrowUpDown className="w-3.5 h-3.5" />} label="Sort" disabled={!hasJson || diffMode} />
+        <ToolBtn
+          onClick={onFormat}
+          icon={<Sparkles className="w-3.5 h-3.5" />}
+          label="Beautify"
+          shortcut="⌘⇧F"
+          disabled={!hasJson || inSpecialMode}
+          accent
+        />
+        <ToolBtn
+          onClick={onMinify}
+          icon={<Minimize2 className="w-3.5 h-3.5" />}
+          label="Minify"
+          shortcut="⌘M"
+          disabled={!hasJson || inSpecialMode}
+        />
+        <ToolBtn
+          onClick={onSortKeys}
+          icon={<ArrowUpDown className="w-3.5 h-3.5" />}
+          label="Sort"
+          disabled={!hasJson || inSpecialMode}
+        />
       </div>
 
       <Divider />
@@ -101,30 +139,84 @@ export default function Toolbar({
           disabled={!hasJson || diffMode}
           accent={copied}
         />
-        <ToolBtn onClick={onDownload} icon={<Download className="w-3.5 h-3.5" />} label="Export" disabled={!hasJson || diffMode} />
-        <ToolBtn onClick={() => fileRef.current?.click()} icon={<Upload className="w-3.5 h-3.5" />} label="Import" disabled={diffMode} />
-        <input ref={fileRef} type="file" accept=".json,.txt" onChange={handleFileChange} className="hidden" />
+        <ToolBtn
+          onClick={onDownload}
+          icon={<Download className="w-3.5 h-3.5" />}
+          label="Export"
+          disabled={!hasJson || diffMode}
+        />
+        <ToolBtn
+          onClick={() => fileRef.current?.click()}
+          icon={<Upload className="w-3.5 h-3.5" />}
+          label="Import"
+          disabled={diffMode}
+        />
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".json,.txt"
+          onChange={handleFileChange}
+          className="hidden"
+        />
       </div>
 
       <Divider />
 
-      {/* View controls */}
+      {/* Tree view controls */}
       <div className="flex items-center gap-0.5">
-        <ToolBtn onClick={onExpandAll} icon={<ChevronsUpDown className="w-3.5 h-3.5" />} label="Expand" disabled={!hasJson || diffMode} />
-        <ToolBtn onClick={onCollapseAll} icon={<ChevronsDownUp className="w-3.5 h-3.5" />} label="Collapse" disabled={!hasJson || diffMode} />
+        <ToolBtn
+          onClick={onExpandAll}
+          icon={<ChevronsUpDown className="w-3.5 h-3.5" />}
+          label="Expand"
+          disabled={!hasJson || inSpecialMode}
+        />
+        <ToolBtn
+          onClick={onCollapseAll}
+          icon={<ChevronsDownUp className="w-3.5 h-3.5" />}
+          label="Collapse"
+          disabled={!hasJson || inSpecialMode}
+        />
       </div>
 
       <Divider />
 
-      {/* Diff toggle */}
-      <ToolBtn
-        onClick={onToggleDiff}
-        icon={<Columns2 className="w-3.5 h-3.5" />}
-        label="Diff"
-        shortcut="⌘D"
-        active={diffMode}
-        accent={diffMode}
-      />
+      {/* Mode toggles */}
+      <div className="flex items-center gap-0.5">
+        <ToolBtn
+          onClick={onToggleDiff}
+          icon={<Columns2 className="w-3.5 h-3.5" />}
+          label="Diff"
+          shortcut="⌘D"
+          active={diffMode}
+          accent={diffMode}
+          disabled={!hasJson}
+        />
+        <ToolBtn
+          onClick={onToggleConvert}
+          icon={<ArrowLeftRight className="w-3.5 h-3.5" />}
+          label="Convert"
+          active={convertMode}
+          accent={convertMode}
+          disabled={!hasJson || diffMode}
+        />
+        <ToolBtn
+          onClick={onToggleSearch}
+          icon={<Search className="w-3.5 h-3.5" />}
+          label="Search"
+          shortcut="⌘K"
+          active={searchMode}
+          accent={searchMode}
+          disabled={!hasJson || diffMode}
+        />
+        <ToolBtn
+          onClick={onToggleNote}
+          icon={<StickyNote className="w-3.5 h-3.5" />}
+          label="Notes"
+          active={noteMode}
+          accent={noteMode}
+          disabled={diffMode}
+        />
+      </div>
 
       <div className="flex-1" />
 

@@ -1,6 +1,15 @@
-import { Suspense, lazy, useCallback, useEffect, useRef } from "react";
+"use client";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useRef } from "react";
 
-const Editor = lazy(() => import("@monaco-editor/react"));
+const Editor = dynamic(() => import("@monaco-editor/react"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">
+      Loading editor…
+    </div>
+  ),
+});
 
 interface JsonEditorProps {
   value: string;
@@ -17,7 +26,6 @@ export default function JsonEditor({ value, onChange, error, dark }: JsonEditorP
     editor.focus();
   }, []);
 
-  // Update markers for errors
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -27,7 +35,6 @@ export default function JsonEditor({ value, onChange, error, dark }: JsonEditorP
     if (!monaco) return;
 
     if (error) {
-      // Try to extract line/col from error message
       const match = error.match(/position (\d+)/);
       let line = 1, col = 1;
       if (match) {
@@ -53,35 +60,27 @@ export default function JsonEditor({ value, onChange, error, dark }: JsonEditorP
 
   return (
     <div className="h-full w-full relative">
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center h-full text-muted-foreground font-mono text-sm">
-            Loading editor…
-          </div>
-        }
-      >
-        <Editor
-          height="100%"
-          language="json"
-          theme={dark ? "vs-dark" : "vs"}
-          value={value}
-          onChange={(v) => onChange(v || "")}
-          onMount={handleMount}
-          options={{
-            fontSize: 13,
-            fontFamily: "'JetBrains Mono', monospace",
-            minimap: { enabled: false },
-            lineNumbers: "on",
-            scrollBeyondLastLine: false,
-            wordWrap: "on",
-            automaticLayout: true,
-            padding: { top: 12 },
-            renderLineHighlight: "line",
-            bracketPairColorization: { enabled: true },
-            tabSize: 2,
-          }}
-        />
-      </Suspense>
+      <Editor
+        height="100%"
+        language="json"
+        theme={dark ? "vs-dark" : "vs"}
+        value={value}
+        onChange={(v) => onChange(v || "")}
+        onMount={handleMount}
+        options={{
+          fontSize: 13,
+          fontFamily: "'JetBrains Mono', monospace",
+          minimap: { enabled: false },
+          lineNumbers: "on",
+          scrollBeyondLastLine: false,
+          wordWrap: "on",
+          automaticLayout: true,
+          padding: { top: 12 },
+          renderLineHighlight: "line",
+          bracketPairColorization: { enabled: true },
+          tabSize: 2,
+        }}
+      />
       {error && (
         <div className="absolute bottom-0 left-0 right-0 bg-destructive/90 text-destructive-foreground text-xs px-3 py-1.5 font-mono truncate animate-slide-up">
           ⚠ {error}
