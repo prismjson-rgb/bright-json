@@ -16,6 +16,7 @@ import {
   ArrowLeftRight,
   Search,
   StickyNote,
+  X,
 } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -93,10 +94,10 @@ export default function Toolbar({
         </div>
         <div className="flex flex-col">
           <span className="font-semibold text-sm tracking-tight text-foreground leading-none">
-            JSON Viewer
+            JSON Prism
           </span>
           <span className="text-[10px] text-muted-foreground leading-tight">
-            Format · Validate · Explore
+            Format · Diff · Transform
           </span>
         </div>
       </div>
@@ -184,8 +185,8 @@ export default function Toolbar({
       <div className="flex items-center gap-0.5">
         <ToolBtn
           onClick={onToggleDiff}
-          icon={<Columns2 className="w-3.5 h-3.5" />}
-          label="Diff"
+          icon={diffMode ? <X className="w-3.5 h-3.5" /> : <Columns2 className="w-3.5 h-3.5" />}
+          label={diffMode ? "Exit Diff" : "Diff"}
           shortcut="⌘D"
           active={diffMode}
           accent={diffMode}
@@ -197,7 +198,7 @@ export default function Toolbar({
           label="Convert"
           active={convertMode}
           accent={convertMode}
-          disabled={!hasJson || diffMode}
+          disabled={!hasJson}
         />
         <ToolBtn
           onClick={onToggleSearch}
@@ -206,7 +207,7 @@ export default function Toolbar({
           shortcut="⌘K"
           active={searchMode}
           accent={searchMode}
-          disabled={!hasJson || diffMode}
+          disabled={!hasJson}
         />
         <ToolBtn
           onClick={onToggleNote}
@@ -214,7 +215,6 @@ export default function Toolbar({
           label="Notes"
           active={noteMode}
           accent={noteMode}
-          disabled={diffMode}
         />
       </div>
 

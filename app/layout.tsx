@@ -4,9 +4,9 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "JSON Viewer — Format, Validate & Beautify",
+  title: "JSON Prism — Format, Validate & Beautify",
   description:
-    "A modern, blazing-fast JSON viewer, formatter, and beautifier. Validate, minify, search, convert, and explore JSON with a collapsible tree view. Supports JSON→YAML, JSON→XML, JSON→CSV.",
+    "A modern, blazing-fast JSON formatter, validator, and beautifier. Validate, minify, diff, search, convert JSON to YAML/XML/CSV, and explore JSON with a collapsible tree view.",
   keywords: [
     "JSON",
     "formatter",
@@ -18,19 +18,20 @@ export const metadata: Metadata = {
     "JSON to XML",
     "JSON diff",
     "online JSON tool",
+    "JSON Prism",
   ],
   authors: [{ name: "bright-json" }],
   openGraph: {
-    title: "JSON Viewer — Format, Validate & Beautify",
+    title: "JSON Prism — Format, Validate & Beautify",
     description:
-      "A modern, blazing-fast JSON viewer, formatter, and beautifier. Validate, minify, and explore JSON with a collapsible tree view.",
+      "A modern, blazing-fast JSON formatter and beautifier. Diff, convert, and explore JSON with a collapsible tree view.",
     type: "website",
-    siteName: "bright-json",
+    siteName: "JSON Prism",
   },
   twitter: {
     card: "summary_large_image",
-    title: "JSON Viewer — Format, Validate & Beautify",
-    description: "A modern, blazing-fast JSON viewer and formatter.",
+    title: "JSON Prism — Format, Validate & Beautify",
+    description: "A modern, blazing-fast JSON formatter, diff viewer, and converter.",
   },
   manifest: "/manifest.json",
   icons: {

@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
-import { Code2, TreePine, Columns2, ArrowLeftRight, StickyNote } from "lucide-react";
+import { Code2, TreePine, Columns2, ArrowLeftRight, StickyNote, X } from "lucide-react";
 import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
 import Toolbar from "@/components/Toolbar";
@@ -14,7 +14,7 @@ import JsonNoteEditor from "@/components/JsonNoteEditor";
 
 const SAMPLE = JSON.stringify(
   {
-    name: "JSON Viewer",
+    name: "JSON Prism",
     version: "2.0.0",
     description: "A modern, blazing-fast JSON formatter and viewer",
     features: [
@@ -101,13 +101,9 @@ export default function JsonViewerClient() {
   }, []);
 
   const handleToggleConvert = useCallback(() => {
-    setConvertMode((c) => {
-      if (!c) {
-        setDiffMode(false);
-        setNoteMode(false);
-      }
-      return !c;
-    });
+    setDiffMode(false);
+    setNoteMode(false);
+    setConvertMode((c) => !c);
   }, []);
 
   const handleToggleSearch = useCallback(() => {
@@ -118,19 +114,20 @@ export default function JsonViewerClient() {
   }, [setQuery]);
 
   const handleToggleNote = useCallback(() => {
-    setNoteMode((n) => {
-      if (!n) {
-        setDiffMode(false);
-        setConvertMode(false);
-      }
-      return !n;
-    });
+    setDiffMode(false);
+    setConvertMode(false);
+    setNoteMode((n) => !n);
   }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
-      if (mod && e.shiftKey && e.key.toLowerCase() === "f") {
+      if (e.key === "Escape") {
+        if (diffMode) { e.preventDefault(); setDiffMode(false); }
+        else if (convertMode) { e.preventDefault(); setConvertMode(false); }
+        else if (noteMode) { e.preventDefault(); setNoteMode(false); }
+        else if (searchMode) { e.preventDefault(); setQuery(""); setSearchMode(false); }
+      } else if (mod && e.shiftKey && e.key.toLowerCase() === "f") {
         e.preventDefault();
         format();
       } else if (mod && e.key.toLowerCase() === "m") {
@@ -149,7 +146,7 @@ export default function JsonViewerClient() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [format, minify, handleToggleTheme, handleToggleDiff, handleToggleSearch]);
+  }, [diffMode, convertMode, noteMode, searchMode, setQuery, format, minify, handleToggleTheme, handleToggleDiff, handleToggleSearch]);
 
   const lineCount = json.split("\n").length;
 
@@ -187,9 +184,17 @@ export default function JsonViewerClient() {
           <div className="pane-header">
             <Columns2 className="w-3.5 h-3.5" />
             <span>Diff Viewer</span>
-            <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">
+            <span className="text-[10px] font-normal normal-case tracking-normal opacity-50 ml-3">
               Left = current editor · Right = paste to compare
             </span>
+            <button
+              onClick={handleToggleDiff}
+              className="ml-auto flex items-center gap-1 text-[10px] px-2 py-1 rounded-md bg-muted/60 hover:bg-destructive/15 hover:text-destructive text-muted-foreground transition-colors duration-150"
+              title="Exit diff mode (Esc)"
+            >
+              <X className="w-3 h-3" />
+              <span>Exit · Esc</span>
+            </button>
           </div>
           <JsonDiffViewer dark={dark} originalJson={json} />
         </main>
@@ -273,11 +278,23 @@ export default function JsonViewerClient() {
       <footer className="status-bar">
         <div className="flex items-center gap-3">
           {diffMode ? (
-            <span>Diff Mode</span>
+            <>
+              <span>Diff Mode</span>
+              <span className="text-border">·</span>
+              <span className="opacity-50">Esc to exit</span>
+            </>
           ) : convertMode ? (
-            <span>Convert Mode</span>
+            <>
+              <span>Convert Mode</span>
+              <span className="text-border">·</span>
+              <span className="opacity-50">Esc to exit</span>
+            </>
           ) : noteMode ? (
-            <span>Notes Mode</span>
+            <>
+              <span>Notes Mode</span>
+              <span className="text-border">·</span>
+              <span className="opacity-50">Esc to exit</span>
+            </>
           ) : (
             <>
               <span>{json.length.toLocaleString()} chars</span>

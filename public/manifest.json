@@ -1,7 +1,7 @@
 {
-  "name": "JSON Viewer — Format, Validate & Beautify",
-  "short_name": "JSON Viewer",
-  "description": "A modern, blazing-fast JSON viewer, formatter, and beautifier.",
+  "name": "JSON Prism — Format, Validate & Beautify",
+  "short_name": "JSON Prism",
+  "description": "A modern, blazing-fast JSON formatter, diff viewer, and converter.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0c0f1a",
