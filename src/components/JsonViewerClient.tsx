@@ -1,12 +1,16 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ChevronsDownUp, ChevronsUpDown, Copy, Check, Download, Upload,
+  Minimize2, ArrowUpDown, Sun, Moon, Sparkles, Share2, Save, Trash2,
+} from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
-import Toolbar from "@/components/Toolbar";
 import Sidebar from "@/components/Sidebar";
 import JsonEditor from "@/components/JsonEditor";
 import JsonTreeView from "@/components/JsonTreeView";
+import JsonVisualEditor from "@/components/JsonVisualEditor";
 import JsonDiffViewer from "@/components/JsonDiffViewer";
 import JsonConvertPanel from "@/components/JsonConvertPanel";
 import JsonSearchPanel from "@/components/JsonSearchPanel";
@@ -21,84 +25,217 @@ import JsonBestPractices from "@/components/JsonBestPractices";
 import JsonTokenEstimator from "@/components/JsonTokenEstimator";
 import JsonLearnPanel from "@/components/JsonLearnPanel";
 import JsonSharePanel from "@/components/JsonSharePanel";
+import JsonTabBar from "@/components/JsonTabBar";
+import SettingsPanel from "@/components/SettingsPanel";
+import OverlaySidebar from "@/components/OverlaySidebar";
+import { useSettings } from "@/contexts/SettingsContext";
 import { safeDecodeJson } from "@/lib/share";
+import { saveJson, loadSavedJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
+import {
+  loadTabs,
+  saveTabs,
+  createTab,
+  getNextTabName,
+  defaultTabs,
+  type TabData,
+  type TabsState,
+} from "@/lib/tabs-storage";
 
-export type PanelMode = "tree" | "diff" | "mock" | "debug" | "trim" | "clean"
+export type PanelMode = "tree" | "visual" | "diff" | "mock" | "debug" | "trim" | "clean"
   | "minimal" | "structure" | "practices" | "tokens" | "convert" | "notes" | "learn" | "share";
-
-const SAMPLE = JSON.stringify({
-  name: "JSON Prism",
-  version: "2.0.0",
-  description: "A modern, blazing-fast JSON formatter and viewer",
-  features: ["format","minify","validate","tree view","syntax highlighting","diff viewer","JSON to YAML/XML/CSV","search","notes","mock generator","debugger","token estimator"],
-  config: { theme: "dark", fontSize: 13, wordWrap: true, lineNumbers: true },
-  stats: { users: 12500, rating: 4.9, downloads: 98200 },
-  metadata: { author: "Developer", license: "MIT" },
-  isAwesome: true,
-  deprecated: false,
-  notes: null,
-}, null, 2);
 
 // Mode label for status bar
 const MODE_LABELS: Partial<Record<PanelMode, string>> = {
-  diff: "Diff Mode", mock: "Mock Generator", debug: "JSON Debugger",
+  visual: "Visual Editor", diff: "Diff Mode", mock: "Mock Generator", debug: "JSON Debugger",
   trim: "JSON Trimmer", clean: "AI Cleaner", minimal: "Minimal Mode",
   structure: "Structure Analyzer", practices: "Best Practices",
   tokens: "Token Estimator", convert: "Convert Mode", notes: "Notes Mode",
   learn: "Learn JSON", share: "Share & Export",
 };
 
+function getInitialTabs(): TabsState {
+  const tabs = defaultTabs();
+  return { tabs, activeId: tabs[0].id };
+}
+
 export default function JsonViewerClient() {
-  const { json, setJson, parsed, error, format, minify, sortKeys } = useJsonParser(SAMPLE);
+  const [tabsState, setTabsState] = useState<TabsState>(getInitialTabs);
+  const activeTab = tabsState.tabs.find((t) => t.id === tabsState.activeId) ?? tabsState.tabs[0];
+  const json = activeTab?.json ?? "";
+  const { setJson: setParserJson, parsed, error, format, minify, sortKeys } = useJsonParser(json);
   const { dark, toggle } = useTheme();
+  const { settings } = useSettings();
 
   const [mode, setMode] = useState<PanelMode>("tree");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [hasSaved, setHasSaved] = useState(false);
   const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const { query, setQuery, matchCount } = useJsonSearch(parsed);
 
-  // Load from URL hash on mount (supports lz-string and legacy btoa)
+  const setJson = useCallback(
+    (value: string) => {
+      setTabsState((prev) => ({
+        ...prev,
+        tabs: prev.tabs.map((t) => (t.id === prev.activeId ? { ...t, json: value } : t)),
+      }));
+      setParserJson(value);
+    },
+    [setParserJson]
+  );
+
+  // Sync parser when switching tabs (not on json edit — only when activeId changes)
+  useEffect(() => {
+    setParserJson(activeTab?.json ?? "");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabsState.activeId]);
+
+  // Load persisted tabs from localStorage on mount
+  useEffect(() => {
+    const loaded = loadTabs();
+    if (loaded) setTabsState(loaded);
+  }, []);
+
+  // Persist tabs to localStorage when they change
+  useEffect(() => {
+    saveTabs(tabsState);
+  }, [tabsState]);
+
+  // Load from URL hash on mount (overrides active tab)
   useEffect(() => {
     const m = window.location.hash.match(/^#json=(.+)/);
     if (m) {
       const decoded = safeDecodeJson(m[1]);
       if (decoded) setJson(decoded);
     }
-  }, [setJson]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const handleCopy = useCallback(() => { navigator.clipboard.writeText(json); }, [json]);
+  useEffect(() => {
+    setHasSaved(hasSavedJson());
+  }, []);
 
-  const handleDownload = useCallback(() => {
-    const blob = new Blob([json], { type: "application/json" });
+  const addTab = useCallback(() => {
+    const newTab = createTab(getNextTabName(tabsState.tabs));
+    setTabsState((prev) => ({
+      tabs: [...prev.tabs, newTab],
+      activeId: newTab.id,
+    }));
+  }, [tabsState.tabs]);
+
+  const closeTab = useCallback(
+    (id: string) => {
+      const idx = tabsState.tabs.findIndex((t) => t.id === id);
+      if (idx < 0) return;
+      const nextTabs = tabsState.tabs.filter((t) => t.id !== id);
+      if (nextTabs.length === 0) return;
+      let nextActive = tabsState.activeId;
+      if (tabsState.activeId === id) {
+        nextActive = nextTabs[Math.min(idx, nextTabs.length - 1)]?.id ?? nextTabs[0].id;
+      }
+      setTabsState({ tabs: nextTabs, activeId: nextActive });
+    },
+    [tabsState]
+  );
+
+  const switchTab = useCallback((id: string) => {
+    setTabsState((prev) => ({ ...prev, activeId: id }));
+  }, []);
+
+  const renameTab = useCallback((id: string, name: string) => {
+    const trimmed = name.trim() || "Untitled";
+    setTabsState((prev) => ({
+      ...prev,
+      tabs: prev.tabs.map((t) => (t.id === id ? { ...t, name: trimmed } : t)),
+    }));
+  }, []);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(json);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, [json]);
+
+  const handleDownload = useCallback((content?: string, filename = "data.json") => {
+    const toDownload = content ?? json;
+    if (!toDownload.trim()) return;
+    const blob = new Blob([toDownload], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "data.json"; a.click();
+    a.href = url;
+    a.download = filename;
+    a.click();
     URL.revokeObjectURL(url);
   }, [json]);
 
-  const handleUpload = useCallback((content: string) => {
-    setJson(content);
-    try { setJson(JSON.stringify(JSON.parse(content), null, 2)); } catch {}
-  }, [setJson]);
+  const handleUpload = useCallback(
+    (content: string, filename?: string) => {
+      let parsed = content;
+      try {
+        parsed = JSON.stringify(JSON.parse(content), null, 2);
+      } catch {}
+      const newTab = createTab(filename?.replace(/\.json$/i, "") || "Imported");
+      newTab.json = parsed;
+      setTabsState((prev) => ({
+        tabs: [...prev.tabs, newTab],
+        activeId: newTab.id,
+      }));
+      setParserJson(parsed);
+    },
+    [setParserJson]
+  );
+
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") handleUpload(reader.result, file.name);
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    },
+    [handleUpload]
+  );
 
   const handleShare = useCallback(() => {
-    setMode("share");
+    setShareOpen(true);
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (saveJson(json)) {
+      setSaved(true);
+      setHasSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+    }
+  }, [json]);
+
+  const handleClearSaved = useCallback(() => {
+    clearSavedJson();
+    setHasSaved(false);
   }, []);
 
   const handleMode = useCallback((m: PanelMode) => {
     setMode(m);
-    if (m !== "tree") setSearchOpen(false);
+    if (m !== "tree" && m !== "visual") setSearchOpen(false);
   }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
       if (e.key === "Escape") {
-        if (mode !== "tree") { setMode("tree"); setSearchOpen(false); }
+        if (shareOpen) { setShareOpen(false); return; }
+        if (settingsOpen) { setSettingsOpen(false); return; }
+        if (mode !== "tree" && mode !== "visual") { setMode("tree"); setSearchOpen(false); }
         else if (searchOpen) { setSearchOpen(false); setQuery(""); }
       } else if (mod && e.shiftKey && e.key.toLowerCase() === "f") {
-        e.preventDefault(); format();
+        e.preventDefault(); format({ indent: settings.format.beautifyIndent, sortKeys: settings.format.sortKeysOnBeautify });
       } else if (mod && e.key.toLowerCase() === "m") {
         e.preventDefault(); minify();
       } else if (mod && e.key.toLowerCase() === "l") {
@@ -109,11 +246,17 @@ export default function JsonViewerClient() {
         e.preventDefault();
         setMode("tree");
         setSearchOpen(s => !s);
+      } else if (mod && e.key.toLowerCase() === "t") {
+        e.preventDefault();
+        addTab();
+      } else if (mod && e.key.toLowerCase() === "w") {
+        e.preventDefault();
+        if (tabsState.tabs.length > 1) closeTab(tabsState.activeId);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [mode, searchOpen, format, minify, toggle, setQuery]);
+  }, [mode, searchOpen, shareOpen, settingsOpen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
 
   const lineCount = json.split("\n").length;
   const modeLabel = MODE_LABELS[mode];
@@ -123,26 +266,23 @@ export default function JsonViewerClient() {
     setMode("tree");
   }, [setJson]);
 
-  return (
-    <div className="flex flex-col h-screen bg-background">
-      <Toolbar
-        onFormat={format}
-        onMinify={minify}
-        onSortKeys={sortKeys}
-        onCopy={handleCopy}
-        onDownload={handleDownload}
-        onUpload={handleUpload}
-        onToggleTheme={toggle}
-        onExpandAll={() => setExpandAll(true)}
-        onCollapseAll={() => setExpandAll(false)}
-        onShare={handleShare}
-        dark={dark}
-        hasJson={!!json.trim()}
-        showTreeControls={mode === "tree"}
-      />
+  const hasJson = !!json.trim();
 
-      <div className="flex flex-1 min-h-0">
-        <Sidebar mode={mode} searchOpen={searchOpen} onMode={handleMode} onSearch={setSearchOpen} />
+  return (
+    <div className="flex flex-col h-screen bg-bg">
+      <div className="flex flex-1 min-h-0 bg-grad-hero bg-bg">
+        <Sidebar
+          mode={mode}
+          searchOpen={searchOpen}
+          shareOpen={shareOpen}
+          settingsOpen={settingsOpen}
+          onMode={handleMode}
+          onSearch={setSearchOpen}
+          onShareClick={() => setShareOpen(true)}
+          onSettingsClick={() => setSettingsOpen(true)}
+          dark={dark}
+          onToggleTheme={toggle}
+        />
 
         {/* Diff: full width */}
         {mode === "diff" && (
@@ -152,7 +292,7 @@ export default function JsonViewerClient() {
               <span className="text-[10px] font-normal normal-case tracking-normal opacity-50 ml-3">Left = current editor · Right = paste to compare</span>
               <button onClick={() => setMode("tree")} className="ml-auto flex items-center gap-1 text-[10px] px-2 py-1 rounded-md bg-muted/60 hover:bg-destructive/15 hover:text-destructive text-muted-foreground transition-colors duration-150" title="Exit (Esc)">&times; Exit · Esc</button>
             </div>
-            <JsonDiffViewer dark={dark} originalJson={json} />
+            <JsonDiffViewer dark={dark} originalJson={json} editorSettings={settings.editor} />
           </main>
         )}
 
@@ -166,26 +306,105 @@ export default function JsonViewerClient() {
         {/* All other modes: editor left + panel right */}
         {mode !== "diff" && mode !== "clean" && (
           <main className="flex flex-1 min-h-0">
-            <section className="flex flex-col flex-1 min-w-0 border-r border-border">
-              <div className="pane-header">
+            <section className="flex flex-col flex-1 min-w-0 border-r border-border bg-surface1">
+              {/* Tab bar */}
+              <JsonTabBar
+                tabs={tabsState.tabs}
+                activeId={tabsState.activeId}
+                onSwitch={switchTab}
+                onClose={closeTab}
+                onRename={renameTab}
+                onAdd={addTab}
+              />
+              <div className="pane-header flex items-center gap-2 flex-wrap">
                 <span>Editor</span>
-                <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
+                <div className="flex items-center gap-0.5 bg-secondary/50 rounded-lg p-0.5 ml-1">
+                  <button onClick={() => format({ indent: settings.format.beautifyIndent, sortKeys: settings.format.sortKeysOnBeautify })} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Beautify (⌘⇧F)">
+                    <Sparkles className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Beautify</span>
+                  </button>
+                  <button onClick={minify} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Minify (⌘M)">
+                    <Minimize2 className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Minify</span>
+                  </button>
+                  <button onClick={sortKeys} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Sort keys">
+                    <ArrowUpDown className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Sort</span>
+                  </button>
+                </div>
+                <button onClick={handleCopy} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Copy JSON">
+                  {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span className="hidden sm:inline text-xs">{copied ? "Copied!" : "Copy"}</span>
+                </button>
+                <button onClick={() => handleDownload()} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Export .json">
+                  <Download className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Export</span>
+                </button>
+                <button onClick={() => fileRef.current?.click()} className="toolbar-btn text-muted-foreground" title="Import file">
+                  <Upload className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Import</span>
+                </button>
+                <input ref={fileRef} type="file" accept=".json,.txt" onChange={handleFileChange} className="hidden" />
+                <button onClick={handleShare} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Share & Export">
+                  <Share2 className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Share</span>
+                </button>
+                <button onClick={handleSave} disabled={!hasJson || !!error} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Save to browser (persists across refresh)">
+                  {saved ? <Check className="w-3.5 h-3.5 text-primary" /> : <Save className="w-3.5 h-3.5" />}
+                  <span className="hidden sm:inline text-xs">{saved ? "Saved!" : "Save"}</span>
+                </button>
+                {hasSaved && (
+                  <button onClick={handleClearSaved} className="toolbar-btn text-muted-foreground hover:text-destructive" title="Delete saved data">
+                    <Trash2 className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Clear saved</span>
+                  </button>
+                )}
+                <button onClick={toggle} className="toolbar-btn text-muted-foreground ml-auto" title="Toggle theme (⌘L)">
+                  {dark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                </button>
+                <span className="text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
               </div>
               <div className="flex-1 min-h-0">
-                <JsonEditor value={json} onChange={setJson} error={error} dark={dark} />
+                <JsonEditor value={json} onChange={setJson} error={error} dark={dark} editorSettings={settings.editor} />
               </div>
             </section>
 
-            <section className="flex flex-col flex-1 min-w-0 bg-[hsl(var(--surface))]">
+            <section className="flex flex-col flex-1 min-w-0 bg-surface2">
               {/* Show search overlay on tree mode */}
-              {mode === "tree" && searchOpen && (
+              {(mode === "tree" || mode === "visual") && searchOpen && (
                 <JsonSearchPanel query={query} matchCount={matchCount} onQueryChange={setQuery} onClose={() => { setSearchOpen(false); setQuery(""); }} />
               )}
 
-              {mode === "tree" && (
+              {(mode === "tree" || mode === "visual") && (
                 <>
                   <div className="pane-header">
-                    <span>Tree View</span>
+                    <span>{mode === "visual" ? "Visual Editor" : "Tree View"}</span>
+                    <div className="flex items-center gap-1.5 ml-2">
+                      <button
+                        onClick={handleCopy}
+                        disabled={!json.trim()}
+                        className="toolbar-btn text-muted-foreground disabled:opacity-30"
+                        title="Copy JSON"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span className="hidden sm:inline text-xs">{copied ? "Copied!" : "Copy"}</span>
+                      </button>
+                      {mode === "tree" && (
+                        <>
+                          <button
+                            onClick={() => setExpandAll(true)}
+                            disabled={!parsed}
+                            className="toolbar-btn text-muted-foreground disabled:opacity-30"
+                            title="Expand all"
+                          >
+                            <ChevronsUpDown className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline text-xs">Expand</span>
+                          </button>
+                          <button
+                            onClick={() => setExpandAll(false)}
+                            disabled={!parsed}
+                            className="toolbar-btn text-muted-foreground disabled:opacity-30"
+                            title="Collapse all"
+                          >
+                            <ChevronsDownUp className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline text-xs">Collapse</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
                     {parsed !== null && (
                       <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">
                         {Array.isArray(parsed) ? `${(parsed as unknown[]).length} items` : `${Object.keys(parsed as object).length} keys`}
@@ -193,7 +412,15 @@ export default function JsonViewerClient() {
                     )}
                   </div>
                   <div className="flex-1 min-h-0 overflow-hidden">
-                    <JsonTreeView data={parsed} expandAll={expandAll} searchTerm={searchOpen ? query : undefined} />
+                    {mode === "visual" ? (
+                      <JsonVisualEditor
+                        parsed={parsed}
+                        onChange={setJson}
+                        dark={dark}
+                      />
+                    ) : (
+                      <JsonTreeView data={parsed} expandAll={expandAll} searchTerm={searchOpen ? query : undefined} treeSettings={settings.treeView} />
+                    )}
                   </div>
                 </>
               )}
@@ -206,16 +433,56 @@ export default function JsonViewerClient() {
               {mode === "tokens" && <JsonTokenEstimator json={json} parsed={parsed} />}
               {mode === "convert" && <JsonConvertPanel parsed={parsed} dark={dark} />}
               {mode === "notes" && <JsonNoteEditor />}
-              {mode === "learn" && <JsonLearnPanel />}
-              {mode === "share" && <JsonSharePanel json={json} onDownloadJson={handleDownload} />}
+              {mode === "learn" && (
+                <JsonLearnPanel
+                  onTryInEditor={(json) => {
+                    setJson(json);
+                    setMode("tree");
+                  }}
+                />
+              )}
             </section>
           </main>
         )}
       </div>
 
+      <OverlaySidebar
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        aria-label="Share & Export"
+      >
+        <JsonSharePanel
+          json={json}
+          onDownloadJson={(content, filename) => handleDownload(content ?? json, filename ?? "data.json")}
+          onClose={() => setShareOpen(false)}
+          tabs={tabsState.tabs}
+          activeTabId={tabsState.activeId}
+        />
+      </OverlaySidebar>
+
+      <OverlaySidebar
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        aria-label="Settings"
+      >
+        <SettingsPanel onClose={() => setSettingsOpen(false)} />
+      </OverlaySidebar>
+
       <footer className="status-bar">
         <div className="flex items-center gap-3">
-          {modeLabel ? (
+          {shareOpen ? (
+            <>
+              <span>Share & Export</span>
+              <span className="text-border">·</span>
+              <span className="opacity-50">Esc to close</span>
+            </>
+          ) : settingsOpen ? (
+            <>
+              <span>Settings</span>
+              <span className="text-border">·</span>
+              <span className="opacity-50">Esc to close</span>
+            </>
+          ) : modeLabel ? (
             <>
               <span>{modeLabel}</span>
               <span className="text-border">·</span>

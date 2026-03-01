@@ -1,0 +1,242 @@
+/* globals.css */
+
+/* Recommended fonts */
+@import url("https://rsms.me/inter/inter.css");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+:root {
+  /* ---------- Core surfaces ---------- */
+  --bg: 220 22% 98%;
+  --surface-1: 0 0% 100%;
+  --surface-2: 220 22% 95%;
+  --border: 215 22% 88%;
+
+  /* ---------- Text ---------- */
+  --text-1: 215 28% 14%;
+  --text-2: 215 20% 26%;
+  --text-3: 215 16% 40%;
+  --link: 210 34% 39%;
+
+  /* ---------- Brand accents ---------- */
+  --primary: 210 34% 39%; /* steel blue */
+  --primary-hover: 210 36% 31%;
+  --focus: 210 58% 68%;
+  --accent-2: 300 20% 38%; /* maroon purple */
+  --accent-warm: 22 36% 48%; /* copper */
+
+  /* ---------- Gradients ---------- */
+  /* Keep these subtle: they drive grad-* utilities in Tailwind */
+  --grad-a: 210 44% 52%; /* blue-ish */
+  --grad-b: 22 42% 56%; /* copper-ish */
+  --chip-a: 210 44% 52%;
+  --chip-b: 300 24% 52%;
+
+  /* ---------- Status ---------- */
+  --success: 158 35% 31%;
+  --warning: 40 52% 36%;
+  --error: 345 35% 39%;
+  --info: 210 44% 45%;
+
+  /* Tinted backgrounds (soft) */
+  --success-bg: 154 40% 95%;
+  --warning-bg: 44 55% 94%;
+  --error-bg: 350 45% 95%;
+  --info-bg: 210 55% 95%;
+
+  /* ---------- Code editor ---------- */
+  --code-bg: 220 28% 96%;
+  --code-border: 215 24% 86%;
+
+  /* Syntax tokens */
+  --syntax-key: 210 36% 31%;
+  --syntax-string: 22 36% 32%;
+  --syntax-number: 300 22% 30%;
+  --syntax-bool: 330 18% 32%;
+  --syntax-comment: 215 14% 46%;
+  --syntax-punct: 215 14% 34%;
+
+  /* ---------- Diff ---------- */
+  --diff-add-bg: 150 38% 94%;
+  --diff-add: 158 35% 31%;
+  --diff-del-bg: 350 45% 94%;
+  --diff-del: 345 35% 39%;
+  --diff-mod-bg: 270 40% 95%;
+  --diff-mod: 300 20% 38%;
+
+  /* ---------- Shadcn-style + app-specific mappings ---------- */
+  /* Generic app tokens used by existing components */
+  --background: var(--bg);
+  --foreground: var(--text-1);
+  --card: var(--surface-1);
+  --card-foreground: var(--text-1);
+  --popover: var(--surface-1);
+  --popover-foreground: var(--text-1);
+  --primary-foreground: 0 0% 100%;
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text-1);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-3);
+  --accent: var(--primary);
+  --accent-foreground: 0 0% 100%;
+  --destructive: var(--error);
+  --destructive-foreground: 0 0% 100%;
+  --input: var(--border);
+  --ring: var(--focus);
+  --radius: 0.9rem;
+
+  /* Existing app tokens for toolbar / panes / sidebar */
+  --toolbar: var(--surface-1);
+  --toolbar-foreground: var(--text-2);
+  --surface: var(--surface-2);
+  --surface-foreground: var(--text-1);
+  --pane-header: var(--surface-2);
+  --pane-header-foreground: var(--text-3);
+
+  /* JSON syntax colors (tie to syntax tokens) */
+  --json-string: 22 36% 32%;
+  --json-number: 300 22% 30%;
+  --json-boolean: 330 18% 32%;
+  --json-null: 215 16% 40%;
+  --json-key: 210 36% 31%;
+  --json-bracket: 215 14% 34%;
+
+  /* Sidebar mapping */
+  --sidebar-background: var(--surface-1);
+  --sidebar-foreground: 215 28% 14%;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: var(--surface-2);
+  --sidebar-accent-foreground: var(--text-1);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--focus);
+}
+
+.dark {
+  --bg: 220 26% 8%;
+  --surface-1: 220 26% 11%;
+  --surface-2: 220 26% 14%;
+  --border: 215 26% 22%;
+
+  --text-1: 210 45% 94%;
+  --text-2: 210 26% 83%;
+  --text-3: 210 18% 69%;
+  --link: 210 52% 72%;
+
+  --primary: 210 44% 57%;
+  --primary-hover: 210 48% 64%;
+  --focus: 210 58% 74%;
+  --accent-2: 300 22% 60%;
+  --accent-warm: 22 46% 64%;
+
+  /* Gradients in dark should glow, not blast */
+  --grad-a: 210 55% 66%;
+  --grad-b: 22 55% 66%;
+  --chip-a: 210 55% 66%;
+  --chip-b: 300 30% 66%;
+
+  --success: 158 45% 45%;
+  --warning: 42 60% 52%;
+  --error: 345 55% 62%;
+  --info: 210 50% 60%;
+
+  --success-bg: 158 45% 12%;
+  --warning-bg: 42 55% 14%;
+  --error-bg: 345 45% 14%;
+  --info-bg: 210 45% 14%;
+
+  --code-bg: 220 30% 6%;
+  --code-border: 215 26% 18%;
+
+  --syntax-key: 210 70% 78%;
+  --syntax-string: 22 55% 70%;
+  --syntax-number: 300 40% 76%;
+  --syntax-bool: 330 35% 72%;
+  --syntax-comment: 210 18% 58%;
+  --syntax-punct: 210 20% 74%;
+
+  --diff-add-bg: 156 45% 10%;
+  --diff-add: 158 45% 45%;
+  --diff-del-bg: 345 45% 10%;
+  --diff-del: 345 55% 62%;
+  --diff-mod-bg: 270 40% 12%;
+  --diff-mod: 300 22% 60%;
+
+  /* Shadcn-style + app-specific mappings */
+  --background: var(--bg);
+  --foreground: var(--text-1);
+  --card: var(--surface-1);
+  --card-foreground: var(--text-1);
+  --popover: var(--surface-1);
+  --popover-foreground: var(--text-1);
+  --primary-foreground: 220 26% 8%;
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--text-1);
+  --muted: var(--surface-2);
+  --muted-foreground: var(--text-3);
+  --accent: var(--primary);
+  --accent-foreground: 220 26% 8%;
+  --destructive: var(--error);
+  --destructive-foreground: 0 0% 100%;
+  --input: var(--border);
+  --ring: var(--focus);
+  --radius: 0.9rem;
+
+  --toolbar: var(--surface-1);
+  --toolbar-foreground: var(--text-2);
+  --surface: var(--surface-2);
+  --surface-foreground: var(--text-1);
+  --pane-header: var(--surface-2);
+  --pane-header-foreground: var(--text-3);
+
+  --json-string: 22 55% 70%;
+  --json-number: 300 40% 76%;
+  --json-boolean: 330 35% 72%;
+  --json-null: 210 18% 58%;
+  --json-key: 210 70% 78%;
+  --json-bracket: 210 20% 74%;
+
+  --sidebar-background: var(--surface-1);
+  --sidebar-foreground: 210 45% 94%;
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: var(--surface-2);
+  --sidebar-accent-foreground: var(--text-1);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--focus);
+}
+
+/* ---------- Base typography & layout defaults ---------- */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: hsl(var(--bg));
+  color: hsl(var(--text-1));
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Links */
+a {
+  color: hsl(var(--link));
+  text-underline-offset: 3px;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Focus */
+:focus-visible {
+  outline: 3px solid hsl(var(--focus) / 0.55);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+
+/* Code blocks baseline */
+code,
+pre {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+

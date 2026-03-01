@@ -1,6 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
+import type { EditorSettings } from "@/lib/settings";
 
 const MonacoDiffEditor = dynamic(
   () => import("@monaco-editor/react").then((mod) => ({ default: mod.DiffEditor })),
@@ -17,25 +18,37 @@ const MonacoDiffEditor = dynamic(
 interface JsonDiffViewerProps {
   dark: boolean;
   originalJson: string;
+  editorSettings?: EditorSettings;
 }
 
-export default function JsonDiffViewer({ dark, originalJson }: JsonDiffViewerProps) {
+export default function JsonDiffViewer({ dark, originalJson, editorSettings }: JsonDiffViewerProps) {
   const [modifiedJson, setModifiedJson] = useState("");
 
   const options = useMemo(
-    () => ({
-      fontSize: 13,
-      fontFamily: "'JetBrains Mono', monospace",
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false,
-      wordWrap: "on" as const,
-      automaticLayout: true,
-      padding: { top: 12 },
-      renderSideBySide: true,
-      readOnly: false,
-      originalEditable: true,
-    }),
-    []
+    () => {
+      const e = editorSettings ?? {
+        fontSize: 13,
+        fontFamily: "'JetBrains Mono', monospace",
+        minimap: false,
+        lineNumbers: "on" as const,
+        wordWrap: "on" as const,
+        paddingTop: 12,
+      };
+      return {
+        fontSize: e.fontSize,
+        fontFamily: e.fontFamily,
+        minimap: { enabled: e.minimap },
+        lineNumbers: e.lineNumbers,
+        scrollBeyondLastLine: false,
+        wordWrap: e.wordWrap,
+        automaticLayout: true,
+        padding: { top: e.paddingTop },
+        renderSideBySide: true,
+        readOnly: false,
+        originalEditable: true,
+      };
+    },
+    [editorSettings]
   );
 
   return (

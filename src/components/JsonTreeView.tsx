@@ -3,10 +3,22 @@ import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ChevronDown, Braces, Brackets } from "lucide-react";
 
+import type { TreeViewSettings } from "@/lib/settings";
+
+// Defaults used when treeSettings not provided (e.g. BundleViewer)
+const DEFAULT_TREE_SETTINGS: TreeViewSettings = {
+  indentPx: 18,
+  fontSize: 13,
+  defaultExpandDepth: 3,
+  showChildCount: true,
+  stringTruncateLength: 120,
+};
+
 interface JsonTreeViewProps {
   data: unknown;
   expandAll?: boolean;
   searchTerm?: string;
+  treeSettings?: TreeViewSettings;
 }
 
 interface FlatRow {
@@ -117,18 +129,26 @@ function TreeRow({
   row,
   onToggle,
   searchTerm,
+  indentPx,
+  fontSize,
+  showChildCount,
+  stringTruncateLength,
 }: {
   row: FlatRow;
   onToggle: (id: string) => void;
   searchTerm?: string;
+  indentPx: number;
+  fontSize: number;
+  showChildCount: boolean;
+  stringTruncateLength: number;
 }) {
-  const indent = row.depth * 18;
+  const indent = row.depth * indentPx;
 
   if (row.isClosingBracket) {
     return (
       <div
-        className="flex items-center py-[2px] px-2 font-mono text-[13px]"
-        style={{ paddingLeft: indent + 8 }}
+        className="flex items-center py-[2px] px-2 font-mono"
+        style={{ paddingLeft: indent + 8, fontSize }}
       >
         <span className="text-json-bracket font-medium">{String(row.value)}</span>
       </div>
@@ -146,7 +166,7 @@ function TreeRow({
       valueEl = <span className="text-json-number font-medium">{val}</span>;
     } else {
       const str = String(val);
-      const display = str.length > 120 ? str.slice(0, 120) + "…" : str;
+      const display = str.length > stringTruncateLength ? str.slice(0, stringTruncateLength) + "…" : str;
       valueEl = (
         <span className="text-json-string" title={str}>
           "{searchTerm ? highlightText(display, searchTerm) : display}"
@@ -156,8 +176,8 @@ function TreeRow({
 
     return (
       <div
-        className="flex items-center gap-1 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-colors font-mono text-[13px]"
-        style={{ marginLeft: indent }}
+        className="flex items-center gap-1 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-colors font-mono"
+        style={{ marginLeft: indent, fontSize }}
       >
         {row.keyName !== undefined && (
           <span className="text-json-key shrink-0">
@@ -179,7 +199,8 @@ function TreeRow({
     <div style={{ marginLeft: indent }}>
       <button
         onClick={() => onToggle(row.id)}
-        className="flex items-center gap-1.5 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-all duration-100 w-full text-left font-mono text-[13px]"
+        className="flex items-center gap-1.5 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-all duration-100 w-full text-left font-mono"
+        style={{ fontSize }}
       >
         <span
           className="text-muted-foreground/70 transition-transform duration-150 shrink-0"
@@ -196,10 +217,12 @@ function TreeRow({
         <span className="text-json-bracket font-medium">{bracket[0]}</span>
         {!row.isExpanded && (
           <>
-            <span className="inline-flex items-center gap-1 text-muted-foreground text-[11px] bg-secondary/60 px-1.5 py-0.5 rounded-md">
-              <TypeIcon className="w-3 h-3" />
-              {row.childCount}
-            </span>
+            {showChildCount && (
+              <span className="inline-flex items-center gap-1 text-muted-foreground text-[11px] bg-secondary/60 px-1.5 py-0.5 rounded-md">
+                <TypeIcon className="w-3 h-3" />
+                {row.childCount}
+              </span>
+            )}
             <span className="text-json-bracket font-medium">{bracket[1]}</span>
           </>
         )}
@@ -208,14 +231,15 @@ function TreeRow({
   );
 }
 
-export default function JsonTreeView({ data, expandAll, searchTerm }: JsonTreeViewProps) {
+export default function JsonTreeView({ data, expandAll, searchTerm, treeSettings }: JsonTreeViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const ts = treeSettings ?? DEFAULT_TREE_SETTINGS;
 
-  // Initialize expanded set with depth < 3 by default
+  // Initialize expanded set with defaultExpandDepth
   const [expanded, setExpanded] = useState<Set<string>>(() => {
     const set = new Set<string>();
     if (data !== null && data !== undefined) {
-      collectDefaultExpanded(data, "root", 0, 3, set);
+      collectDefaultExpanded(data, "root", 0, ts.defaultExpandDepth, set);
     }
     return set;
   });
@@ -239,11 +263,11 @@ export default function JsonTreeView({ data, expandAll, searchTerm }: JsonTreeVi
       prevDataRef.current = data;
       const set = new Set<string>();
       if (data !== null && data !== undefined) {
-        collectDefaultExpanded(data, "root", 0, 3, set);
+        collectDefaultExpanded(data, "root", 0, ts.defaultExpandDepth, set);
       }
       setExpanded(set);
     }
-  }, [data]);
+  }, [data, ts.defaultExpandDepth]);
 
   const rows = useMemo(() => {
     if (data === null || data === undefined) return [];
@@ -307,7 +331,15 @@ export default function JsonTreeView({ data, expandAll, searchTerm }: JsonTreeVi
                 paddingRight: "1rem",
               }}
             >
-              <TreeRow row={row} onToggle={handleToggle} searchTerm={searchTerm} />
+              <TreeRow
+              row={row}
+              onToggle={handleToggle}
+              searchTerm={searchTerm}
+              indentPx={ts.indentPx}
+              fontSize={ts.fontSize}
+              showChildCount={ts.showChildCount}
+              stringTruncateLength={ts.stringTruncateLength}
+            />
             </div>
           );
         })}

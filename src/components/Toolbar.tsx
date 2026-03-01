@@ -1,35 +1,28 @@
 "use client";
 import {
-  Braces, Copy, Download, Upload, Minimize2, ArrowUpDown, Sun, Moon,
-  ChevronsDownUp, ChevronsUpDown, Check, Sparkles, Share2,
+  Braces, Download, Upload, Minimize2, ArrowUpDown, Sun, Moon,
+  Sparkles, Share2,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 interface ToolbarProps {
   onFormat: () => void;
   onMinify: () => void;
   onSortKeys: () => void;
-  onCopy: () => void;
   onDownload: () => void;
   onUpload: (content: string) => void;
   onToggleTheme: () => void;
-  onExpandAll: () => void;
-  onCollapseAll: () => void;
   onShare: () => void;
   dark: boolean;
   hasJson: boolean;
-  showTreeControls: boolean;
 }
 
 export default function Toolbar({
-  onFormat, onMinify, onSortKeys, onCopy, onDownload, onUpload,
-  onToggleTheme, onExpandAll, onCollapseAll, onShare,
-  dark, hasJson, showTreeControls,
+  onFormat, onMinify, onSortKeys, onDownload, onUpload,
+  onToggleTheme, onShare,
+  dark, hasJson,
 }: ToolbarProps) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => { onCopy(); setCopied(true); setTimeout(() => setCopied(false), 1500); };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -41,7 +34,7 @@ export default function Toolbar({
   };
 
   return (
-    <header className="flex items-center gap-0.5 px-4 py-2.5 bg-toolbar border-b border-border sticky top-0 z-10 flex-wrap">
+    <header className="flex items-center gap-0.5 px-4 py-2.5 bg-surface1 border-b border-border shadow-soft sticky top-0 z-10 flex-wrap">
       {/* Logo */}
       <div className="flex items-center gap-2 mr-4">
         <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -66,21 +59,10 @@ export default function Toolbar({
 
       {/* Actions */}
       <div className="flex items-center gap-0.5">
-        <ToolBtn onClick={handleCopy} icon={copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />} label={copied ? "Copied!" : "Copy"} disabled={!hasJson} accent={copied} />
         <ToolBtn onClick={onDownload} icon={<Download className="w-3.5 h-3.5" />} label="Export" disabled={!hasJson} />
         <ToolBtn onClick={() => fileRef.current?.click()} icon={<Upload className="w-3.5 h-3.5" />} label="Import" />
         <input ref={fileRef} type="file" accept=".json,.txt" onChange={handleFileChange} className="hidden" />
       </div>
-
-      {showTreeControls && (
-        <>
-          <Divider />
-          <div className="flex items-center gap-0.5">
-            <ToolBtn onClick={onExpandAll} icon={<ChevronsUpDown className="w-3.5 h-3.5" />} label="Expand" disabled={!hasJson} />
-            <ToolBtn onClick={onCollapseAll} icon={<ChevronsDownUp className="w-3.5 h-3.5" />} label="Collapse" disabled={!hasJson} />
-          </div>
-        </>
-      )}
 
       <div className="flex-1" />
 

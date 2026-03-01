@@ -1,17 +1,24 @@
 "use client";
-import { TreePine, Columns2, Wand2, Bug, Scissors, Eraser, PackageMinus, BarChart3, Lightbulb, Hash, ArrowLeftRight, StickyNote, Search, BookOpen, Share2 } from "lucide-react";
+import { Braces, TreePine, Columns2, Wand2, Bug, Scissors, Eraser, PackageMinus, BarChart3, Lightbulb, Hash, ArrowLeftRight, StickyNote, Search, BookOpen, Share2, Sun, Moon, Settings, FormInput } from "lucide-react";
 import type { PanelMode } from "./JsonViewerClient";
 
 interface SidebarProps {
   mode: PanelMode;
   searchOpen: boolean;
+  shareOpen?: boolean;
+  settingsOpen?: boolean;
+  dark?: boolean;
   onMode: (mode: PanelMode) => void;
   onSearch: (open: boolean) => void;
+  onShareClick?: () => void;
+  onSettingsClick?: () => void;
+  onToggleTheme?: () => void;
 }
 
 const sections = [
   { label: "VIEW", items: [
     { mode: "tree" as PanelMode, icon: TreePine, label: "Tree View", shortcut: "Default" },
+    { mode: "visual" as PanelMode, icon: FormInput, label: "Visual Editor", shortcut: "No-code" },
     { mode: "diff" as PanelMode, icon: Columns2, label: "Diff Viewer", shortcut: "⌘D" },
   ]},
   { label: "TOOLS", items: [
@@ -36,22 +43,33 @@ const sections = [
   ]},
 ];
 
-export default function Sidebar({ mode, searchOpen, onMode, onSearch }: SidebarProps) {
+export default function Sidebar({ mode, searchOpen, shareOpen, settingsOpen, dark, onMode, onSearch, onShareClick, onSettingsClick, onToggleTheme }: SidebarProps) {
   return (
-    <aside className="flex flex-col w-44 shrink-0 border-r border-border bg-[hsl(var(--toolbar))] overflow-y-auto overflow-x-hidden">
+    <aside className="flex flex-col w-44 shrink-0 border-r border-border bg-surface1 overflow-y-auto overflow-x-hidden">
+      <div className="flex items-center gap-2 px-3 py-3 border-b border-border/60 shrink-0">
+        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <Braces className="w-4 h-4 text-primary" />
+        </div>
+        <div className="min-w-0">
+          <div className="font-semibold text-xs tracking-tight text-foreground truncate">JSON Prism</div>
+          <div className="text-[9px] text-muted-foreground truncate">Format · Diff · Transform</div>
+        </div>
+      </div>
       {sections.map((section, si) => (
         <div key={si} className={`flex flex-col ${si > 0 ? "border-t border-border/60" : ""}`}>
-          <span className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/50 select-none">
+          <span className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-text3/60 select-none">
             {section.label}
           </span>
           {section.items.map((item) => {
             const Icon = item.icon;
-            const isActive = mode === item.mode;
+            const isShare = item.mode === "share";
+            const isActive = isShare ? !!shareOpen : mode === item.mode;
             const title = "shortcut" in item && item.shortcut ? `${item.label} (${item.shortcut})` : item.label;
+            const handleClick = isShare && onShareClick ? onShareClick : () => onMode(item.mode);
             return (
               <button
                 key={item.mode}
-                onClick={() => onMode(item.mode)}
+                onClick={handleClick}
                 title={title}
                 className={`sidebar-btn ${isActive ? "sidebar-btn-active" : ""}`}
               >
@@ -66,7 +84,7 @@ export default function Sidebar({ mode, searchOpen, onMode, onSearch }: SidebarP
         </div>
       ))}
       <div className="flex flex-col border-t border-border/60">
-        <span className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-muted-foreground/50 select-none">
+        <span className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-text3/60 select-none">
           UTILITY
         </span>
         <button
@@ -78,7 +96,28 @@ export default function Sidebar({ mode, searchOpen, onMode, onSearch }: SidebarP
           <span className="text-xs">Search</span>
           <span className="ml-auto text-[9px] opacity-40 font-mono shrink-0">⌘K</span>
         </button>
+        {onSettingsClick && (
+          <button
+            onClick={onSettingsClick}
+            title="Settings"
+            className={`sidebar-btn ${settingsOpen ? "sidebar-btn-active" : ""}`}
+          >
+            <Settings className="w-[15px] h-[15px] shrink-0" />
+            <span className="text-xs">Settings</span>
+          </button>
+        )}
       </div>
+      {onToggleTheme && (
+        <div className="mt-auto border-t border-border/60 p-2">
+          <button
+            onClick={onToggleTheme}
+            className="flex items-center justify-center w-full py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+            title="Toggle theme (⌘L)"
+          >
+            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

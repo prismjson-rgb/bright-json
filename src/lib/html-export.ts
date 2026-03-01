@@ -156,6 +156,7 @@ export function generateHtml(json: string): string {
 
   <div class="toolbar">
     <input id="q" type="text" placeholder="&#128269; Search keys and values&hellip;" autocomplete="off" />
+    <button class="btn" id="copy-btn">Copy JSON</button>
     <button class="btn" id="exp-btn">&#9660; Expand All</button>
     <button class="btn" id="col-btn">&#9654; Collapse All</button>
     <span id="mc"></span>
@@ -239,6 +240,23 @@ export function generateHtml(json: string): string {
       sm.style.display = collapsed ? 'none' : 'inline';
       tg.innerHTML     = collapsed ? '&#9660;' : '&#9654;';
     });
+
+    // Copy JSON
+    var copyBtn = document.getElementById('copy-btn');
+    copyBtn.onclick = function () {
+      navigator.clipboard.writeText(RAW).then(function () {
+        var orig = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        copyBtn.disabled = true;
+        setTimeout(function () {
+          copyBtn.textContent = orig;
+          copyBtn.disabled = false;
+        }, 1500);
+      }).catch(function () {
+        copyBtn.textContent = 'Copy failed';
+        setTimeout(function () { copyBtn.textContent = 'Copy JSON'; }, 1500);
+      });
+    };
 
     // Expand all
     document.getElementById('exp-btn').onclick = function () {

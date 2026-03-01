@@ -11,14 +11,17 @@ const Editor = dynamic(() => import("@monaco-editor/react"), {
   ),
 });
 
+import type { EditorSettings } from "@/lib/settings";
+
 interface JsonEditorProps {
   value: string;
   onChange: (value: string) => void;
   error: string | null;
   dark: boolean;
+  editorSettings?: EditorSettings;
 }
 
-export default function JsonEditor({ value, onChange, error, dark }: JsonEditorProps) {
+export default function JsonEditor({ value, onChange, error, dark, editorSettings }: JsonEditorProps) {
   const editorRef = useRef<any>(null);
 
   const handleMount = useCallback((editor: any) => {
@@ -58,6 +61,18 @@ export default function JsonEditor({ value, onChange, error, dark }: JsonEditorP
     }
   }, [error, value]);
 
+  const opts = editorSettings ?? {
+    fontSize: 13,
+    fontFamily: "'JetBrains Mono', monospace",
+    minimap: false,
+    lineNumbers: "on" as const,
+    wordWrap: "on" as const,
+    tabSize: 2,
+    paddingTop: 12,
+    renderLineHighlight: "line" as const,
+    bracketPairColorization: true,
+  };
+
   return (
     <div className="h-full w-full relative">
       <Editor
@@ -68,21 +83,21 @@ export default function JsonEditor({ value, onChange, error, dark }: JsonEditorP
         onChange={(v) => onChange(v || "")}
         onMount={handleMount}
         options={{
-          fontSize: 13,
-          fontFamily: "'JetBrains Mono', monospace",
-          minimap: { enabled: false },
-          lineNumbers: "on",
+          fontSize: opts.fontSize,
+          fontFamily: opts.fontFamily,
+          minimap: { enabled: opts.minimap },
+          lineNumbers: opts.lineNumbers,
           scrollBeyondLastLine: false,
-          wordWrap: "on",
+          wordWrap: opts.wordWrap,
           automaticLayout: true,
-          padding: { top: 12 },
-          renderLineHighlight: "line",
-          bracketPairColorization: { enabled: true },
-          tabSize: 2,
+          padding: { top: opts.paddingTop },
+          renderLineHighlight: opts.renderLineHighlight,
+          bracketPairColorization: { enabled: opts.bracketPairColorization },
+          tabSize: opts.tabSize,
         }}
       />
       {error && (
-        <div className="absolute bottom-0 left-0 right-0 bg-destructive/90 text-destructive-foreground text-xs px-3 py-1.5 font-mono truncate animate-slide-up">
+        <div className="absolute bottom-0 left-0 right-0 bg-error/90 text-white text-xs px-3 py-1.5 font-mono truncate animate-slide-up">
           ⚠ {error}
         </div>
       )}

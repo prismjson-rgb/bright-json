@@ -2,14 +2,18 @@
 import { useState, useCallback, useEffect } from "react";
 import {
   Link2, Plus, Trash2, Copy, Check, Download,
-  FileCode, Package, Lock, ChevronDown, AlertTriangle, Sparkles, Zap, Loader2,
+  FileCode, Package, Lock, ChevronDown, AlertTriangle, Sparkles, Zap, Loader2, X,
 } from "lucide-react";
 import { encodeJson, encodeBundle, isTooLarge, type BundleEntry } from "@/lib/share";
 import { generateHtml } from "@/lib/html-export";
+import type { TabData } from "@/lib/tabs-storage";
 
 interface JsonSharePanelProps {
   json: string;
-  onDownloadJson: () => void;
+  onDownloadJson: (json?: string, filename?: string) => void;
+  onClose?: () => void;
+  tabs?: TabData[];
+  activeTabId?: string;
 }
 
 type Section = "link" | "bundle" | "export";
@@ -26,8 +30,48 @@ async function shortenUrl(longUrl: string): Promise<string> {
   return data.shorturl as string;
 }
 
-export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelProps) {
+export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [], activeTabId }: JsonSharePanelProps) {
   const [open, setOpen] = useState<Section>("link");
+  const [shareScope, setShareScope] = useState<"current" | "selected" | "all">("current");
+  const [exportScope, setExportScope] = useState<"current" | "selected" | "all">("current");
+  const [selectedTabIds, setSelectedTabIds] = useState<Set<string>>(() =>
+    new Set(activeTabId ? [activeTabId] : [])
+  );
+
+  const hasMultipleTabs = tabs.length > 1;
+  const hasJson = !!json.trim();
+
+  const getShareJson = (): string => {
+    if (!hasMultipleTabs || shareScope === "current") return json;
+    const ids = shareScope === "all" ? tabs.map((t) => t.id) : Array.from(selectedTabIds);
+    const entries = tabs.filter((t) => ids.includes(t.id)).map((t) => ({ title: t.name, json: t.json }));
+    return JSON.stringify(entries);
+  };
+
+  const getShareUrl = (): string => {
+    const toShare = getShareJson();
+    if (!toShare.trim()) return "";
+    if (hasMultipleTabs && shareScope !== "current") {
+      try {
+        const entries = JSON.parse(toShare) as BundleEntry[];
+        const encoded = encodeBundle(entries);
+        return window.location.origin + "/bundle/#bundle=" + encoded;
+      } catch {
+        return "";
+      }
+    }
+    const encoded = encodeJson(toShare);
+    return window.location.origin + "/#json=" + encoded;
+  };
+
+  const toggleTabSelection = (id: string) => {
+    setSelectedTabIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   /* ── Share via Link ─────────────────────────────── */
   const [shareUrl, setShareUrl]         = useState("");
@@ -37,16 +81,20 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
   const [shorteningLink, setShorteningLink] = useState(false);
   const [linkShortenErr, setLinkShortenErr] = useState("");
 
+  const shareUrlComputed = getShareUrl();
+  const shareHasJson = (() => {
+    if (!hasMultipleTabs || shareScope === "current") return !!json.trim();
+    if (shareScope === "all") return tabs.some((t) => t.json.trim());
+    return tabs.some((t) => selectedTabIds.has(t.id) && t.json.trim());
+  })();
+
   useEffect(() => {
-    if (!json.trim()) { setShareUrl(""); setUrlTooLarge(false); return; }
-    const encoded = encodeJson(json);
-    const url = window.location.origin + "/#json=" + encoded;
-    setShareUrl(url);
-    setUrlTooLarge(isTooLarge(url));
-    // Reset short link when JSON changes
+    if (!shareHasJson) { setShareUrl(""); setUrlTooLarge(false); return; }
+    setShareUrl(shareUrlComputed);
+    setUrlTooLarge(isTooLarge(shareUrlComputed));
     setShortLinkUrl("");
     setLinkShortenErr("");
-  }, [json]);
+  }, [shareUrlComputed, shareHasJson]);
 
   const handleShortenLink = async () => {
     setShorteningLink(true);
@@ -70,7 +118,12 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
   };
 
   /* ── Bundle ─────────────────────────────────────── */
-  const [bundleEntries, setBundleEntries]     = useState<BundleEntry[]>([{ title: "My JSON", json: "" }]);
+  const [bundleEntries, setBundleEntries] = useState<BundleEntry[]>([{ title: "My JSON", json: "" }]);
+
+  const useAllTabsAsBundle = useCallback(() => {
+    const entries = tabs.filter((t) => t.json.trim()).map((t) => ({ title: t.name, json: t.json }));
+    if (entries.length) setBundleEntries(entries);
+  }, [tabs]);
   const [bundleUrl, setBundleUrl]             = useState("");
   const [shortBundleUrl, setShortBundleUrl]   = useState("");
   const [bundleTooLarge, setBundleTooLarge]   = useState(false);
@@ -110,6 +163,25 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
     setTimeout(() => setCopiedBundle(false), 1600);
   };
 
+  const getExportData = (): { json: string; filename: string; isBundle: boolean } => {
+    if (!hasMultipleTabs || exportScope === "current") {
+      return { json, filename: "data.json", isBundle: false };
+    }
+    const ids = exportScope === "all" ? tabs.map((t) => t.id) : Array.from(selectedTabIds);
+    const entries = tabs.filter((t) => ids.includes(t.id) && t.json.trim()).map((t) => ({ title: t.name, json: t.json }));
+    return {
+      json: JSON.stringify(entries, null, 2),
+      filename: "bundle.json",
+      isBundle: true,
+    };
+  };
+
+  const exportHasJson = (() => {
+    if (!hasMultipleTabs || exportScope === "current") return hasJson;
+    if (exportScope === "all") return tabs.some((t) => t.json.trim());
+    return tabs.some((t) => selectedTabIds.has(t.id) && t.json.trim());
+  })();
+
   const addEntry    = () => setBundleEntries(e => [...e, { title: `Entry ${e.length + 1}`, json: "" }]);
   const removeEntry = (idx: number) => setBundleEntries(e => e.filter((_, i) => i !== idx));
   const updateEntry = (idx: number, field: keyof BundleEntry, value: string) =>
@@ -118,14 +190,21 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
 
   /* ── HTML Export ─────────────────────────────────── */
   const handleHtmlExport = () => {
-    const html = generateHtml(json);
+    const { json: toExport } = getExportData();
+    if (!toExport.trim()) return;
+    const html = generateHtml(toExport);
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const url  = URL.createObjectURL(blob);
     Object.assign(document.createElement("a"), { href: url, download: "json-export.html" }).click();
     URL.revokeObjectURL(url);
   };
 
-  const hasJson = !!json.trim();
+  const handleDownloadJson = () => {
+    const { json: toExport, filename } = getExportData();
+    if (!toExport.trim()) return;
+    onDownloadJson(toExport, filename);
+  };
+
   const compressionRatio = hasJson
     ? Math.round((1 - encodeJson(json).length / json.length) * 100)
     : 0;
@@ -133,9 +212,21 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
   return (
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Header */}
-      <div className="pane-header">
-        <Sparkles className="w-3.5 h-3.5 text-primary" />
-        <span>Share &amp; Export</span>
+      <div className="pane-header flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
+          <span>Share &amp; Export</span>
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-2 -mr-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+            title="Close (Esc)"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Privacy banner */}
@@ -155,12 +246,41 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
           icon={<Link2 className="w-3.5 h-3.5 text-primary" />}
           open={open === "link"}
           onToggle={() => setOpen(s => s === "link" ? "export" : "link")}
-          badge={hasJson && !urlTooLarge ? "Ready" : undefined}
+          badge={shareHasJson && !urlTooLarge ? "Ready" : undefined}
         />
 
         {open === "link" && (
           <div className="px-4 py-4 flex flex-col gap-3 border-b border-border">
-            {!hasJson ? (
+            {hasMultipleTabs && (
+              <div className="flex flex-col gap-2">
+                <span className="text-[11px] font-medium text-muted-foreground">Share</span>
+                <div className="flex flex-wrap gap-2">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="shareScope" checked={shareScope === "current"} onChange={() => setShareScope("current")} className="rounded-full" />
+                    <span className="text-xs">Current tab</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="shareScope" checked={shareScope === "selected"} onChange={() => setShareScope("selected")} className="rounded-full" />
+                    <span className="text-xs">Selected tabs</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="shareScope" checked={shareScope === "all"} onChange={() => setShareScope("all")} className="rounded-full" />
+                    <span className="text-xs">All tabs (bundle)</span>
+                  </label>
+                </div>
+                {shareScope === "selected" && (
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {tabs.map((t) => (
+                      <label key={t.id} className="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" checked={selectedTabIds.has(t.id)} onChange={() => toggleTabSelection(t.id)} className="rounded" />
+                        <span className="text-[11px] truncate max-w-[100px]">{t.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {!shareHasJson ? (
               <p className="text-xs text-muted-foreground">Paste JSON in the editor first.</p>
             ) : urlTooLarge ? (
               <WarningBox
@@ -269,10 +389,15 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
               ))}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button onClick={addEntry} className="toolbar-btn text-muted-foreground">
                 <Plus className="w-3.5 h-3.5" /><span>Add JSON</span>
               </button>
+              {hasMultipleTabs && (
+                <button onClick={useAllTabsAsBundle} className="toolbar-btn text-primary">
+                  <Package className="w-3.5 h-3.5" /><span>Use all tabs</span>
+                </button>
+              )}
               <button onClick={generateBundleUrl} className="toolbar-btn ml-auto">
                 <Package className="w-3.5 h-3.5 text-primary" /><span>Generate Bundle Link</span>
               </button>
@@ -340,10 +465,39 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
         />
 
         {open === "export" && (
-          <div className="px-4 py-4 flex flex-col gap-2 border-b border-border">
+          <div className="px-4 py-4 flex flex-col gap-3 border-b border-border">
+            {hasMultipleTabs && (
+              <div className="flex flex-col gap-2">
+                <span className="text-[11px] font-medium text-muted-foreground">Export</span>
+                <div className="flex flex-wrap gap-2">
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="exportScope" checked={exportScope === "current"} onChange={() => setExportScope("current")} className="rounded-full" />
+                    <span className="text-xs">Current tab</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="exportScope" checked={exportScope === "selected"} onChange={() => setExportScope("selected")} className="rounded-full" />
+                    <span className="text-xs">Selected tabs</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="exportScope" checked={exportScope === "all"} onChange={() => setExportScope("all")} className="rounded-full" />
+                    <span className="text-xs">All tabs (bundle)</span>
+                  </label>
+                </div>
+                {(exportScope === "selected" || exportScope === "all") && exportScope === "selected" && (
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {tabs.map((t) => (
+                      <label key={t.id} className="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" checked={selectedTabIds.has(t.id)} onChange={() => toggleTabSelection(t.id)} className="rounded" />
+                        <span className="text-[11px] truncate max-w-[100px]">{t.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <button
               onClick={handleHtmlExport}
-              disabled={!hasJson}
+              disabled={!exportHasJson}
               className="flex items-start gap-3 w-full p-3 rounded-xl bg-primary/5 border border-primary/20 hover:bg-primary/10 hover:border-primary/40 transition-all disabled:opacity-40 disabled:cursor-not-allowed text-left"
             >
               <FileCode className="w-4 h-4 text-primary mt-0.5 shrink-0" />
@@ -356,14 +510,16 @@ export default function JsonSharePanel({ json, onDownloadJson }: JsonSharePanelP
             </button>
 
             <button
-              onClick={onDownloadJson}
-              disabled={!hasJson}
+              onClick={handleDownloadJson}
+              disabled={!exportHasJson}
               className="flex items-start gap-3 w-full p-3 rounded-xl bg-secondary/40 border border-border hover:bg-secondary/70 transition-all disabled:opacity-40 disabled:cursor-not-allowed text-left"
             >
               <Download className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
               <div>
                 <div className="text-sm font-medium">Download .json</div>
-                <div className="text-[11px] text-muted-foreground mt-0.5">Raw JSON file</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">
+                  {hasMultipleTabs && exportScope !== "current" ? "Bundle JSON (all/selected tabs)" : "Raw JSON file"}
+                </div>
               </div>
             </button>
 

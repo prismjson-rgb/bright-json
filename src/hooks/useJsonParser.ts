@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+export interface FormatOptions {
+  indent?: number;
+  sortKeys?: boolean;
+}
+
 interface UseJsonParserResult {
   json: string;
   setJson: (value: string) => void;
   parsed: unknown | null;
   error: string | null;
-  format: () => void;
+  format: (options?: FormatOptions) => void;
   minify: () => void;
   sortKeys: () => void;
 }
@@ -58,10 +63,13 @@ export function useJsonParser(initialValue = ""): UseJsonParserResult {
     return () => clearTimeout(debounceRef.current);
   }, []);
 
-  const format = useCallback(() => {
+  const format = useCallback((options?: FormatOptions) => {
     try {
-      const obj = JSON.parse(json);
-      const formatted = JSON.stringify(obj, null, 2);
+      const indent = options?.indent ?? 2;
+      const sort = options?.sortKeys ?? false;
+      let obj = JSON.parse(json);
+      if (sort) obj = sortObjectKeys(obj);
+      const formatted = JSON.stringify(obj, null, indent);
       setJsonRaw(formatted);
       setParsed(obj);
       setError(null);

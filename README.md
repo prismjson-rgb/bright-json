@@ -1,73 +1,69 @@
-# Welcome to your Lovable project
+## Bright JSON – Static Next.js App with Base Theme Kit
 
-## Project info
+This repo is a static Next.js app for working with JSON (format, validate, diff, convert) plus a **modular Base Theme Kit** you can reuse across B2B technical SaaS projects.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+The theme kit provides:
 
-## How can I edit this code?
+- **Semantic design tokens** for surfaces, text, accents, status, gradients, and code/diff states (light + dark).
+- **Tailwind configuration** wired to CSS variables for easy theming.
+- **Typography helpers** and a small component starter set (Button, Card, Input, Badge, Table, CodePanel, DiffLine).
 
-There are several ways of editing your application.
+The JSON tooling UI is built with React, Tailwind CSS, and shadcn-ui primitives on top of this design system.
 
-**Use Lovable**
+## Tech stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- Next.js (App Router, static export)
+- React 18
+- TypeScript
+- Tailwind CSS (+ `tailwindcss-animate`)
+- shadcn-ui primitives
 
-Changes made via Lovable will be committed automatically to this repo.
+## Theme kit structure
 
-**Use your preferred IDE**
+The design system lives in `/theme-kit`:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- `tokens/palette.base.ts` – raw color palette (slate, blue, copper, purple).
+- `tokens/theme.semantic.ts` – semantic token helpers (bg, surface, text, status, gradients).
+- `tailwind.config.ts` – example Tailwind `extend` config using semantic tokens.
+- `globals.css` – light/dark CSS variables, gradients, code/diff tokens, base typography.
+- `typography.ts` – ergonomic text-style helpers.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Core starter components using these tokens live in `src/components/theme-kit`.
 
-Follow these steps:
+## Content (no database)
+
+All content lives in markdown files under `content/`:
+
+- `content/learn/` — tutorial articles → `/learn/*`
+- `content/pages/` — static pages → `/about`, `/privacy`, etc.
+
+Add or remove `.md` files and run `npm run generate:content`. Editable via IDE or GitHub.
+
+See `content/README.md` for authoring details.
+
+## Running locally
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Then open `http://localhost:3000`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Building a static site
 
-**Use GitHub Codespaces**
+This project is configured for static export via `next.config.ts`:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```sh
+npm run build
+npm run start           # serves the built app
+```
 
-## What technologies are used for this project?
+Or export static assets:
 
-This project is built with:
+```sh
+npm run build
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+The output is in `.next` and can be deployed to any static host (e.g. Vercel static export, Netlify, GitHub Pages behind a Node adapter, etc.).
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
