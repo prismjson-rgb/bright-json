@@ -179,6 +179,10 @@ const config: Config = {
           "radial-gradient(1200px circle at 20% 10%, hsl(var(--grad-a) / 0.22), transparent 55%), radial-gradient(900px circle at 80% 0%, hsl(var(--grad-b) / 0.18), transparent 60%)",
         "grad-divider": "linear-gradient(90deg, transparent, hsl(var(--border)), transparent)",
         "grad-chip": "linear-gradient(135deg, hsl(var(--chip-a)), hsl(var(--chip-b)))",
+        // Dark-mode accent gradients (use with text-white for contrast)
+        "grad-teal": "linear-gradient(90deg, hsl(var(--teal-grad-from)), hsl(var(--teal-grad-to)))",
+        "grad-orange": "linear-gradient(90deg, hsl(var(--orange-grad-from)), hsl(var(--orange-grad-to)))",
+        "grad-fuchsia": "linear-gradient(90deg, hsl(var(--fuchsia-grad-from)), hsl(var(--fuchsia-grad-to)))",
       },
 
       // Typography scale

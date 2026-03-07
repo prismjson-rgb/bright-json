@@ -54,7 +54,7 @@ export default function JsonTabBar({
           key={tab.id}
           className={`group flex items-center gap-1.5 px-3 py-2 border-r border-border/60 text-xs font-medium shrink-0 cursor-pointer transition-colors min-w-0 max-w-[160px] ${
             tab.id === activeId
-              ? "bg-surface2 text-foreground"
+              ? "bg-surface2 text-foreground tab-active-grad"
               : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
           }`}
           onClick={() => editingId !== tab.id && onSwitch(tab.id)}

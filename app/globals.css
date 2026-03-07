@@ -34,10 +34,31 @@
     transform: translateY(0);
   }
 
+  /* Dark: toolbar header – subtle horizontal gradient */
+  .dark .toolbar-header {
+    background: linear-gradient(90deg, hsl(var(--toolbar)), hsl(240 18% 13%));
+  }
+
+  /* Dark: toolbar accent button (e.g. Beautify) – teal gradient, white text */
+  .dark .toolbar-btn-accent-grad {
+    background: linear-gradient(90deg, hsl(var(--teal-grad-from)), hsl(var(--teal-grad-to)));
+    color: hsl(0 0% 100%);
+  }
+  .dark .toolbar-btn-accent-grad:hover:not(:disabled) {
+    background: linear-gradient(90deg, hsl(var(--teal-grad-from)), hsl(var(--teal-grad-to)));
+    color: hsl(0 0% 100%);
+    filter: brightness(1.1);
+  }
+
   .pane-header {
     @apply flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-wider
            border-b border-border select-none;
     background: hsl(var(--pane-header));
+    color: hsl(var(--pane-header-foreground));
+  }
+  /* Dark: pane header – subtle teal-tinted gradient, text stays readable */
+  .dark .pane-header {
+    background: linear-gradient(90deg, hsl(var(--surface-2)), hsl(240 18% 14%));
     color: hsl(var(--pane-header-foreground));
   }
 
@@ -46,6 +67,9 @@
            border-t border-border select-none;
     background: hsl(var(--toolbar));
     color: hsl(var(--muted-foreground));
+  }
+  .dark .status-bar {
+    background: linear-gradient(90deg, hsl(var(--toolbar)), hsl(240 20% 9%));
   }
 
   .glow-dot {
@@ -60,12 +84,54 @@
     box-shadow: 0 0 6px 1px hsl(var(--destructive) / 0.4);
   }
 
+  /* Dark: sidebar – subtle vertical gradient */
+  .dark aside.bg-surface1 {
+    background: linear-gradient(180deg, hsl(var(--surface-1)), hsl(240 14% 10%));
+  }
+
   .sidebar-btn {
     @apply flex items-center gap-2.5 w-full px-3 py-2 text-muted-foreground
            hover:text-foreground hover:bg-accent/10 transition-colors duration-150 cursor-pointer;
   }
   .sidebar-btn-active {
     @apply bg-primary/10 text-primary;
+  }
+
+  /* Dark: sidebar active item – teal gradient, white text */
+  .dark .sidebar-btn-active {
+    background: linear-gradient(90deg, hsl(var(--teal-grad-from)), hsl(var(--teal-grad-to)));
+    color: hsl(0 0% 100%);
+  }
+  .dark .sidebar-btn-active:hover {
+    background: linear-gradient(90deg, hsl(var(--teal-grad-from)), hsl(var(--teal-grad-to)));
+    color: hsl(0 0% 100%);
+    filter: brightness(1.08);
+  }
+
+  /* Dark: gradient utility classes (text stays white for contrast) */
+  .dark .bg-grad-teal {
+    background: linear-gradient(90deg, hsl(var(--teal-grad-from)), hsl(var(--teal-grad-to)));
+    color: hsl(0 0% 100%);
+  }
+  .dark .bg-grad-orange {
+    background: linear-gradient(90deg, hsl(var(--orange-grad-from)), hsl(var(--orange-grad-to)));
+    color: hsl(0 0% 100%);
+  }
+  .dark .bg-grad-fuchsia {
+    background: linear-gradient(90deg, hsl(var(--fuchsia-grad-from)), hsl(var(--fuchsia-grad-to)));
+    color: hsl(0 0% 100%);
+  }
+
+  /* Dark: canvas gradient – visible teal/orange glow for overall gradient scheme */
+  .dark .bg-grad-hero.bg-bg {
+    background-image: radial-gradient(1200px circle at 20% 10%, hsl(var(--grad-a) / 0.18), transparent 50%), radial-gradient(900px circle at 85% 5%, hsl(var(--grad-b) / 0.12), transparent 55%);
+    background-color: hsl(var(--bg));
+  }
+
+  /* Dark: tab bar active tab – teal gradient, white text */
+  .dark .tab-active-grad {
+    background: linear-gradient(90deg, hsl(var(--teal-grad-from)), hsl(var(--teal-grad-to))) !important;
+    color: hsl(0 0% 100%) !important;
   }
 }
 

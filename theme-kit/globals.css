@@ -30,6 +30,13 @@
   --grad-b: 22 42% 56%; /* copper-ish */
   --chip-a: 210 44% 52%;
   --chip-b: 300 24% 52%;
+  /* Gradient stops (used in dark; light fallbacks) */
+  --teal-grad-from: 210 44% 52%;
+  --teal-grad-to: 210 36% 42%;
+  --orange-grad-from: 22 42% 56%;
+  --orange-grad-to: 22 36% 46%;
+  --fuchsia-grad-from: 300 24% 52%;
+  --fuchsia-grad-to: 300 20% 42%;
 
   /* ---------- Status ---------- */
   --success: 158 35% 31%;
@@ -112,27 +119,38 @@
 }
 
 .dark {
-  --bg: 220 26% 8%;
-  --surface-1: 220 26% 11%;
-  --surface-2: 220 26% 14%;
-  --border: 215 26% 22%;
+  /* ---------- Dark blue-gray surfaces (reference palette) ---------- */
+  --bg: 240 25% 7%;           /* #0F0F17 - main canvas */
+  --surface-1: 240 15% 9%;   /* #12121A - sidebar */
+  --surface-2: 240 17% 12%;  /* #1A1A24 - cards, panes */
+  --border: 215 22% 20%;
 
-  --text-1: 210 45% 94%;
-  --text-2: 210 26% 83%;
-  --text-3: 210 18% 69%;
-  --link: 210 52% 72%;
+  /* ---------- Text: high contrast on dark ---------- */
+  --text-1: 0 0% 100%;       /* primary text */
+  --text-2: 210 15% 85%;     /* secondary */
+  --text-3: 210 12% 65%;     /* muted */
+  --link: 170 75% 55%;
 
-  --primary: 210 44% 57%;
-  --primary-hover: 210 48% 64%;
-  --focus: 210 58% 74%;
-  --accent-2: 300 22% 60%;
-  --accent-warm: 22 46% 64%;
+  /* ---------- Primary accent: teal (sidebar active, primary actions) ---------- */
+  --primary: 170 72% 52%;
+  --primary-hover: 170 72% 58%;
+  --focus: 170 72% 58%;
+  /* Secondary accents: orange, fuchsia - for variety on cards/chips */
+  --accent-2: 338 100% 42%;   /* fuchsia-magenta */
+  --accent-warm: 27 100% 48%; /* orange */
 
-  /* Gradients in dark should glow, not blast */
-  --grad-a: 210 55% 66%;
-  --grad-b: 22 55% 66%;
-  --chip-a: 210 55% 66%;
-  --chip-b: 300 30% 66%;
+  /* ---------- Gradient stops (monochromatic for text contrast) ---------- */
+  --teal-grad-from: 170 77% 58%;   /* #3EE9D1 */
+  --teal-grad-to: 170 61% 45%;     /* #2CB9A3 */
+  --orange-grad-from: 27 100% 48%;
+  --orange-grad-to: 22 88% 42%;
+  --fuchsia-grad-from: 340 81% 51%;
+  --fuchsia-grad-to: 338 100% 36%;
+
+  --grad-a: 170 72% 52%;
+  --grad-b: 27 100% 48%;
+  --chip-a: 170 72% 52%;
+  --chip-b: 338 100% 42%;
 
   --success: 158 45% 45%;
   --warning: 42 60% 52%;
@@ -144,8 +162,8 @@
   --error-bg: 345 45% 14%;
   --info-bg: 210 45% 14%;
 
-  --code-bg: 220 30% 6%;
-  --code-border: 215 26% 18%;
+  --code-bg: 240 22% 6%;
+  --code-border: 215 22% 18%;
 
   --syntax-key: 210 70% 78%;
   --syntax-string: 22 55% 70%;
@@ -161,28 +179,28 @@
   --diff-mod-bg: 270 40% 12%;
   --diff-mod: 300 22% 60%;
 
-  /* Shadcn-style + app-specific mappings */
+  /* Shadcn-style + app-specific: white text on gradient/solid accent for contrast */
   --background: var(--bg);
   --foreground: var(--text-1);
-  --card: var(--surface-1);
+  --card: var(--surface-2);
   --card-foreground: var(--text-1);
-  --popover: var(--surface-1);
+  --popover: var(--surface-2);
   --popover-foreground: var(--text-1);
-  --primary-foreground: 220 26% 8%;
+  --primary-foreground: 0 0% 100%;
   --secondary: var(--surface-2);
   --secondary-foreground: var(--text-1);
   --muted: var(--surface-2);
   --muted-foreground: var(--text-3);
   --accent: var(--primary);
-  --accent-foreground: 220 26% 8%;
+  --accent-foreground: 0 0% 100%;
   --destructive: var(--error);
   --destructive-foreground: 0 0% 100%;
   --input: var(--border);
   --ring: var(--focus);
   --radius: 0.9rem;
 
-  --toolbar: var(--surface-1);
-  --toolbar-foreground: var(--text-2);
+  --toolbar: 240 17% 11%;    /* #1C1C26 - header bar */
+  --toolbar-foreground: var(--text-1);
   --surface: var(--surface-2);
   --surface-foreground: var(--text-1);
   --pane-header: var(--surface-2);
@@ -196,7 +214,7 @@
   --json-bracket: 210 20% 74%;
 
   --sidebar-background: var(--surface-1);
-  --sidebar-foreground: 210 45% 94%;
+  --sidebar-foreground: var(--text-1);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: var(--surface-2);

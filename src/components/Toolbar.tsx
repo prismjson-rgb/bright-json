@@ -34,11 +34,11 @@ export default function Toolbar({
   };
 
   return (
-    <header className="flex items-center gap-0.5 px-4 py-2.5 bg-surface1 border-b border-border shadow-soft sticky top-0 z-10 flex-wrap">
+    <header className="toolbar-header flex items-center gap-0.5 px-4 py-2.5 bg-surface1 border-b border-border shadow-soft sticky top-0 z-10 flex-wrap">
       {/* Logo */}
       <div className="flex items-center gap-2 mr-4">
-        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Braces className="w-4 h-4 text-primary" />
+        <div className="w-7 h-7 rounded-lg bg-primary/10 dark:bg-grad-teal flex items-center justify-center dark:text-white">
+          <Braces className="w-4 h-4 text-primary dark:text-white" />
         </div>
         <div className="flex flex-col">
           <span className="font-semibold text-sm tracking-tight text-foreground leading-none">JSON Prism</span>
@@ -50,7 +50,7 @@ export default function Toolbar({
 
       {/* Format group */}
       <div className="flex items-center gap-0.5 bg-secondary/50 rounded-lg p-0.5">
-        <ToolBtn onClick={onFormat} icon={<Sparkles className="w-3.5 h-3.5" />} label="Beautify" shortcut="⌘⇧F" disabled={!hasJson} accent />
+        <ToolBtn onClick={onFormat} icon={<Sparkles className="w-3.5 h-3.5" />} label="Beautify" shortcut="⌘⇧F" disabled={!hasJson} accent accentGradient />
         <ToolBtn onClick={onMinify} icon={<Minimize2 className="w-3.5 h-3.5" />} label="Minify" shortcut="⌘M" disabled={!hasJson} />
         <ToolBtn onClick={onSortKeys} icon={<ArrowUpDown className="w-3.5 h-3.5" />} label="Sort" disabled={!hasJson} />
       </div>
@@ -81,13 +81,13 @@ export default function Toolbar({
 
 function Divider() { return <div className="h-6 w-px bg-border mx-2 shrink-0" />; }
 
-function ToolBtn({ onClick, icon, label, shortcut, disabled, accent, active }: {
+function ToolBtn({ onClick, icon, label, shortcut, disabled, accent, accentGradient, active }: {
   onClick: () => void; icon: React.ReactNode; label: string; shortcut?: string;
-  disabled?: boolean; accent?: boolean; active?: boolean;
+  disabled?: boolean; accent?: boolean; accentGradient?: boolean; active?: boolean;
 }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      className={`toolbar-btn ${active ? "bg-primary/10 text-primary" : accent ? "text-primary" : "text-muted-foreground"}`}
+      className={`toolbar-btn ${active ? "bg-primary/10 text-primary" : accentGradient && !disabled ? "toolbar-btn-accent-grad" : accent ? "text-primary" : "text-muted-foreground"}`}
       title={shortcut ? `${label} (${shortcut})` : label}>
       {icon}
       <span className="hidden md:inline">{label}</span>
