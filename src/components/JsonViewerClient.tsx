@@ -9,7 +9,7 @@ import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "@/components/Sidebar";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import JsonEditor from "@/components/JsonEditor";
 import JsonTreeView from "@/components/JsonTreeView";
 import JsonVisualEditor from "@/components/JsonVisualEditor";
@@ -333,6 +333,7 @@ export default function JsonViewerClient() {
         {isMobile && (
           <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
             <SheetContent side="left" className="w-[min(100vw-2rem,16rem)] min-w-[11rem] p-0 gap-0 border-r border-border bg-surface1 overflow-hidden [&>button]:hidden">
+              <SheetTitle className="sr-only">Navigation menu</SheetTitle>
               <Sidebar {...sidebarProps} />
             </SheetContent>
           </Sheet>
