@@ -28,11 +28,13 @@ function sortObjectKeys(obj: unknown): unknown {
   return obj;
 }
 
-export function useJsonParser(initialValue = ""): UseJsonParserResult {
+export function useJsonParser(initialValue = "", onTransform?: (value: string) => void): UseJsonParserResult {
   const [json, setJsonRaw] = useState(initialValue);
   const [parsed, setParsed] = useState<unknown | null>(null);
   const [error, setError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const onTransformRef = useRef(onTransform);
+  useEffect(() => { onTransformRef.current = onTransform; });
 
   const validate = useCallback((value: string) => {
     if (!value.trim()) {
@@ -73,6 +75,7 @@ export function useJsonParser(initialValue = ""): UseJsonParserResult {
       setJsonRaw(formatted);
       setParsed(obj);
       setError(null);
+      onTransformRef.current?.(formatted);
     } catch {}
   }, [json]);
 
@@ -83,6 +86,7 @@ export function useJsonParser(initialValue = ""): UseJsonParserResult {
       setJsonRaw(minified);
       setParsed(obj);
       setError(null);
+      onTransformRef.current?.(minified);
     } catch {}
   }, [json]);
 
@@ -94,6 +98,7 @@ export function useJsonParser(initialValue = ""): UseJsonParserResult {
       setJsonRaw(formatted);
       setParsed(sorted);
       setError(null);
+      onTransformRef.current?.(formatted);
     } catch {}
   }, [json]);
 

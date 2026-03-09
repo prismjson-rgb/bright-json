@@ -64,7 +64,15 @@ export default function JsonViewerClient() {
   const [tabsState, setTabsState] = useState<TabsState>(getInitialTabs);
   const activeTab = tabsState.tabs.find((t) => t.id === tabsState.activeId) ?? tabsState.tabs[0];
   const json = activeTab?.json ?? "";
-  const { setJson: setParserJson, parsed, error, format, minify, sortKeys } = useJsonParser(json);
+
+  const syncTabJson = useCallback((value: string) => {
+    setTabsState((prev) => ({
+      ...prev,
+      tabs: prev.tabs.map((t) => (t.id === prev.activeId ? { ...t, json: value } : t)),
+    }));
+  }, []);
+
+  const { setJson: setParserJson, parsed, error, format, minify, sortKeys } = useJsonParser(json, syncTabJson);
   const { dark, toggle } = useTheme();
   const { settings } = useSettings();
   const isMobile = useIsMobile();
