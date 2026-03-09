@@ -78,7 +78,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   const [shortLinkUrl, setShortLinkUrl] = useState("");
   const [copiedLink, setCopiedLink]     = useState(false);
   const [shorteningLink, setShorteningLink] = useState(false);
-  const [linkShortenErr, setLinkShortenErr] = useState("");
 
   const shareUrlComputed = getShareUrl();
   const shareHasJson = (() => {
@@ -92,11 +91,10 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     const computed = shareUrlComputed;
     setShareUrl(computed);
     setShortLinkUrl("");
-    setLinkShortenErr("");
     setShorteningLink(true);
     shortenUrl(computed)
       .then(setShortLinkUrl)
-      .catch(() => setLinkShortenErr("Couldn't shorten — copy the full link below."))
+      .catch(() => {})
       .finally(() => setShorteningLink(false));
   }, [shareUrlComputed, shareHasJson]);
 
@@ -118,7 +116,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   const [shortBundleUrl, setShortBundleUrl]   = useState("");
   const [copiedBundle, setCopiedBundle]       = useState(false);
   const [shorteningBundle, setShorteningBundle] = useState(false);
-  const [bundleShortenErr, setBundleShortenErr] = useState("");
 
   const generateBundleUrl = useCallback(() => {
     const valid = bundleEntries.filter(e => e.title.trim() && e.json.trim());
@@ -126,12 +123,11 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     const encoded = encodeBundle(valid);
     const url = window.location.origin + "/bundle/#bundle=" + encoded;
     setShortBundleUrl("");
-    setBundleShortenErr("");
     setBundleUrl(url);
     setShorteningBundle(true);
     shortenUrl(url)
       .then(setShortBundleUrl)
-      .catch(() => setBundleShortenErr("Couldn't shorten — copy the full link below."))
+      .catch(() => {})
       .finally(() => setShorteningBundle(false));
   }, [bundleEntries]);
 
@@ -184,9 +180,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     onDownloadJson(toExport, filename);
   };
 
-  const compressionRatio = hasJson
-    ? Math.round((1 - encodeJson(json).length / json.length) * 100)
-    : 0;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
@@ -291,15 +284,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                         use full link
                       </button>
                     </span>
-                  ) : linkShortenErr ? (
-                    <span className="text-[11px] text-destructive">{linkShortenErr}</span>
                   ) : null}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground/50">
-                  <span>{shareUrl.length.toLocaleString()} chars (compressed)</span>
-                  <span>·</span>
-                  <span className="text-primary/70">{compressionRatio}% smaller than raw JSON</span>
                 </div>
               </>
             )}
@@ -398,8 +383,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                           use full link
                         </button>
                       </span>
-                    ) : bundleShortenErr ? (
-                      <span className="text-[11px] text-destructive">{bundleShortenErr}</span>
                     ) : null}
                   </div>
 
