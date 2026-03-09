@@ -127,7 +127,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     setShortBundleUrl("");
     setBundleShortenErr("");
     setBundleUrl(url);
-    setBundleTooLarge(false);
     setShorteningBundle(true);
     shortenUrl(url)
       .then(setShortBundleUrl)
