@@ -278,7 +278,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                       <Zap className="w-3 h-3" />
                       Shortened via is.gd
                       <button
-                        onClick={() => { setShortLinkUrl(""); setLinkShortenErr(""); }}
+                        onClick={() => { setShortLinkUrl(""); }}
                         className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
                       >
                         use full link
