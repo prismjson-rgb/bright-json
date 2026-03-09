@@ -408,7 +408,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                     Recipients see a list and can open each JSON in the editor.
                   </p>
                 </div>
-              )
             )}
           </div>
         )}
