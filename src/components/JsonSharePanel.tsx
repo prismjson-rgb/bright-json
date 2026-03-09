@@ -18,15 +18,16 @@ interface JsonSharePanelProps {
 
 type Section = "link" | "bundle" | "export";
 
-/** Shorten any URL via TinyURL public API — no API key required */
+/** Shorten any URL via is.gd public CORS API — handles URL fragments correctly */
 async function shortenUrl(longUrl: string): Promise<string> {
   const res = await fetch(
-    `https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`
+    `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`,
+    { headers: { Accept: "application/json" } }
   );
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const short = (await res.text()).trim();
-  if (!short.startsWith("http")) throw new Error("Shortening failed");
-  return short;
+  const data = await res.json();
+  if (data.errorcode) throw new Error(data.errormessage ?? "Shortening failed");
+  return data.shorturl as string;
 }
 
 export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [], activeTabId }: JsonSharePanelProps) {
@@ -282,7 +283,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                   ) : shortLinkUrl ? (
                     <span className="flex items-center gap-1.5 text-[11px] text-primary">
                       <Zap className="w-3 h-3" />
-                      Shortened via TinyURL
+                      Shortened via is.gd
                       <button
                         onClick={() => { setShortLinkUrl(""); setLinkShortenErr(""); }}
                         className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
@@ -389,7 +390,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                     ) : shortBundleUrl ? (
                       <span className="flex items-center gap-1.5 text-[11px] text-primary">
                         <Zap className="w-3 h-3" />
-                        Shortened via TinyURL
+                        Shortened via is.gd
                         <button
                           onClick={() => { setShortBundleUrl(""); setBundleShortenErr(""); }}
                           className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
