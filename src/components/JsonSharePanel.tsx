@@ -87,12 +87,11 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   })();
 
   useEffect(() => {
-    if (!shareHasJson) { setShareUrl(""); setUrlTooLarge(false); return; }
+    if (!shareHasJson) { setShareUrl(""); return; }
     const computed = shareUrlComputed;
     setShareUrl(computed);
     setShortLinkUrl("");
     setLinkShortenErr("");
-    setUrlTooLarge(false);
     setShorteningLink(true);
     shortenUrl(computed)
       .then(setShortLinkUrl)
