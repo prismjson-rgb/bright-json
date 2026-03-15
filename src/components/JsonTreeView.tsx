@@ -1,9 +1,28 @@
 "use client";
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { ChevronDown, Braces, Brackets } from "lucide-react";
+import { ChevronDown, Braces, Brackets, Copy, Check } from "lucide-react";
 
 import type { TreeViewSettings } from "@/lib/settings";
+
+/** Get the value at a path like "root", "root.foo", "root.items[0]", "root[0].name" */
+function getValueAtPath(obj: unknown, path: string): unknown {
+  if (path === "root") return obj;
+  let current: unknown = obj;
+  const rest = path.slice(4); // "root".length === 4
+  if (!rest) return current;
+  const re = /\.([^.[]+)|\[(\d+)\]/g;
+  let m;
+  while ((m = re.exec(rest)) !== null) {
+    if (current === null || current === undefined) return undefined;
+    if (m[1] !== undefined) {
+      current = (current as Record<string, unknown>)[m[1]];
+    } else {
+      current = (current as unknown[])[Number(m[2])];
+    }
+  }
+  return current;
+}
 
 // Defaults used when treeSettings not provided (e.g. BundleViewer)
 const DEFAULT_TREE_SETTINGS: TreeViewSettings = {
@@ -128,6 +147,9 @@ function highlightText(text: string, searchTerm: string): React.ReactNode {
 function TreeRow({
   row,
   onToggle,
+  onCopyValue,
+  onCopyBranch,
+  copiedPath,
   searchTerm,
   indentPx,
   fontSize,
@@ -136,6 +158,9 @@ function TreeRow({
 }: {
   row: FlatRow;
   onToggle: (id: string) => void;
+  onCopyValue: (path: string, value: unknown) => void;
+  onCopyBranch: (path: string) => void;
+  copiedPath: string | null;
   searchTerm?: string;
   indentPx: number;
   fontSize: number;
@@ -143,6 +168,7 @@ function TreeRow({
   stringTruncateLength: number;
 }) {
   const indent = row.depth * indentPx;
+  const isCopied = copiedPath === row.id;
 
   if (row.isClosingBracket) {
     return (
@@ -176,7 +202,7 @@ function TreeRow({
 
     return (
       <div
-        className="flex items-center gap-1 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-colors font-mono"
+        className="group flex items-center gap-1 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-colors font-mono"
         style={{ marginLeft: indent, fontSize }}
       >
         {row.keyName !== undefined && (
@@ -186,20 +212,32 @@ function TreeRow({
           </span>
         )}
         {valueEl}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onCopyValue(row.id, row.value);
+          }}
+          className="ml-1 shrink-0 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-secondary/80 text-muted-foreground hover:text-foreground transition-opacity"
+          title="Copy value"
+          aria-label="Copy value"
+        >
+          {isCopied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
+        </button>
       </div>
     );
   }
 
-  // Expandable
+  // Expandable branch/node
   const isArray = row.isArray;
   const bracket = isArray ? ["[", "]"] : ["{", "}"];
   const TypeIcon = isArray ? Brackets : Braces;
 
   return (
-    <div style={{ marginLeft: indent }}>
+    <div className="group flex items-center gap-0.5 w-fit" style={{ marginLeft: indent }}>
       <button
         onClick={() => onToggle(row.id)}
-        className="flex items-center gap-1.5 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-all duration-100 w-full text-left font-mono"
+        className="flex items-center gap-1.5 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-all duration-100 text-left font-mono"
         style={{ fontSize }}
       >
         <span
@@ -226,6 +264,18 @@ function TreeRow({
             <span className="text-json-bracket font-medium">{bracket[1]}</span>
           </>
         )}
+      </button>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onCopyBranch(row.id);
+        }}
+        className="shrink-0 p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-secondary/80 text-muted-foreground hover:text-foreground transition-opacity"
+        title={row.id === "root" ? "Copy entire JSON" : "Copy this section"}
+        aria-label={row.id === "root" ? "Copy entire JSON" : "Copy this section"}
+      >
+        {isCopied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
       </button>
     </div>
   );
@@ -290,6 +340,55 @@ export default function JsonTreeView({ data, expandAll, searchTerm, treeSettings
     });
   }, []);
 
+  const [copiedPath, setCopiedPath] = useState<string | null>(null);
+  const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const copyToClipboard = useCallback((text: string): boolean => {
+    if (typeof navigator?.clipboard?.writeText !== "function") return false;
+    navigator.clipboard.writeText(text).catch(() => {});
+    return true;
+  }, []);
+
+  const handleCopyValue = useCallback(
+    (path: string, value: unknown) => {
+      const text =
+        typeof value === "string"
+          ? value
+          : JSON.stringify(value);
+      if (copyToClipboard(text)) {
+        setCopiedPath(path);
+        if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+        copiedTimeoutRef.current = setTimeout(() => {
+          setCopiedPath(null);
+          copiedTimeoutRef.current = null;
+        }, 1500);
+      }
+    },
+    [copyToClipboard]
+  );
+
+  const handleCopyBranch = useCallback(
+    (path: string) => {
+      const value = getValueAtPath(data, path);
+      const text = JSON.stringify(value, null, 2);
+      if (copyToClipboard(text)) {
+        setCopiedPath(path);
+        if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+        copiedTimeoutRef.current = setTimeout(() => {
+          setCopiedPath(null);
+          copiedTimeoutRef.current = null;
+        }, 1500);
+      }
+    },
+    [data, copyToClipboard]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current);
+    };
+  }, []);
+
   if (data === null || data === undefined) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-3 text-muted-foreground animate-fade-in">
@@ -332,14 +431,17 @@ export default function JsonTreeView({ data, expandAll, searchTerm, treeSettings
               }}
             >
               <TreeRow
-              row={row}
-              onToggle={handleToggle}
-              searchTerm={searchTerm}
-              indentPx={ts.indentPx}
-              fontSize={ts.fontSize}
-              showChildCount={ts.showChildCount}
-              stringTruncateLength={ts.stringTruncateLength}
-            />
+                row={row}
+                onToggle={handleToggle}
+                onCopyValue={handleCopyValue}
+                onCopyBranch={handleCopyBranch}
+                copiedPath={copiedPath}
+                searchTerm={searchTerm}
+                indentPx={ts.indentPx}
+                fontSize={ts.fontSize}
+                showChildCount={ts.showChildCount}
+                stringTruncateLength={ts.stringTruncateLength}
+              />
             </div>
           );
         })}

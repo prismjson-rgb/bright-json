@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check, Download, Upload,
   Minimize2, ArrowUpDown, Sun, Moon, Sparkles, Share2, Save, Trash2, Menu, Braces,
@@ -12,24 +13,31 @@ import Sidebar from "@/components/Sidebar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import JsonEditor from "@/components/JsonEditor";
 import JsonTreeView from "@/components/JsonTreeView";
-import JsonVisualEditor from "@/components/JsonVisualEditor";
-import JsonDiffViewer from "@/components/JsonDiffViewer";
-import JsonConvertPanel from "@/components/JsonConvertPanel";
-import JsonSearchPanel from "@/components/JsonSearchPanel";
-import JsonNoteEditor from "@/components/JsonNoteEditor";
-import JsonMockGenerator from "@/components/JsonMockGenerator";
-import JsonDebugger from "@/components/JsonDebugger";
-import JsonTrimmer from "@/components/JsonTrimmer";
-import JsonAiCleaner from "@/components/JsonAiCleaner";
-import JsonMinimalMode from "@/components/JsonMinimalMode";
-import JsonStructureAnalyzer from "@/components/JsonStructureAnalyzer";
-import JsonBestPractices from "@/components/JsonBestPractices";
-import JsonTokenEstimator from "@/components/JsonTokenEstimator";
-import JsonLearnPanel from "@/components/JsonLearnPanel";
-import JsonSharePanel from "@/components/JsonSharePanel";
 import JsonTabBar from "@/components/JsonTabBar";
-import SettingsPanel from "@/components/SettingsPanel";
 import OverlaySidebar from "@/components/OverlaySidebar";
+
+const panelLoading = () => (
+  <div className="flex items-center justify-center flex-1 min-h-[200px] text-muted-foreground text-sm">
+    Loading…
+  </div>
+);
+
+const JsonVisualEditor = dynamic(() => import("@/components/JsonVisualEditor"), { ssr: false, loading: panelLoading });
+const JsonDiffViewer = dynamic(() => import("@/components/JsonDiffViewer"), { ssr: false, loading: panelLoading });
+const JsonConvertPanel = dynamic(() => import("@/components/JsonConvertPanel"), { ssr: false, loading: panelLoading });
+const JsonSearchPanel = dynamic(() => import("@/components/JsonSearchPanel"), { ssr: false, loading: panelLoading });
+const JsonNoteEditor = dynamic(() => import("@/components/JsonNoteEditor"), { ssr: false, loading: panelLoading });
+const JsonMockGenerator = dynamic(() => import("@/components/JsonMockGenerator"), { ssr: false, loading: panelLoading });
+const JsonDebugger = dynamic(() => import("@/components/JsonDebugger"), { ssr: false, loading: panelLoading });
+const JsonTrimmer = dynamic(() => import("@/components/JsonTrimmer"), { ssr: false, loading: panelLoading });
+const JsonAiCleaner = dynamic(() => import("@/components/JsonAiCleaner"), { ssr: false, loading: panelLoading });
+const JsonMinimalMode = dynamic(() => import("@/components/JsonMinimalMode"), { ssr: false, loading: panelLoading });
+const JsonStructureAnalyzer = dynamic(() => import("@/components/JsonStructureAnalyzer"), { ssr: false, loading: panelLoading });
+const JsonBestPractices = dynamic(() => import("@/components/JsonBestPractices"), { ssr: false, loading: panelLoading });
+const JsonTokenEstimator = dynamic(() => import("@/components/JsonTokenEstimator"), { ssr: false, loading: panelLoading });
+const JsonLearnPanel = dynamic(() => import("@/components/JsonLearnPanel"), { ssr: false, loading: panelLoading });
+const JsonSharePanel = dynamic(() => import("@/components/JsonSharePanel"), { ssr: false, loading: panelLoading });
+const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), { ssr: false, loading: panelLoading });
 import { useSettings } from "@/contexts/SettingsContext";
 import { safeDecodeJson } from "@/lib/share";
 import { saveJson, loadSavedJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";

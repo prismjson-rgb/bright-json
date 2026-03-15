@@ -1,8 +1,6 @@
 /* globals.css */
 
-/* Recommended fonts */
-@import url("https://rsms.me/inter/inter.css");
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap");
+/* Fonts loaded via <link> in layout.tsx (non-blocking chain) for better LCP */
 
 :root {
   /* ---------- Core surfaces ---------- */
