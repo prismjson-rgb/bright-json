@@ -2,9 +2,9 @@
 import { useState, useCallback, useEffect } from "react";
 import {
   Link2, Plus, Trash2, Copy, Check, Download,
-  FileCode, Package, Lock, ChevronDown, AlertTriangle, Sparkles, Zap, Loader2, X,
+  FileCode, Package, Lock, ChevronDown, Sparkles, Zap, Loader2, X,
 } from "lucide-react";
-import { encodeJson, encodeBundle, isTooLarge, type BundleEntry } from "@/lib/share";
+import { encodeJson, encodeBundle, type BundleEntry } from "@/lib/share";
 import { generateHtml } from "@/lib/html-export";
 import type { TabData } from "@/lib/tabs-storage";
 
@@ -18,7 +18,7 @@ interface JsonSharePanelProps {
 
 type Section = "link" | "bundle" | "export";
 
-/** Shorten any URL via is.gd public CORS API — no API key required */
+/** Shorten any URL via is.gd public CORS API — handles URL fragments correctly */
 async function shortenUrl(longUrl: string): Promise<string> {
   const res = await fetch(
     `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`,
@@ -76,10 +76,8 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   /* ── Share via Link ─────────────────────────────── */
   const [shareUrl, setShareUrl]         = useState("");
   const [shortLinkUrl, setShortLinkUrl] = useState("");
-  const [urlTooLarge, setUrlTooLarge]   = useState(false);
   const [copiedLink, setCopiedLink]     = useState(false);
   const [shorteningLink, setShorteningLink] = useState(false);
-  const [linkShortenErr, setLinkShortenErr] = useState("");
 
   const shareUrlComputed = getShareUrl();
   const shareHasJson = (() => {
@@ -89,26 +87,16 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   })();
 
   useEffect(() => {
-    if (!shareHasJson) { setShareUrl(""); setUrlTooLarge(false); return; }
-    setShareUrl(shareUrlComputed);
-    setUrlTooLarge(isTooLarge(shareUrlComputed));
+    if (!shareHasJson) { setShareUrl(""); return; }
+    const computed = shareUrlComputed;
+    setShareUrl(computed);
     setShortLinkUrl("");
-    setLinkShortenErr("");
-  }, [shareUrlComputed, shareHasJson]);
-
-  const handleShortenLink = async () => {
     setShorteningLink(true);
-    setLinkShortenErr("");
-    try {
-      const short = await shortenUrl(shareUrl);
-      setShortLinkUrl(short);
-    } catch (e) {
-      setLinkShortenErr("Shortening failed — try again or copy the full link.");
-      console.error(e);
-    } finally {
-      setShorteningLink(false);
-    }
-  };
+    shortenUrl(computed)
+      .then(setShortLinkUrl)
+      .catch(() => {})
+      .finally(() => setShorteningLink(false));
+  }, [shareUrlComputed, shareHasJson]);
 
   const displayLinkUrl = shortLinkUrl || shareUrl;
   const handleCopyLink = () => {
@@ -126,35 +114,22 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   }, [tabs]);
   const [bundleUrl, setBundleUrl]             = useState("");
   const [shortBundleUrl, setShortBundleUrl]   = useState("");
-  const [bundleTooLarge, setBundleTooLarge]   = useState(false);
   const [copiedBundle, setCopiedBundle]       = useState(false);
   const [shorteningBundle, setShorteningBundle] = useState(false);
-  const [bundleShortenErr, setBundleShortenErr] = useState("");
 
   const generateBundleUrl = useCallback(() => {
     const valid = bundleEntries.filter(e => e.title.trim() && e.json.trim());
     if (!valid.length) return;
     const encoded = encodeBundle(valid);
     const url = window.location.origin + "/bundle/#bundle=" + encoded;
-    setBundleUrl(url);
-    setBundleTooLarge(isTooLarge(url));
     setShortBundleUrl("");
-    setBundleShortenErr("");
-  }, [bundleEntries]);
-
-  const handleShortenBundle = async () => {
+    setBundleUrl(url);
     setShorteningBundle(true);
-    setBundleShortenErr("");
-    try {
-      const short = await shortenUrl(bundleUrl);
-      setShortBundleUrl(short);
-    } catch (e) {
-      setBundleShortenErr("Shortening failed — try again or copy the full link.");
-      console.error(e);
-    } finally {
-      setShorteningBundle(false);
-    }
-  };
+    shortenUrl(url)
+      .then(setShortBundleUrl)
+      .catch(() => {})
+      .finally(() => setShorteningBundle(false));
+  }, [bundleEntries]);
 
   const displayBundleUrl = shortBundleUrl || bundleUrl;
   const handleCopyBundle = () => {
@@ -205,9 +180,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     onDownloadJson(toExport, filename);
   };
 
-  const compressionRatio = hasJson
-    ? Math.round((1 - encodeJson(json).length / json.length) * 100)
-    : 0;
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
@@ -246,7 +218,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
           icon={<Link2 className="w-3.5 h-3.5 text-primary" />}
           open={open === "link"}
           onToggle={() => setOpen(s => s === "link" ? "export" : "link")}
-          badge={shareHasJson && !urlTooLarge ? "Ready" : undefined}
+          badge={shareHasJson ? "Ready" : undefined}
         />
 
         {open === "link" && (
@@ -282,11 +254,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
             )}
             {!shareHasJson ? (
               <p className="text-xs text-muted-foreground">Paste JSON in the editor first.</p>
-            ) : urlTooLarge ? (
-              <WarningBox
-                title="JSON too large for a URL"
-                body="Your JSON exceeds the safe browser URL limit (~2 KB). Use HTML Export below to share as a file."
-              />
             ) : (
               <>
                 {/* URL display + copy */}
@@ -299,41 +266,25 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                   <CopyBtn copied={copiedLink} onClick={handleCopyLink} />
                 </div>
 
-                {/* Shorten row */}
+                {/* Shorten status */}
                 <div className="flex items-center gap-2">
-                  {!shortLinkUrl ? (
-                    <button
-                      onClick={handleShortenLink}
-                      disabled={shorteningLink}
-                      className="toolbar-btn text-primary disabled:opacity-50"
-                      title="Get a short link via is.gd"
-                    >
-                      {shorteningLink
-                        ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        : <Zap className="w-3.5 h-3.5" />}
-                      <span>{shorteningLink ? "Shortening…" : "Shorten Link"}</span>
-                    </button>
-                  ) : (
+                  {shorteningLink ? (
+                    <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Generating short link…
+                    </span>
+                  ) : shortLinkUrl ? (
                     <span className="flex items-center gap-1.5 text-[11px] text-primary">
-                      <Check className="w-3 h-3" />
+                      <Zap className="w-3 h-3" />
                       Shortened via is.gd
                       <button
-                        onClick={() => { setShortLinkUrl(""); setLinkShortenErr(""); }}
+                        onClick={() => { setShortLinkUrl(""); }}
                         className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
                       >
                         use full link
                       </button>
                     </span>
-                  )}
-                  {linkShortenErr && (
-                    <span className="text-[11px] text-destructive">{linkShortenErr}</span>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground/50">
-                  <span>{shareUrl.length.toLocaleString()} chars (compressed)</span>
-                  <span>·</span>
-                  <span className="text-primary/70">{compressionRatio}% smaller than raw JSON</span>
+                  ) : null}
                 </div>
               </>
             )}
@@ -346,7 +297,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
           icon={<Package className="w-3.5 h-3.5 text-primary" />}
           open={open === "bundle"}
           onToggle={() => setOpen(s => s === "bundle" ? "link" : "bundle")}
-          badge={bundleUrl && !bundleTooLarge ? "Ready" : undefined}
+          badge={bundleUrl ? "Ready" : undefined}
         />
 
         {open === "bundle" && (
@@ -404,9 +355,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
             </div>
 
             {bundleUrl && (
-              bundleTooLarge ? (
-                <WarningBox title="Bundle too large for a URL" body="Try fewer entries or smaller JSONs." />
-              ) : (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2">
                     <input
@@ -417,41 +365,31 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                     <CopyBtn copied={copiedBundle} onClick={handleCopyBundle} />
                   </div>
 
-                  {/* Shorten bundle */}
+                  {/* Shorten bundle status */}
                   <div className="flex items-center gap-2">
-                    {!shortBundleUrl ? (
-                      <button
-                        onClick={handleShortenBundle}
-                        disabled={shorteningBundle}
-                        className="toolbar-btn text-primary disabled:opacity-50"
-                      >
-                        {shorteningBundle
-                          ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          : <Zap className="w-3.5 h-3.5" />}
-                        <span>{shorteningBundle ? "Shortening…" : "Shorten Link"}</span>
-                      </button>
-                    ) : (
+                    {shorteningBundle ? (
+                      <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Generating short link…
+                      </span>
+                    ) : shortBundleUrl ? (
                       <span className="flex items-center gap-1.5 text-[11px] text-primary">
-                        <Check className="w-3 h-3" />
+                        <Zap className="w-3 h-3" />
                         Shortened via is.gd
                         <button
-                          onClick={() => { setShortBundleUrl(""); setBundleShortenErr(""); }}
+                          onClick={() => { setShortBundleUrl(""); }}
                           className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
                         >
                           use full link
                         </button>
                       </span>
-                    )}
-                    {bundleShortenErr && (
-                      <span className="text-[11px] text-destructive">{bundleShortenErr}</span>
-                    )}
+                    ) : null}
                   </div>
 
                   <p className="text-[10px] text-muted-foreground/50">
                     Recipients see a list and can open each JSON in the editor.
                   </p>
                 </div>
-              )
             )}
           </div>
         )}
@@ -523,11 +461,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
               </div>
             </button>
 
-            {urlTooLarge && hasJson && (
-              <p className="text-[11px] text-primary/80 mt-1">
-                💡 JSON too large for a URL — HTML Export is the best way to share it.
-              </p>
-            )}
           </div>
         )}
 
@@ -565,17 +498,5 @@ function CopyBtn({ copied, onClick }: { copied: boolean; onClick: () => void }) 
       {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
       <span className="hidden sm:inline">{copied ? "Copied!" : "Copy"}</span>
     </button>
-  );
-}
-
-function WarningBox({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="flex gap-2.5 p-3 rounded-xl bg-destructive/8 border border-destructive/25">
-      <AlertTriangle className="w-3.5 h-3.5 text-destructive shrink-0 mt-0.5" />
-      <div>
-        <p className="text-xs font-medium text-destructive">{title}</p>
-        <p className="text-[11px] text-destructive/70 mt-0.5">{body}</p>
-      </div>
-    </div>
   );
 }

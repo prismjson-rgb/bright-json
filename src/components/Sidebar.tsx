@@ -1,5 +1,6 @@
 "use client";
 import { Braces, TreePine, Columns2, Wand2, Bug, Scissors, Eraser, PackageMinus, BarChart3, Lightbulb, Hash, ArrowLeftRight, StickyNote, Search, BookOpen, Share2, Sun, Moon, Settings, FormInput, X } from "lucide-react";
+import Link from "next/link";
 import type { PanelMode } from "./JsonViewerClient";
 
 interface SidebarProps {
@@ -119,7 +120,7 @@ export default function Sidebar({ mode, searchOpen, shareOpen, settingsOpen, dar
         )}
       </div>
       {onToggleTheme && (
-        <div className="mt-auto border-t border-border/60 p-2">
+        <div className="mt-auto border-t border-border/60 p-2 flex flex-col gap-1">
           <button
             onClick={onToggleTheme}
             className="flex items-center justify-center w-full py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
@@ -127,6 +128,11 @@ export default function Sidebar({ mode, searchOpen, shareOpen, settingsOpen, dar
           >
             {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
+          <div className="flex items-center justify-center gap-2 pb-1">
+            <Link href="/privacy" className="text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">Privacy</Link>
+            <span className="text-[9px] text-muted-foreground/30">·</span>
+            <Link href="/terms" className="text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">Terms</Link>
+          </div>
         </div>
       )}
     </aside>
