@@ -8,7 +8,7 @@ import {
 } from "@/lib/learn-content";
 import { LearnArticlePage } from "@/components/LearnArticlePage";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://bright-json.vercel.app";
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
 export function generateStaticParams() {
   return getTutorialSections().map((s) => ({ slug: s.id }));
@@ -23,7 +23,7 @@ export async function generateMetadata({
   const section = getSectionById(slug);
   if (!section) return { title: "Not Found" };
 
-  const title = section.metaTitle || `${section.title} | JSON Tutorial`;
+  const title = section.metaTitle || section.title;
   const description =
     section.metaDescription ||
     `Learn about ${section.title} in this JSON tutorial. Part of the complete JSON guide from JSON Prism.`;
@@ -38,11 +38,13 @@ export async function generateMetadata({
       type: "article",
       siteName: "JSON Prism",
       url: `${BASE}/learn/${slug}/`,
+      images: [{ url: `${BASE}/icons/icon-512.png`, width: 512, height: 512, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [`${BASE}/icons/icon-512.png`],
     },
     alternates: {
       canonical: `${BASE}/learn/${slug}/`,
@@ -74,9 +76,19 @@ export default async function LearnArticleRoute({
     author: { "@type": "Organization", name: "JSON Prism" },
     publisher: { "@type": "Organization", name: "JSON Prism" },
     url: `${BASE}/learn/${slug}/`,
-    datePublished: "2024-01-01",
+    datePublished: "2025-12-01",
     dateModified: new Date().toISOString().split("T")[0],
     mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/learn/${slug}/` },
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: "Learn", item: `${BASE}/learn/` },
+      { "@type": "ListItem", position: 3, name: section.title, item: `${BASE}/learn/${slug}/` },
+    ],
   };
 
   return (
@@ -84,6 +96,10 @@ export default async function LearnArticleRoute({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
 
       <header className="border-b border-border bg-surface1 sticky top-0 z-10">

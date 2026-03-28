@@ -2,9 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Braces } from "lucide-react";
 
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
+
 export const metadata: Metadata = {
   title: "Privacy Policy — JSON Prism",
-  description: "Privacy policy for JSON Prism — how we handle your data.",
+  description:
+    "Privacy policy for JSON Prism. All JSON processing runs locally in your browser — no data is transmitted or stored on any server.",
+  alternates: { canonical: `${BASE}/privacy/` },
+  openGraph: {
+    title: "Privacy Policy — JSON Prism",
+    description:
+      "Privacy policy for JSON Prism. All JSON processing runs locally in your browser — no data is transmitted or stored.",
+    type: "website",
+    siteName: "JSON Prism",
+    url: `${BASE}/privacy/`,
+  },
 };
 
 export default function PrivacyPage() {
@@ -61,18 +73,23 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">Local Storage</h2>
+            <h2 className="text-xl font-semibold mb-3">Browser storage</h2>
             <p className="text-muted-foreground leading-relaxed">
-              JSON Prism stores the following data locally in your browser using{" "}
+              JSON Prism stores data only on your device:{" "}
               <code className="text-xs bg-muted px-1 py-0.5 rounded">
                 localStorage
-              </code>
-              :
+              </code>{" "}
+              for the theme, and{" "}
+              <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                IndexedDB
+              </code>{" "}
+              for tabs, editor content, settings, and saved JSON (larger payloads
+              use async storage so the page stays responsive).
             </p>
             <ul className="list-disc pl-6 space-y-2 text-muted-foreground mt-3">
               <li>
                 <strong className="text-foreground">Theme preference</strong>{" "}
-                (light or dark) — stored under the key{" "}
+                (light or dark) —{" "}
                 <code className="text-xs bg-muted px-1 py-0.5 rounded">
                   json-viewer-theme
                 </code>
@@ -98,11 +115,18 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">
-              Third-Party Services
+              Third-Party Services &amp; Analytics
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              JSON Prism does not integrate any third-party analytics, tracking
-              pixels, advertising networks, or user-profiling services.
+              JSON Prism uses Google Tag Manager (GTM) to load analytics
+              scripts. GTM may collect standard usage data such as pages viewed,
+              browser type, and approximate location. This data is used solely
+              to understand aggregate usage patterns and improve the tool. No
+              JSON content you process is included in any analytics event.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              JSON Prism does not integrate advertising networks,
+              retargeting pixels, or user-profiling services.
             </p>
           </section>
 

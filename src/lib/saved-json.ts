@@ -1,45 +1,76 @@
 /**
- * Persist JSON to localStorage. Data survives page refresh until explicitly cleared.
+ * Persist JSON via IndexedDB (async). Migrates legacy localStorage entry once.
  */
 
-const STORAGE_KEY = "json-prism-saved";
+import { idbGet, idbSet, idbDelete } from "@/lib/json-prism-idb";
 
-export function saveJson(json: string): boolean {
+const IDB_KEY = "json-prism-saved-v1";
+const LEGACY_LS_KEY = "json-prism-saved";
+
+export async function saveJson(json: string): Promise<boolean> {
   if (typeof window === "undefined") return false;
   try {
-    JSON.parse(json); // validate before saving
+    JSON.parse(json);
   } catch {
     return false;
   }
   try {
-    localStorage.setItem(STORAGE_KEY, json);
+    await idbSet(IDB_KEY, json);
+    try {
+      localStorage.removeItem(LEGACY_LS_KEY);
+    } catch {
+      /* ignore */
+    }
     return true;
   } catch {
     return false;
   }
 }
 
-export function loadSavedJson(): string | null {
+export async function loadSavedJson(): Promise<string | null> {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const fromIdb = await idbGet<string>(IDB_KEY);
+    if (typeof fromIdb === "string" && fromIdb.length > 0) {
+      JSON.parse(fromIdb);
+      return fromIdb;
+    }
+
+    const raw = localStorage.getItem(LEGACY_LS_KEY);
     if (!raw) return null;
-    JSON.parse(raw); // validate
+    JSON.parse(raw);
+    await idbSet(IDB_KEY, raw);
+    try {
+      localStorage.removeItem(LEGACY_LS_KEY);
+    } catch {
+      /* ignore */
+    }
     return raw;
   } catch {
     return null;
   }
 }
 
-export function hasSavedJson(): boolean {
+export async function hasSavedJson(): Promise<boolean> {
   if (typeof window === "undefined") return false;
-  return localStorage.getItem(STORAGE_KEY) !== null;
+  try {
+    const fromIdb = await idbGet<string>(IDB_KEY);
+    if (typeof fromIdb === "string" && fromIdb.length > 0) return true;
+    return localStorage.getItem(LEGACY_LS_KEY) !== null;
+  } catch {
+    return false;
+  }
 }
 
-export function clearSavedJson(): void {
+export async function clearSavedJson(): Promise<void> {
   if (typeof window === "undefined") return;
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    await idbDelete(IDB_KEY);
+  } catch {
+    /* ignore */
+  }
+  try {
+    localStorage.removeItem(LEGACY_LS_KEY);
   } catch {
     /* ignore */
   }

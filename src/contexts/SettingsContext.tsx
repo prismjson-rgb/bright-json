@@ -9,7 +9,7 @@ import {
   useEffect,
 } from "react";
 import type { AppSettings } from "@/lib/settings";
-import { loadSettings, saveSettings as persistSettings } from "@/lib/settings";
+import { DEFAULT_SETTINGS, loadSettings, saveSettings as persistSettings } from "@/lib/settings";
 
 interface SettingsContextValue {
   settings: AppSettings;
@@ -17,29 +17,32 @@ interface SettingsContextValue {
   resetSettings: () => void;
 }
 
-const defaultSettings = loadSettings();
-
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    setSettings(loadSettings());
+    let cancelled = false;
+    void loadSettings().then((s) => {
+      if (!cancelled) setSettings(s);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const updateSettings = useCallback((update: Partial<AppSettings>) => {
     setSettings((prev) => {
       const next = merge(prev, update);
-      persistSettings(next);
+      void persistSettings(next);
       return next;
     });
   }, []);
 
   const resetSettings = useCallback(() => {
-    const { DEFAULT_SETTINGS } = require("@/lib/settings");
     setSettings(DEFAULT_SETTINGS);
-    persistSettings(DEFAULT_SETTINGS);
+    void persistSettings(DEFAULT_SETTINGS);
   }, []);
 
   const value = useMemo(

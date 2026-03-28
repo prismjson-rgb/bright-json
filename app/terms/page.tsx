@@ -2,9 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Braces } from "lucide-react";
 
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
+
 export const metadata: Metadata = {
   title: "Terms & Conditions — JSON Prism",
-  description: "Terms and conditions for using JSON Prism.",
+  description:
+    "Terms and conditions for using JSON Prism — a free, browser-based JSON formatting and validation tool.",
+  alternates: { canonical: `${BASE}/terms/` },
+  openGraph: {
+    title: "Terms & Conditions — JSON Prism",
+    description:
+      "Terms and conditions for using JSON Prism — a free, browser-based JSON formatting and validation tool.",
+    type: "website",
+    siteName: "JSON Prism",
+    url: `${BASE}/terms/`,
+  },
 };
 
 export default function TermsPage() {

@@ -1,8 +1,11 @@
 /**
- * Persist multi-tab JSON to localStorage.
+ * Persist multi-tab JSON to IndexedDB (async, non-blocking). Migrates legacy localStorage once.
  */
 
-const TABS_KEY = "json-prism-tabs";
+import { idbGet, idbSet } from "@/lib/json-prism-idb";
+
+const IDB_KEY = "json-prism-tabs-v1";
+const LEGACY_LS_KEY = "json-prism-tabs";
 
 export interface TabData {
   id: string;
@@ -31,26 +34,49 @@ function defaultTabs(): TabData[] {
   return [{ id: crypto.randomUUID(), name: "Untitled 1", json: sample }];
 }
 
-export function loadTabs(): TabsState | null {
+function normalizeTabsState(data: unknown): TabsState | null {
+  if (!data || typeof data !== "object") return null;
+  const d = data as TabsState;
+  if (!Array.isArray(d.tabs) || d.tabs.length === 0) return null;
+  const valid = d.tabs.filter((t) => t && t.id && t.name != null && typeof t.json === "string");
+  if (valid.length === 0) return null;
+  const activeId = valid.some((t) => t.id === d.activeId) ? d.activeId : valid[0].id;
+  return { tabs: valid, activeId };
+}
+
+export async function loadTabs(): Promise<TabsState | null> {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(TABS_KEY);
+    const fromIdb = await idbGet<TabsState>(IDB_KEY);
+    const normalized = normalizeTabsState(fromIdb);
+    if (normalized) return normalized;
+
+    const raw = localStorage.getItem(LEGACY_LS_KEY);
     if (!raw) return null;
-    const data = JSON.parse(raw) as TabsState;
-    if (!Array.isArray(data.tabs) || data.tabs.length === 0) return null;
-    const valid = data.tabs.filter((t) => t && t.id && t.name != null && typeof t.json === "string");
-    if (valid.length === 0) return null;
-    const activeId = valid.some((t) => t.id === data.activeId) ? data.activeId : valid[0].id;
-    return { tabs: valid, activeId };
+    const parsed = JSON.parse(raw) as unknown;
+    const migrated = normalizeTabsState(parsed);
+    if (!migrated) return null;
+    await idbSet(IDB_KEY, migrated);
+    try {
+      localStorage.removeItem(LEGACY_LS_KEY);
+    } catch {
+      /* ignore */
+    }
+    return migrated;
   } catch {
     return null;
   }
 }
 
-export function saveTabs(state: TabsState): void {
+export async function saveTabs(state: TabsState): Promise<void> {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(TABS_KEY, JSON.stringify(state));
+    await idbSet(IDB_KEY, state);
+    try {
+      localStorage.removeItem(LEGACY_LS_KEY);
+    } catch {
+      /* ignore */
+    }
   } catch {
     /* ignore */
   }

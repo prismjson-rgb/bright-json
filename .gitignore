@@ -25,3 +25,9 @@ out
 *.sln
 *.sw?
 .vercel
+
+# Test coverage output
+coverage/
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo

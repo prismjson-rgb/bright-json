@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getPageBySlug, getAllPageSlugs } from "@/lib/pages-content";
 import { MarkdownArticleBody } from "@/components/MarkdownArticleBody";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://bright-json.vercel.app";
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
 export function generateStaticParams() {
   return getAllPageSlugs().map((slug) => ({ slug }));
@@ -19,14 +19,14 @@ export async function generateMetadata({
   const page = getPageBySlug(slug);
   if (!page) return { title: "Not Found" };
 
-  const title = page.metaTitle || `${page.title} | JSON Prism`;
+  const title = page.metaTitle || page.title;
   const description = page.metaDescription || "";
 
   return {
     title: `${title} | JSON Prism`,
     description,
     openGraph: {
-      title,
+      title: `${title} | JSON Prism`,
       description,
       type: "website",
       siteName: "JSON Prism",

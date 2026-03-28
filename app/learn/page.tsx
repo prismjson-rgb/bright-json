@@ -8,7 +8,7 @@ import {
 
 const TITLE = "JSON Tutorial — Complete Guide from Beginner to Expert | JSON Prism";
 const DESCRIPTION =
-  "Master JSON with our free, comprehensive tutorial. 17+ articles covering basics, data types, APIs, JSON Schema, JSONPath, security & more. Each topic has its own page for focused learning.";
+  "Master JSON free. 18 articles: basics, data types, REST APIs, JSON Schema, JSONPath, security, and more. Each topic has its own page for focused learning.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     type: "website",
     siteName: "JSON Prism",
-    url: "https://bright-json.vercel.app/learn/",
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com"}/learn/`,
   },
   twitter: {
     card: "summary_large_image",
@@ -36,21 +36,23 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
   alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || "https://bright-json.vercel.app"}/learn/`,
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com"}/learn/`,
   },
 };
+
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
 const JSON_LD_COURSE = {
   "@context": "https://schema.org",
   "@type": "Course",
   name: "Complete JSON Tutorial — From Beginner to Expert",
   description: DESCRIPTION,
-  provider: { "@type": "Organization", name: "JSON Prism", url: "https://bright-json.vercel.app" },
+  provider: { "@type": "Organization", name: "JSON Prism", url: `${BASE}/` },
   hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: "PT1H" },
   hasPart: getTutorialSections().map((s) => ({
     "@type": "LearningResource",
     name: s.title,
-    url: `https://bright-json.vercel.app/learn/${s.id}/`,
+    url: `${BASE}/learn/${s.id}/`,
   })),
 };
 

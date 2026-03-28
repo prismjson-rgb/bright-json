@@ -3,8 +3,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check, Download, Upload,
-  Minimize2, ArrowUpDown, Sun, Moon, Sparkles, Share2, Save, Trash2, Menu, Braces,
+  Minimize2, ArrowUpDown, Sun, Moon, Sparkles, Share2, Save, Trash2, Menu, Braces, Wrench,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
 import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
@@ -38,9 +39,11 @@ const JsonTokenEstimator = dynamic(() => import("@/components/JsonTokenEstimator
 const JsonLearnPanel = dynamic(() => import("@/components/JsonLearnPanel"), { ssr: false, loading: panelLoading });
 const JsonSharePanel = dynamic(() => import("@/components/JsonSharePanel"), { ssr: false, loading: panelLoading });
 const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), { ssr: false, loading: panelLoading });
+const JsonFlowView = dynamic(() => import("@/components/JsonFlowView"), { ssr: false, loading: panelLoading });
 import { useSettings } from "@/contexts/SettingsContext";
+import { repairJson } from "@/lib/json-debug";
 import { safeDecodeJson } from "@/lib/share";
-import { saveJson, loadSavedJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
+import { saveJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
 import {
   loadTabs,
   saveTabs,
@@ -51,12 +54,12 @@ import {
   type TabsState,
 } from "@/lib/tabs-storage";
 
-export type PanelMode = "tree" | "visual" | "diff" | "mock" | "debug" | "trim" | "clean"
+export type PanelMode = "tree" | "visual" | "flow" | "diff" | "mock" | "debug" | "trim" | "clean"
   | "minimal" | "structure" | "practices" | "tokens" | "convert" | "notes" | "learn" | "share";
 
 // Mode label for status bar
 const MODE_LABELS: Partial<Record<PanelMode, string>> = {
-  visual: "Visual Editor", diff: "Diff Mode", mock: "Mock Generator", debug: "JSON Debugger",
+  visual: "Visual Editor", flow: "Flow View", diff: "Diff Mode", mock: "Mock Generator", debug: "JSON Debugger",
   trim: "JSON Trimmer", clean: "AI Cleaner", minimal: "Minimal Mode",
   structure: "Structure Analyzer", practices: "Best Practices",
   tokens: "Token Estimator", convert: "Convert Mode", notes: "Notes Mode",
@@ -68,8 +71,14 @@ function getInitialTabs(): TabsState {
   return { tabs, activeId: tabs[0].id };
 }
 
+/** Debounce tab persistence so we do not stringify/write multi‑MB JSON on every keystroke. */
+const TABS_SAVE_DEBOUNCE_MS = 400;
+
 export default function JsonViewerClient() {
   const [tabsState, setTabsState] = useState<TabsState>(getInitialTabs);
+  const [tabsHydrated, setTabsHydrated] = useState(false);
+  const tabsStateRef = useRef(tabsState);
+  tabsStateRef.current = tabsState;
   const activeTab = tabsState.tabs.find((t) => t.id === tabsState.activeId) ?? tabsState.tabs[0];
   const json = activeTab?.json ?? "";
 
@@ -109,35 +118,80 @@ export default function JsonViewerClient() {
     [setParserJson]
   );
 
+  const handleRepairJson = useCallback(() => {
+    if (!json.trim()) return;
+    try {
+      const fixed = repairJson(json);
+      const obj = JSON.parse(fixed);
+      const indent = settings.format.beautifyIndent;
+      const out = JSON.stringify(obj, null, indent);
+      setJson(out);
+      toast.success("JSON repaired");
+    } catch {
+      toast.error("Could not repair JSON — structure may need manual edits");
+    }
+  }, [json, setJson, settings.format.beautifyIndent]);
+
   // Sync parser when switching tabs (not on json edit — only when activeId changes)
   useEffect(() => {
     setParserJson(activeTab?.json ?? "");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabsState.activeId]);
 
-  // Load persisted tabs from localStorage on mount
+  // Load persisted tabs from IndexedDB (async); avoid saving defaults before hydration completes
   useEffect(() => {
-    const loaded = loadTabs();
-    if (loaded) setTabsState(loaded);
+    let cancelled = false;
+    void (async () => {
+      const loaded = await loadTabs();
+      if (!cancelled) {
+        if (loaded) setTabsState(loaded);
+        setTabsHydrated(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Persist tabs to localStorage when they change
+  // Debounced persist — avoids blocking the main thread on every keystroke
   useEffect(() => {
-    saveTabs(tabsState);
-  }, [tabsState]);
+    if (!tabsHydrated) return;
+    const id = window.setTimeout(() => {
+      void saveTabs(tabsState);
+    }, TABS_SAVE_DEBOUNCE_MS);
+    return () => window.clearTimeout(id);
+  }, [tabsState, tabsHydrated]);
 
-  // Load from URL hash on mount (overrides active tab)
+  // Flush latest tabs when leaving or hiding the tab (debounce may not have run yet)
   useEffect(() => {
+    const flush = () => {
+      if (!tabsHydrated) return;
+      void saveTabs(tabsStateRef.current);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") flush();
+    };
+    window.addEventListener("beforeunload", flush);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("beforeunload", flush);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [tabsHydrated]);
+
+  // Load from URL hash after storage hydrate so hash wins over restored tabs
+  useEffect(() => {
+    if (!tabsHydrated) return;
     const m = window.location.hash.match(/^#json=(.+)/);
     if (m) {
       const decoded = safeDecodeJson(m[1]);
       if (decoded) setJson(decoded);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tabsHydrated]);
 
   useEffect(() => {
-    setHasSaved(hasSavedJson());
+    void hasSavedJson().then(setHasSaved);
   }, []);
 
   const addTab = useCallback(() => {
@@ -229,16 +283,17 @@ export default function JsonViewerClient() {
   }, []);
 
   const handleSave = useCallback(() => {
-    if (saveJson(json)) {
-      setSaved(true);
-      setHasSaved(true);
-      setTimeout(() => setSaved(false), 1500);
-    }
+    void (async () => {
+      if (await saveJson(json)) {
+        setSaved(true);
+        setHasSaved(true);
+        setTimeout(() => setSaved(false), 1500);
+      }
+    })();
   }, [json]);
 
   const handleClearSaved = useCallback(() => {
-    clearSavedJson();
-    setHasSaved(false);
+    void clearSavedJson().then(() => setHasSaved(false));
   }, []);
 
   const handleMode = useCallback((m: PanelMode) => {
@@ -452,7 +507,7 @@ export default function JsonViewerClient() {
                 </div>
                 <div className="px-3 pb-2 pt-0 pl-[3.25rem]">
                   <span className="text-xs font-semibold uppercase tracking-wider text-foreground/90 truncate block">
-                    {modeLabel ?? (mode === "visual" ? "Visual Editor" : "Tree View")}
+                    {modeLabel ?? (mode === "visual" ? "Visual Editor" : mode === "flow" ? "Flow View" : "Tree View")}
                   </span>
                 </div>
               </div>
@@ -478,6 +533,15 @@ export default function JsonViewerClient() {
                   </button>
                   <button onClick={sortKeys} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Sort keys">
                     <ArrowUpDown className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Sort</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRepairJson}
+                    disabled={!hasJson || !error}
+                    className="toolbar-btn text-muted-foreground disabled:opacity-30"
+                    title="Repair invalid JSON (quotes, commas, brackets, etc.)"
+                  >
+                    <Wrench className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Fix</span>
                   </button>
                 </div>
                 <button onClick={handleCopy} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Copy JSON">
@@ -519,10 +583,12 @@ export default function JsonViewerClient() {
                 <JsonSearchPanel query={query} matchCount={matchCount} onQueryChange={setQuery} onClose={() => { setSearchOpen(false); setQuery(""); }} />
               )}
 
-              {(mode === "tree" || mode === "visual") && (
+              {(mode === "tree" || mode === "visual" || mode === "flow") && (
                 <>
                   <div className="pane-header">
-                    <span>{mode === "visual" ? "Visual Editor" : "Tree View"}</span>
+                    <span>
+                      {mode === "visual" ? "Visual Editor" : mode === "flow" ? "Flow View" : "Tree View"}
+                    </span>
                     <div className="flex items-center gap-1.5 ml-2">
                       <button
                         onClick={handleCopy}
@@ -556,9 +622,14 @@ export default function JsonViewerClient() {
                         </>
                       )}
                     </div>
-                    {parsed !== null && (
+                    {parsed !== null && mode !== "flow" && (
                       <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">
                         {Array.isArray(parsed) ? `${(parsed as unknown[]).length} items` : `${Object.keys(parsed as object).length} keys`}
+                      </span>
+                    )}
+                    {mode === "flow" && parsed !== null && (
+                      <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-50 hidden sm:inline">
+                        Pan · scroll to zoom · drag nodes
                       </span>
                     )}
                   </div>
@@ -569,6 +640,8 @@ export default function JsonViewerClient() {
                         onChange={setJson}
                         dark={dark}
                       />
+                    ) : mode === "flow" ? (
+                      <JsonFlowView parsed={parsed} dark={dark} />
                     ) : (
                       <JsonTreeView data={parsed} expandAll={expandAll} searchTerm={searchOpen ? query : undefined} treeSettings={settings.treeView} />
                     )}

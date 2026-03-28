@@ -1,7 +1,9 @@
 /**
  * User-editable JSON editor & viewer settings.
- * Persisted in localStorage; all keys prefixed with json-prism-settings-
+ * Persisted in IndexedDB (async). Migrates legacy localStorage once.
  */
+
+import { idbGet, idbSet } from "@/lib/json-prism-idb";
 
 export interface EditorSettings {
   fontSize: number;
@@ -65,15 +67,32 @@ export const DEFAULT_SETTINGS: AppSettings = {
   format: DEFAULT_FORMAT,
 };
 
-const STORAGE_KEY = "json-prism-settings";
+const IDB_KEY = "json-prism-settings-v1";
+const LEGACY_LS_KEY = "json-prism-settings";
 
-function loadFromStorage(): AppSettings {
+function mergePartial(parsed: Partial<AppSettings>): AppSettings {
+  return deepMerge(DEFAULT_SETTINGS, parsed);
+}
+
+export async function loadSettings(): Promise<AppSettings> {
   if (typeof window === "undefined") return DEFAULT_SETTINGS;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const fromIdb = await idbGet<AppSettings>(IDB_KEY);
+    if (fromIdb && typeof fromIdb === "object") {
+      return mergePartial(fromIdb as Partial<AppSettings>);
+    }
+
+    const raw = localStorage.getItem(LEGACY_LS_KEY);
     if (!raw) return DEFAULT_SETTINGS;
     const parsed = JSON.parse(raw) as Partial<AppSettings>;
-    return deepMerge(DEFAULT_SETTINGS, parsed);
+    const merged = mergePartial(parsed);
+    await idbSet(IDB_KEY, merged);
+    try {
+      localStorage.removeItem(LEGACY_LS_KEY);
+    } catch {
+      /* ignore */
+    }
+    return merged;
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -94,17 +113,18 @@ function deepMerge<T extends object>(target: T, source: Partial<T>): T {
   return out as T;
 }
 
-export function saveSettings(settings: AppSettings): void {
+export async function saveSettings(settings: AppSettings): Promise<void> {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    await idbSet(IDB_KEY, settings);
+    try {
+      localStorage.removeItem(LEGACY_LS_KEY);
+    } catch {
+      /* ignore */
+    }
   } catch {
     /* ignore */
   }
-}
-
-export function loadSettings(): AppSettings {
-  return loadFromStorage();
 }
 
 // Font family options for editor

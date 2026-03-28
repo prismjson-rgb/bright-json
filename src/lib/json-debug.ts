@@ -1,3 +1,5 @@
+import { jsonrepair } from "jsonrepair";
+
 export interface DebugIssue {
   line: number;
   col?: number;
@@ -75,7 +77,7 @@ export function analyzeJson(json: string): DebugIssue[] {
         severity: "error",
         type: "unclosed-bracket",
         message: `Unclosed ${b.ch === "{" ? "object {" : "array ["} opened on line ${b.line}`,
-        autoFixable: false,
+        autoFixable: true,
       });
     }
 
@@ -114,8 +116,17 @@ function humanizeError(msg: string): string {
   return msg;
 }
 
+/**
+ * Repair invalid JSON using the `jsonrepair` library (missing brackets, commas,
+ * colons, quotes, trailing commas, comments, NDJSON→array, etc.).
+ * @see https://github.com/josdejong/jsonrepair
+ */
+export function repairJson(input: string): string {
+  const s = input.trim();
+  if (!s) return s;
+  return jsonrepair(s);
+}
+
 export function applyAutoFix(json: string): string {
-  // Fix trailing commas
-  const fixed = json.replace(/,(\s*[}\]])/g, "$1");
-  return fixed;
+  return repairJson(json);
 }

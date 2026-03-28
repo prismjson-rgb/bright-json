@@ -1,5 +1,5 @@
 "use client";
-import { Braces, TreePine, Columns2, Wand2, Bug, Scissors, Eraser, PackageMinus, BarChart3, Lightbulb, Hash, ArrowLeftRight, StickyNote, Search, BookOpen, Share2, Sun, Moon, Settings, FormInput, X } from "lucide-react";
+import { Braces, TreePine, Columns2, Wand2, Bug, Scissors, Eraser, PackageMinus, BarChart3, Lightbulb, Hash, ArrowLeftRight, StickyNote, Search, BookOpen, Share2, Sun, Moon, Settings, FormInput, X, GitBranch } from "lucide-react";
 import Link from "next/link";
 import type { PanelMode } from "./JsonViewerClient";
 
@@ -21,6 +21,7 @@ const sections = [
   { label: "VIEW", items: [
     { mode: "tree" as PanelMode, icon: TreePine, label: "Tree View", shortcut: "Default" },
     { mode: "visual" as PanelMode, icon: FormInput, label: "Visual Editor", shortcut: "No-code" },
+    { mode: "flow" as PanelMode, icon: GitBranch, label: "Flow View", shortcut: "Graph" },
     { mode: "diff" as PanelMode, icon: Columns2, label: "Diff Viewer", shortcut: "⌘D" },
   ]},
   { label: "TOOLS", items: [
