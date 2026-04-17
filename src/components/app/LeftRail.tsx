@@ -1,5 +1,5 @@
 "use client";
-import { ChevronLeft, ChevronRight, Search, Settings, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
 import Logo from "./Logo";
 import { AppButton } from "./AppButton";
@@ -8,10 +8,6 @@ import { RAIL_GROUPS, railModesForGroup, type PanelMode } from "@/lib/modes";
 interface LeftRailProps {
   mode: PanelMode;
   onModeChange: (mode: PanelMode) => void;
-  searchOpen: boolean;
-  onSearchToggle: (open: boolean) => void;
-  settingsOpen?: boolean;
-  onSettingsClick?: () => void;
   /** Desktop: collapse to icon-only rail. Ignored in mobile sheet. */
   collapsed?: boolean;
   onToggleCollapse?: () => void;
@@ -21,8 +17,6 @@ interface LeftRailProps {
 
 export default function LeftRail({
   mode, onModeChange,
-  searchOpen, onSearchToggle,
-  settingsOpen, onSettingsClick,
   collapsed = false, onToggleCollapse,
   onClose,
 }: LeftRailProps) {
@@ -87,47 +81,6 @@ export default function LeftRail({
           </div>
         );
       })}
-
-      {/* Utility group: Search + Settings */}
-      <div className="flex flex-col border-t border-border/60">
-        {!iconOnly && (
-          <span className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-text3/60 select-none">
-            Utility
-          </span>
-        )}
-        <div className={`flex flex-col ${iconOnly ? "items-center py-1.5 gap-1" : ""}`}>
-          <AppButton
-            variant="rail"
-            size={iconOnly ? "icon" : "sm"}
-            active={searchOpen}
-            onClick={() => {
-              if (!(mode === "tree" || mode === "visual")) onModeChange("tree");
-              onSearchToggle(!searchOpen);
-            }}
-            title="Search (⌘K)"
-            aria-label="Search"
-            leftIcon={<Search className="w-[15px] h-[15px]" />}
-            label={<span className="text-xs">Search</span>}
-            shortcut="⌘K"
-            iconOnly={iconOnly}
-            className={iconOnly ? "" : "px-3 py-2"}
-          />
-          {onSettingsClick && (
-            <AppButton
-              variant="rail"
-              size={iconOnly ? "icon" : "sm"}
-              active={!!settingsOpen}
-              onClick={onSettingsClick}
-              title="Settings"
-              aria-label="Settings"
-              leftIcon={<Settings className="w-[15px] h-[15px]" />}
-              label={<span className="text-xs">Settings</span>}
-              iconOnly={iconOnly}
-              className={iconOnly ? "" : "px-3 py-2"}
-            />
-          )}
-        </div>
-      </div>
 
       {/* Footer: collapse toggle (desktop) + legal links */}
       <div className="mt-auto border-t border-border/60 p-2 flex flex-col gap-1">

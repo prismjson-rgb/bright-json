@@ -35,6 +35,9 @@ export interface ModeConfig {
   shortcut?: string;
   /** Short hint shown beside the label in the left rail. */
   hint?: string;
+  /** True for modes that exist in the registry but should not appear in the
+   *  left rail (e.g. share, which is triggered from the top header icon). */
+  hideFromRail?: boolean;
 }
 
 export const MODES: Record<PanelMode, ModeConfig> = {
@@ -52,7 +55,7 @@ export const MODES: Record<PanelMode, ModeConfig> = {
   tokens:    { id: "tokens",    label: "Token Estimator",    icon: Hash,           group: "analyze",   layout: "split" },
   convert:   { id: "convert",   label: "Convert",            icon: ArrowLeftRight, group: "transform", layout: "split" },
   notes:     { id: "notes",     label: "Notes",              icon: StickyNote,     group: "transform", layout: "split" },
-  share:     { id: "share",     label: "Share & Export",     icon: Share2,         group: "transform", layout: "split" },
+  share:     { id: "share",     label: "Share & Export",     icon: Share2,         group: "transform", layout: "split", hideFromRail: true },
   learn:     { id: "learn",     label: "Learn JSON",         icon: BookOpen,       group: "learn",     layout: "split" },
 };
 
@@ -68,7 +71,7 @@ export const RAIL_GROUPS: { key: ModeGroup; label: string }[] = [
 ];
 
 export function railModesForGroup(group: ModeGroup): ModeConfig[] {
-  return Object.values(MODES).filter((m) => m.group === group);
+  return Object.values(MODES).filter((m) => m.group === group && !m.hideFromRail);
 }
 
 export function getModeLabel(mode: PanelMode): string {

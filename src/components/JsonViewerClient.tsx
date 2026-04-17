@@ -302,10 +302,12 @@ export default function JsonViewerClient() {
     if (isMobile) setMobileMenuOpen(false);
   }, [isMobile]);
 
-  const handleSearchToggle = useCallback((open: boolean) => {
-    setSearchOpen(open);
+  const handleSearchToggle = useCallback(() => {
+    // Search only renders in tree/visual modes, so jump there if needed.
+    if (!(mode === "tree" || mode === "visual")) setMode("tree");
+    setSearchOpen((s) => !s);
     if (isMobile) setMobileMenuOpen(false);
-  }, [isMobile]);
+  }, [isMobile, mode]);
 
   const handleShareClick = useCallback(() => {
     setShareOpen(true);
@@ -372,27 +374,25 @@ export default function JsonViewerClient() {
   const railProps = {
     mode,
     onModeChange: handleModeSelect,
+  };
+
+  const headerProps = {
+    mode,
+    onModeChange: handleModeSelect,
+    dark,
+    onToggleTheme: toggle,
+    onOpenShare: handleShareClick,
+    onOpenSettings: handleSettingsClick,
     searchOpen,
     onSearchToggle: handleSearchToggle,
-    settingsOpen,
-    onSettingsClick: handleSettingsClick,
+    shareActive: shareOpen,
+    settingsActive: settingsOpen,
+    hasJson,
   };
 
   return (
     <div className="flex flex-col h-screen bg-bg">
-      {!isMobile && (
-        <AppHeader
-          mode={mode}
-          onModeChange={handleModeSelect}
-          dark={dark}
-          onToggleTheme={toggle}
-          onOpenShare={handleShareClick}
-          onOpenSettings={handleSettingsClick}
-          shareActive={shareOpen}
-          settingsActive={settingsOpen}
-          hasJson={hasJson}
-        />
-      )}
+      {!isMobile && <AppHeader {...headerProps} />}
 
       <div className="flex flex-1 min-h-0 bg-grad-hero bg-bg">
         {!isMobile && (
@@ -414,7 +414,19 @@ export default function JsonViewerClient() {
 
         {layout === "focused" && mode === "diff" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            {isMobile && <MobileHeader mode={mode} onOpenMenu={() => setMobileMenuOpen(true)} />}
+            {isMobile && (
+              <MobileHeader
+                mode={mode}
+                onOpenMenu={() => setMobileMenuOpen(true)}
+                onOpenShare={handleShareClick}
+                onOpenSettings={handleSettingsClick}
+                searchOpen={searchOpen}
+                onSearchToggle={handleSearchToggle}
+                shareActive={shareOpen}
+                settingsActive={settingsOpen}
+                hasJson={hasJson}
+              />
+            )}
             <div className="pane-header">
               <span>Diff Viewer</span>
               <span className="text-[10px] font-normal normal-case tracking-normal opacity-50 ml-3">Left = current editor · Right = paste to compare</span>
@@ -426,14 +438,38 @@ export default function JsonViewerClient() {
 
         {layout === "focused" && mode === "clean" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            {isMobile && <MobileHeader mode={mode} onOpenMenu={() => setMobileMenuOpen(true)} />}
+            {isMobile && (
+              <MobileHeader
+                mode={mode}
+                onOpenMenu={() => setMobileMenuOpen(true)}
+                onOpenShare={handleShareClick}
+                onOpenSettings={handleSettingsClick}
+                searchOpen={searchOpen}
+                onSearchToggle={handleSearchToggle}
+                shareActive={shareOpen}
+                settingsActive={settingsOpen}
+                hasJson={hasJson}
+              />
+            )}
             <JsonAiCleaner onUseJson={handleUseJson} dark={dark} />
           </main>
         )}
 
         {layout === "split" && (
           <main className="flex flex-1 min-h-0 flex-col md:flex-row min-w-0 overflow-y-auto md:overflow-visible">
-            {isMobile && <MobileHeader mode={mode} onOpenMenu={() => setMobileMenuOpen(true)} />}
+            {isMobile && (
+              <MobileHeader
+                mode={mode}
+                onOpenMenu={() => setMobileMenuOpen(true)}
+                onOpenShare={handleShareClick}
+                onOpenSettings={handleSettingsClick}
+                searchOpen={searchOpen}
+                onSearchToggle={handleSearchToggle}
+                shareActive={shareOpen}
+                settingsActive={settingsOpen}
+                hasJson={hasJson}
+              />
+            )}
             <section className="flex flex-col min-w-0 border-r border-border bg-surface1 min-h-[70vh] md:flex-1 md:min-h-0 shrink-0">
               <JsonTabBar
                 tabs={tabsState.tabs}

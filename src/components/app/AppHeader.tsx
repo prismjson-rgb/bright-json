@@ -1,5 +1,5 @@
 "use client";
-import { Moon, Settings, Share2, Sun } from "lucide-react";
+import { Moon, Search, Settings, Share2, Sun } from "lucide-react";
 import Logo from "./Logo";
 import ModeTabs from "./ModeTabs";
 import { AppButton } from "./AppButton";
@@ -12,6 +12,8 @@ interface AppHeaderProps {
   onToggleTheme: () => void;
   onOpenShare: () => void;
   onOpenSettings: () => void;
+  searchOpen: boolean;
+  onSearchToggle: () => void;
   shareActive?: boolean;
   settingsActive?: boolean;
   hasJson: boolean;
@@ -19,7 +21,8 @@ interface AppHeaderProps {
 
 export default function AppHeader({
   mode, onModeChange, dark, onToggleTheme,
-  onOpenShare, onOpenSettings, shareActive, settingsActive, hasJson,
+  onOpenShare, onOpenSettings, searchOpen, onSearchToggle,
+  shareActive, settingsActive, hasJson,
 }: AppHeaderProps) {
   return (
     <header className="toolbar-header flex items-center gap-4 px-4 h-12 border-b border-border bg-surface1 shrink-0">
@@ -30,6 +33,15 @@ export default function AppHeader({
       <ModeTabs mode={mode} onChange={onModeChange} className="flex-1 min-w-0 overflow-x-auto" />
 
       <div className="flex items-center gap-0.5 shrink-0">
+        <AppButton
+          variant="icon"
+          size="icon"
+          onClick={onSearchToggle}
+          active={searchOpen}
+          title="Search (⌘K)"
+          aria-label="Search"
+          leftIcon={<Search className="w-4 h-4" />}
+        />
         <AppButton
           variant="icon"
           size="icon"
