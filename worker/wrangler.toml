@@ -1,0 +1,19 @@
+name = "prism-short"
+main = "src/index.ts"
+compatibility_date = "2026-04-01"
+account_id = "8294e44ced7d8f156440f89cc13b1bd4"
+
+# Custom domain — KV-backed short links at https://s.jsonprism.com/<slug>.
+# `custom_domain = true` tells Cloudflare to provision TLS and route the entire
+# hostname to this Worker (no route pattern + DNS gymnastics required).
+[[routes]]
+pattern = "s.jsonprism.com"
+custom_domain = true
+
+[[kv_namespaces]]
+binding = "SHORT_LINKS"
+id = "4c864c997c894ae8bbf2547253fb0d47"
+
+[vars]
+SITE_URL = "https://jsonprism.com"
+ALLOWED_ORIGIN = "https://jsonprism.com"

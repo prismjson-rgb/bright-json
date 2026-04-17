@@ -3,11 +3,18 @@ import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Link2, Plus, Trash2, Copy, Check, Download,
   FileCode, Package, Lock, ChevronDown, Sparkles, X, AlertTriangle,
+  Loader2, Zap,
 } from "lucide-react";
 import { encodeJsonAsync, encodeBundleAsync, type BundleEntry } from "@/lib/share";
 import { generateHtml } from "@/lib/html-export";
 import type { TabData } from "@/lib/tabs-storage";
 import { AppButton } from "@/components/app/AppButton";
+import {
+  createShortLink,
+  extractSharePayload,
+  isShortLinkConfigured,
+  type ShortLinkResult,
+} from "@/lib/short-link";
 
 interface JsonSharePanelProps {
   json: string;
@@ -21,9 +28,32 @@ type Section = "link" | "bundle" | "export";
 
 type LinkStatus = "empty" | "ok" | "too-large" | "failed";
 
+type ShortState =
+  | { kind: "idle" }
+  | { kind: "pending" }
+  | { kind: "success"; shortUrl: string; expiresInSeconds: number }
+  | { kind: "error"; message: string };
+
 // Rough cap where URLs start running into browser/server limits. Past this,
-// nudge the user toward file export rather than a shared link.
+// nudge the user toward the opt-in short link or file export.
 const URL_LENGTH_WARN = 8000;
+
+const shortEnabled = isShortLinkConfigured();
+
+function shortErrorMessage(r: Exclude<ShortLinkResult, { ok: true }>): string {
+  switch (r.code) {
+    case "too-large":
+      return `Payload is larger than the shortener limit (${Math.round(r.limit / 1024)} KB). Use Export below.`;
+    case "network":
+      return "Couldn't reach the shortener. Check your connection and try again.";
+    case "server":
+      return `Shortener returned an error (${r.status}). Try again in a moment.`;
+    case "not-configured":
+      return "Short-link service isn't configured for this build.";
+    case "aborted":
+      return "";
+  }
+}
 
 export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [], activeTabId }: JsonSharePanelProps) {
   const [open, setOpen] = useState<Section>("link");
@@ -68,6 +98,9 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   const [shareUrl, setShareUrl]     = useState("");
   const [linkStatus, setLinkStatus] = useState<LinkStatus>("empty");
   const [copiedLink, setCopiedLink] = useState(false);
+  const [shortLinkState, setShortLinkState] = useState<ShortState>({ kind: "idle" });
+  const [copiedShortLink, setCopiedShortLink] = useState(false);
+  const shortLinkAbortRef = useRef<AbortController | null>(null);
 
   const shareHasJson = shareInput.kind !== "empty";
 
@@ -96,11 +129,52 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     return () => { cancelled = true; };
   }, [shareInput]);
 
+  // Invalidate the short link whenever the underlying full link changes — a
+  // stale short link would silently redirect to the old payload.
+  useEffect(() => {
+    shortLinkAbortRef.current?.abort();
+    setShortLinkState({ kind: "idle" });
+  }, [shareUrl]);
+
+  useEffect(() => () => shortLinkAbortRef.current?.abort(), []);
+
+  const handleCreateShortLink = useCallback(async () => {
+    if (!shareUrl) return;
+    const extracted = extractSharePayload(shareUrl);
+    if (!extracted) return;
+
+    shortLinkAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    shortLinkAbortRef.current = ctrl;
+    setShortLinkState({ kind: "pending" });
+
+    const result = await createShortLink(extracted.kind, extracted.payload, ctrl.signal);
+    if (ctrl.signal.aborted) return;
+    if (result.ok === true) {
+      setShortLinkState({
+        kind: "success",
+        shortUrl: result.url,
+        expiresInSeconds: result.expiresInSeconds,
+      });
+      return;
+    }
+    if (result.code !== "aborted") {
+      setShortLinkState({ kind: "error", message: shortErrorMessage(result) });
+    }
+  }, [shareUrl]);
+
   const handleCopyLink = () => {
     if (!shareUrl) return;
     navigator.clipboard.writeText(shareUrl);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 1600);
+  };
+
+  const handleCopyShortLink = () => {
+    if (shortLinkState.kind !== "success") return;
+    navigator.clipboard.writeText(shortLinkState.shortUrl);
+    setCopiedShortLink(true);
+    setTimeout(() => setCopiedShortLink(false), 1600);
   };
 
   /* ── Bundle ─────────────────────────────────────── */
@@ -113,7 +187,10 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   const [bundleUrl, setBundleUrl]       = useState("");
   const [bundleStatus, setBundleStatus] = useState<LinkStatus>("empty");
   const [copiedBundle, setCopiedBundle] = useState(false);
+  const [shortBundleState, setShortBundleState] = useState<ShortState>({ kind: "idle" });
+  const [copiedShortBundle, setCopiedShortBundle] = useState(false);
   const bundleAbortRef = useRef<AbortController | null>(null);
+  const shortBundleAbortRef = useRef<AbortController | null>(null);
 
   const generateBundleUrl = useCallback(async () => {
     const valid = bundleEntries.filter(e => e.title.trim() && e.json.trim());
@@ -136,11 +213,50 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
 
   useEffect(() => () => bundleAbortRef.current?.abort(), []);
 
+  useEffect(() => {
+    shortBundleAbortRef.current?.abort();
+    setShortBundleState({ kind: "idle" });
+  }, [bundleUrl]);
+
+  useEffect(() => () => shortBundleAbortRef.current?.abort(), []);
+
   const handleCopyBundle = () => {
     if (!bundleUrl) return;
     navigator.clipboard.writeText(bundleUrl);
     setCopiedBundle(true);
     setTimeout(() => setCopiedBundle(false), 1600);
+  };
+
+  const handleCreateShortBundleLink = useCallback(async () => {
+    if (!bundleUrl) return;
+    const extracted = extractSharePayload(bundleUrl);
+    if (!extracted) return;
+
+    shortBundleAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    shortBundleAbortRef.current = ctrl;
+    setShortBundleState({ kind: "pending" });
+
+    const result = await createShortLink(extracted.kind, extracted.payload, ctrl.signal);
+    if (ctrl.signal.aborted) return;
+    if (result.ok === true) {
+      setShortBundleState({
+        kind: "success",
+        shortUrl: result.url,
+        expiresInSeconds: result.expiresInSeconds,
+      });
+      return;
+    }
+    if (result.code !== "aborted") {
+      setShortBundleState({ kind: "error", message: shortErrorMessage(result) });
+    }
+  }, [bundleUrl]);
+
+  const handleCopyShortBundle = () => {
+    if (shortBundleState.kind !== "success") return;
+    navigator.clipboard.writeText(shortBundleState.shortUrl);
+    setCopiedShortBundle(true);
+    setTimeout(() => setCopiedShortBundle(false), 1600);
   };
 
   const getExportData = (): { json: string; filename: string; isBundle: boolean } => {
@@ -210,8 +326,10 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
       <div className="flex items-start gap-2 px-4 py-2.5 border-b border-border bg-primary/5 text-xs text-muted-foreground">
         <Lock className="w-3 h-3 text-primary mt-0.5 shrink-0" />
         <span>
-          <strong className="text-foreground font-medium">Zero storage, zero third-parties.</strong>{" "}
-          Your JSON is encoded into the link itself — no server ever sees it.
+          <strong className="text-foreground font-medium">Zero storage by default.</strong>{" "}
+          Your JSON is encoded into the link itself.{shortEnabled ? (
+            <> Optional short links store the encoded payload for 30 days on our own Cloudflare KV — auto-deleted after.</>
+          ) : null}
         </span>
       </div>
 
@@ -272,6 +390,15 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                 </div>
 
                 <LinkStatusLine status={linkStatus} charCount={shareUrl.length} />
+
+                {shortEnabled && shareUrl && (
+                  <ShortLinkControls
+                    state={shortLinkState}
+                    copied={copiedShortLink}
+                    onCreate={handleCreateShortLink}
+                    onCopy={handleCopyShortLink}
+                  />
+                )}
               </>
             )}
           </div>
@@ -360,6 +487,15 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                   </div>
 
                   <LinkStatusLine status={bundleStatus} charCount={bundleUrl.length} />
+
+                  {shortEnabled && (
+                    <ShortLinkControls
+                      state={shortBundleState}
+                      copied={copiedShortBundle}
+                      onCreate={handleCreateShortBundleLink}
+                      onCopy={handleCopyShortBundle}
+                    />
+                  )}
 
                   <p className="text-[10px] text-muted-foreground/50">
                     Recipients see a list and can open each JSON in the editor.
@@ -477,6 +613,60 @@ function CopyBtn({ copied, onClick }: { copied: boolean; onClick: () => void }) 
       label={copied ? "Copied!" : "Copy"}
       hideLabelOnMobile
     />
+  );
+}
+
+function ShortLinkControls({
+  state,
+  copied,
+  onCreate,
+  onCopy,
+}: {
+  state: ShortState;
+  copied: boolean;
+  onCreate: () => void;
+  onCopy: () => void;
+}) {
+  if (state.kind === "idle") {
+    return (
+      <AppButton
+        onClick={onCreate}
+        leftIcon={<Zap className="w-3.5 h-3.5 text-primary" />}
+        label="Create short link (30-day)"
+      />
+    );
+  }
+  if (state.kind === "pending") {
+    return (
+      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+        <Loader2 className="w-3 h-3 animate-spin" />
+        Creating short link…
+      </div>
+    );
+  }
+  if (state.kind === "error") {
+    return (
+      <div className="flex items-start gap-1.5 text-[11px] text-amber-600 dark:text-amber-400">
+        <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+        <span>{state.message}</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center gap-2">
+        <input
+          readOnly
+          value={state.shortUrl}
+          className="flex-1 min-w-0 text-[11px] font-mono bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 text-foreground truncate outline-none"
+          onClick={(e) => (e.target as HTMLInputElement).select()}
+        />
+        <CopyBtn copied={copied} onClick={onCopy} />
+      </div>
+      <span className="text-[10px] text-muted-foreground/60">
+        Auto-deletes in {Math.round(state.expiresInSeconds / 86400)} days.
+      </span>
+    </div>
   );
 }
 

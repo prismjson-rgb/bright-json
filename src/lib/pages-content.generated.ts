@@ -18,8 +18,8 @@ export const PAGES: PageContent[] = [
     "slug": "privacy",
     "title": "Privacy Policy",
     "metaTitle": "Privacy Policy — JSON Prism",
-    "metaDescription": "JSON Prism processes data locally. No server storage. No analytics by default.",
-    "contentMarkdown": "JSON Prism is designed with privacy in mind.\r\n\r\n- **No server storage** — All JSON processing happens in your browser\r\n- **No data sent** — Your JSON is never transmitted to our servers\r\n- **Share links** — When you share, JSON is encoded directly into the URL fragment (client-side only). Nothing is uploaded, and no third-party shortener is involved\r\n\r\nWe do not collect, store, or sell your data."
+    "metaDescription": "JSON Prism processes data locally. No server storage by default. No analytics by default.",
+    "contentMarkdown": "JSON Prism is designed with privacy in mind.\r\n\r\n- **Local processing** — All JSON parsing, formatting, and viewing happens in your browser\r\n- **No data sent by default** — Your JSON is never transmitted to our servers\r\n- **Share links** — When you share, JSON is encoded directly into the URL fragment (client-side only). Nothing is uploaded\r\n- **Optional short links** — If you click _Create short link_, the already-encoded payload (not your original JSON) is stored on our own Cloudflare KV for **30 days**, then auto-deleted. The short link service is never contacted unless you press that button\r\n\r\nWe do not collect, store, or sell your data."
   }
 ];
 export const PAGE_SLUGS: string[] = ["about","privacy"];
