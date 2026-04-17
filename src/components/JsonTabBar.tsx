@@ -48,13 +48,13 @@ export default function JsonTabBar({
   };
 
   return (
-    <div className="flex items-center gap-0 border-b border-border/60 bg-surface1/80 shrink-0 overflow-x-auto">
+    <div className="flex items-center gap-1 border-b border-border/60 bg-[hsl(var(--pane-header))] shrink-0 overflow-x-auto px-1.5 pt-2">
       {tabs.map((tab) => (
         <div
           key={tab.id}
-          className={`group flex items-center gap-1.5 px-3 py-2 border-r border-border/60 text-xs font-medium shrink-0 cursor-pointer transition-colors min-w-0 max-w-[160px] ${
+          className={`group flex items-center gap-1.5 px-2.5 py-1 border border-transparent rounded-t-md text-xs font-medium shrink-0 cursor-pointer transition-colors min-w-0 max-w-[160px] ${
             tab.id === activeId
-              ? "bg-surface2 text-foreground tab-active-grad"
+              ? "border-t-primary/60 border-l-primary/60 border-r-primary/60 text-foreground"
               : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
           }`}
           onClick={() => editingId !== tab.id && onSwitch(tab.id)}
@@ -98,7 +98,7 @@ export default function JsonTabBar({
       <button
         type="button"
         onClick={onAdd}
-        className="flex items-center justify-center w-8 h-8 shrink-0 text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
+        className="flex items-center justify-center w-7 h-7 shrink-0 text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
         title="New tab"
         aria-label="New tab"
       >

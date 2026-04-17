@@ -1,0 +1,63 @@
+"use client";
+import { Moon, Settings, Share2, Sun } from "lucide-react";
+import Logo from "./Logo";
+import ModeTabs from "./ModeTabs";
+import { AppButton } from "./AppButton";
+import type { PanelMode } from "@/lib/modes";
+
+interface AppHeaderProps {
+  mode: PanelMode;
+  onModeChange: (mode: PanelMode) => void;
+  dark: boolean;
+  onToggleTheme: () => void;
+  onOpenShare: () => void;
+  onOpenSettings: () => void;
+  shareActive?: boolean;
+  settingsActive?: boolean;
+  hasJson: boolean;
+}
+
+export default function AppHeader({
+  mode, onModeChange, dark, onToggleTheme,
+  onOpenShare, onOpenSettings, shareActive, settingsActive, hasJson,
+}: AppHeaderProps) {
+  return (
+    <header className="toolbar-header flex items-center gap-4 px-4 h-12 border-b border-border bg-surface1 shrink-0">
+      <Logo className="shrink-0" />
+
+      <div className="h-6 w-px bg-border shrink-0" aria-hidden />
+
+      <ModeTabs mode={mode} onChange={onModeChange} className="flex-1 min-w-0 overflow-x-auto" />
+
+      <div className="flex items-center gap-0.5 shrink-0">
+        <AppButton
+          variant="icon"
+          size="icon"
+          onClick={onOpenShare}
+          active={!!shareActive}
+          disabled={!hasJson}
+          title="Share & Export"
+          aria-label="Share & Export"
+          leftIcon={<Share2 className="w-4 h-4" />}
+        />
+        <AppButton
+          variant="icon"
+          size="icon"
+          onClick={onToggleTheme}
+          title="Toggle theme (⌘L)"
+          aria-label="Toggle theme"
+          leftIcon={dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        />
+        <AppButton
+          variant="icon"
+          size="icon"
+          onClick={onOpenSettings}
+          active={!!settingsActive}
+          title="Settings"
+          aria-label="Settings"
+          leftIcon={<Settings className="w-4 h-4" />}
+        />
+      </div>
+    </header>
+  );
+}

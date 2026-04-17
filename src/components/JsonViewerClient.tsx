@@ -3,18 +3,22 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check, Download, Upload,
-  Minimize2, ArrowUpDown, Sun, Moon, Sparkles, Share2, Save, Trash2, Menu, Braces, Wrench,
+  Minimize2, ArrowUpDown, Sparkles, Save, Trash2, Wrench,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
 import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
 import { useIsMobile } from "@/hooks/use-mobile";
-import Sidebar from "@/components/Sidebar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import JsonEditor from "@/components/JsonEditor";
 import JsonTabBar from "@/components/JsonTabBar";
 import OverlaySidebar from "@/components/OverlaySidebar";
+import AppHeader from "@/components/app/AppHeader";
+import LeftRail from "@/components/app/LeftRail";
+import MobileHeader from "@/components/app/MobileHeader";
+import { AppButton } from "@/components/app/AppButton";
+import { MODES, getModeLayout, type PanelMode } from "@/lib/modes";
 
 const panelLoading = () => (
   <div className="flex items-center justify-center flex-1 min-h-[200px] text-muted-foreground text-sm">
@@ -50,21 +54,11 @@ import {
   createTab,
   getNextTabName,
   defaultTabs,
-  type TabData,
   type TabsState,
 } from "@/lib/tabs-storage";
 
-export type PanelMode = "tree" | "visual" | "flow" | "diff" | "mock" | "debug" | "trim" | "clean"
-  | "minimal" | "structure" | "practices" | "tokens" | "convert" | "notes" | "learn" | "share";
-
-// Mode label for status bar
-const MODE_LABELS: Partial<Record<PanelMode, string>> = {
-  visual: "Visual Editor", flow: "Flow View", diff: "Diff Mode", mock: "Mock Generator", debug: "JSON Debugger",
-  trim: "JSON Trimmer", clean: "AI Cleaner", minimal: "Minimal Mode",
-  structure: "Structure Analyzer", practices: "Best Practices",
-  tokens: "Token Estimator", convert: "Convert Mode", notes: "Notes Mode",
-  learn: "Learn JSON", share: "Share & Export",
-};
+// Re-exported so older imports continue to resolve; canonical source is @/lib/modes.
+export type { PanelMode } from "@/lib/modes";
 
 function getInitialTabs(): TabsState {
   const tabs = defaultTabs();
@@ -98,7 +92,8 @@ export default function JsonViewerClient() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [railCollapsed, setRailCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
@@ -280,10 +275,6 @@ export default function JsonViewerClient() {
     [handleUpload]
   );
 
-  const handleShare = useCallback(() => {
-    setShareOpen(true);
-  }, []);
-
   const handleSave = useCallback(() => {
     void (async () => {
       if (await saveJson(json)) {
@@ -298,35 +289,32 @@ export default function JsonViewerClient() {
     void clearSavedJson().then(() => setHasSaved(false));
   }, []);
 
-  const handleMode = useCallback((m: PanelMode) => {
+  // Single mode-selection handler: routes "share" to the overlay, closes mobile
+  // sheet, and clears search unless the new mode supports it.
+  const handleModeSelect = useCallback((m: PanelMode) => {
+    if (m === "share") {
+      setShareOpen(true);
+      if (isMobile) setMobileMenuOpen(false);
+      return;
+    }
     setMode(m);
     if (m !== "tree" && m !== "visual") setSearchOpen(false);
-  }, []);
-
-  const handleModeMaybeCloseSidebar = useCallback(
-    (m: PanelMode) => {
-      handleMode(m);
-      if (isMobile) setSidebarOpen(false);
-    },
-    [handleMode, isMobile]
-  );
-
-  const handleSearchMaybeCloseSidebar = useCallback(
-    (open: boolean) => {
-      setSearchOpen(open);
-      if (isMobile) setSidebarOpen(false);
-    },
-    [isMobile]
-  );
-
-  const handleShareClickMaybeCloseSidebar = useCallback(() => {
-    setShareOpen(true);
-    if (isMobile) setSidebarOpen(false);
+    if (isMobile) setMobileMenuOpen(false);
   }, [isMobile]);
 
-  const handleSettingsClickMaybeCloseSidebar = useCallback(() => {
+  const handleSearchToggle = useCallback((open: boolean) => {
+    setSearchOpen(open);
+    if (isMobile) setMobileMenuOpen(false);
+  }, [isMobile]);
+
+  const handleShareClick = useCallback(() => {
+    setShareOpen(true);
+    if (isMobile) setMobileMenuOpen(false);
+  }, [isMobile]);
+
+  const handleSettingsClick = useCallback(() => {
     setSettingsOpen(true);
-    if (isMobile) setSidebarOpen(false);
+    if (isMobile) setMobileMenuOpen(false);
   }, [isMobile]);
 
   useEffect(() => {
@@ -362,7 +350,8 @@ export default function JsonViewerClient() {
   }, [mode, searchOpen, shareOpen, settingsOpen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
 
   const lineCount = json.split("\n").length;
-  const modeLabel = MODE_LABELS[mode];
+  const modeCfg = MODES[mode];
+  const layout = getModeLayout(mode);
 
   const handleUseJson = useCallback((j: string) => {
     setJson(j);
@@ -371,76 +360,61 @@ export default function JsonViewerClient() {
 
   const hasJson = !!json.trim();
 
-  const sidebarProps = isMobile
-    ? {
-        mode,
-        searchOpen,
-        shareOpen,
-        settingsOpen,
-        onMode: handleModeMaybeCloseSidebar,
-        onSearch: handleSearchMaybeCloseSidebar,
-        onShareClick: handleShareClickMaybeCloseSidebar,
-        onSettingsClick: handleSettingsClickMaybeCloseSidebar,
-        onToggleTheme: toggle,
-        onClose: () => setSidebarOpen(false),
-      }
-    : {
-        mode,
-        searchOpen,
-        shareOpen,
-        settingsOpen,
-        onMode: handleMode,
-        onSearch: setSearchOpen,
-        onShareClick: () => setShareOpen(true),
-        onSettingsClick: () => setSettingsOpen(true),
-        dark,
-        onToggleTheme: toggle,
-      };
+  // Status bar label mirrors the current overlay/mode context.
+  const statusLabel = shareOpen
+    ? "Share & Export"
+    : settingsOpen
+    ? "Settings"
+    : mode === "tree"
+    ? null
+    : modeCfg.label;
+
+  const railProps = {
+    mode,
+    onModeChange: handleModeSelect,
+    searchOpen,
+    onSearchToggle: handleSearchToggle,
+    settingsOpen,
+    onSettingsClick: handleSettingsClick,
+  };
 
   return (
     <div className="flex flex-col h-screen bg-bg">
-      <div className="flex flex-1 min-h-0 bg-grad-hero bg-bg">
-        {!isMobile && <Sidebar {...sidebarProps} />}
+      {!isMobile && (
+        <AppHeader
+          mode={mode}
+          onModeChange={handleModeSelect}
+          dark={dark}
+          onToggleTheme={toggle}
+          onOpenShare={handleShareClick}
+          onOpenSettings={handleSettingsClick}
+          shareActive={shareOpen}
+          settingsActive={settingsOpen}
+          hasJson={hasJson}
+        />
+      )}
 
-        {/* Mobile: sidebar in sheet (hamburger) */}
+      <div className="flex flex-1 min-h-0 bg-grad-hero bg-bg">
+        {!isMobile && (
+          <LeftRail
+            {...railProps}
+            collapsed={railCollapsed}
+            onToggleCollapse={() => setRailCollapsed((c) => !c)}
+          />
+        )}
+
         {isMobile && (
-          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetContent side="left" className="w-[min(100vw-2rem,16rem)] min-w-[11rem] p-0 gap-0 border-r border-border bg-surface1 overflow-hidden [&>button]:hidden">
               <SheetTitle className="sr-only">Navigation menu</SheetTitle>
-              <Sidebar {...sidebarProps} />
+              <LeftRail {...railProps} onClose={() => setMobileMenuOpen(false)} />
             </SheetContent>
           </Sheet>
         )}
 
-        {/* Diff: full width */}
-        {mode === "diff" && (
+        {layout === "focused" && mode === "diff" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            {isMobile && (
-              <div className="flex flex-col border-b border-border bg-surface1 shrink-0">
-                <div className="flex items-center gap-2 px-3 py-2">
-                  <button
-                    type="button"
-                    onClick={() => setSidebarOpen(true)}
-                    className="flex items-center justify-center w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors shrink-0"
-                    aria-label="Open menu"
-                  >
-                    <Menu className="w-5 h-5" />
-                  </button>
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Braces className="w-4 h-4 text-primary" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-semibold text-xs tracking-tight text-foreground truncate">JSON Prism</div>
-                      <div className="text-[9px] text-muted-foreground truncate">Format · Diff · Transform</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="px-3 pb-2 pt-0 pl-[3.25rem]">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground/90">Diff Viewer</span>
-                </div>
-              </div>
-            )}
+            {isMobile && <MobileHeader mode={mode} onOpenMenu={() => setMobileMenuOpen(true)} />}
             <div className="pane-header">
               <span>Diff Viewer</span>
               <span className="text-[10px] font-normal normal-case tracking-normal opacity-50 ml-3">Left = current editor · Right = paste to compare</span>
@@ -450,72 +424,17 @@ export default function JsonViewerClient() {
           </main>
         )}
 
-        {/* AI Cleaner: own layout */}
-        {mode === "clean" && (
+        {layout === "focused" && mode === "clean" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            {isMobile && (
-              <div className="flex flex-col border-b border-border bg-surface1 shrink-0">
-                <div className="flex items-center gap-2 px-3 py-2">
-                  <button
-                    type="button"
-                    onClick={() => setSidebarOpen(true)}
-                    className="flex items-center justify-center w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors shrink-0"
-                    aria-label="Open menu"
-                  >
-                    <Menu className="w-5 h-5" />
-                  </button>
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Braces className="w-4 h-4 text-primary" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-semibold text-xs tracking-tight text-foreground truncate">JSON Prism</div>
-                      <div className="text-[9px] text-muted-foreground truncate">Format · Diff · Transform</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="px-3 pb-2 pt-0 pl-[3.25rem]">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground/90">AI Cleaner</span>
-                </div>
-              </div>
-            )}
+            {isMobile && <MobileHeader mode={mode} onOpenMenu={() => setMobileMenuOpen(true)} />}
             <JsonAiCleaner onUseJson={handleUseJson} dark={dark} />
           </main>
         )}
 
-        {/* All other modes: editor left + panel right (stacked on mobile, scrollable) */}
-        {mode !== "diff" && mode !== "clean" && (
+        {layout === "split" && (
           <main className="flex flex-1 min-h-0 flex-col md:flex-row min-w-0 overflow-y-auto md:overflow-visible">
-            {isMobile && (
-              <div className="flex flex-col border-b border-border bg-surface1 shrink-0">
-                <div className="flex items-center gap-2 px-3 py-2">
-                  <button
-                    type="button"
-                    onClick={() => setSidebarOpen(true)}
-                    className="flex items-center justify-center w-9 h-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors shrink-0"
-                    aria-label="Open menu"
-                  >
-                    <Menu className="w-5 h-5" />
-                  </button>
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Braces className="w-4 h-4 text-primary" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="font-semibold text-xs tracking-tight text-foreground truncate">JSON Prism</div>
-                      <div className="text-[9px] text-muted-foreground truncate">Format · Diff · Transform</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="px-3 pb-2 pt-0 pl-[3.25rem]">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground/90 truncate block">
-                    {modeLabel ?? (mode === "visual" ? "Visual Editor" : mode === "flow" ? "Flow View" : "Tree View")}
-                  </span>
-                </div>
-              </div>
-            )}
+            {isMobile && <MobileHeader mode={mode} onOpenMenu={() => setMobileMenuOpen(true)} />}
             <section className="flex flex-col min-w-0 border-r border-border bg-surface1 min-h-[70vh] md:flex-1 md:min-h-0 shrink-0">
-              {/* Tab bar */}
               <JsonTabBar
                 tabs={tabsState.tabs}
                 activeId={tabsState.activeId}
@@ -527,52 +446,82 @@ export default function JsonViewerClient() {
               <div className="pane-header flex items-center gap-2 flex-wrap">
                 <span>Editor</span>
                 <div className="flex items-center gap-0.5 bg-secondary/50 rounded-lg p-0.5 ml-1">
-                  <button onClick={() => format({ indent: settings.format.beautifyIndent, sortKeys: settings.format.sortKeysOnBeautify })} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Beautify (⌘⇧F)">
-                    <Sparkles className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Beautify</span>
-                  </button>
-                  <button onClick={minify} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Minify (⌘M)">
-                    <Minimize2 className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Minify</span>
-                  </button>
-                  <button onClick={sortKeys} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Sort keys">
-                    <ArrowUpDown className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Sort</span>
-                  </button>
-                  <button
-                    type="button"
+                  <AppButton
+                    onClick={() => format({ indent: settings.format.beautifyIndent, sortKeys: settings.format.sortKeysOnBeautify })}
+                    disabled={!hasJson}
+                    title="Beautify (⌘⇧F)"
+                    leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+                    label="Beautify"
+                    hideLabelOnMobile
+                  />
+                  <AppButton
+                    onClick={minify}
+                    disabled={!hasJson}
+                    title="Minify (⌘M)"
+                    leftIcon={<Minimize2 className="w-3.5 h-3.5" />}
+                    label="Minify"
+                    hideLabelOnMobile
+                  />
+                  <AppButton
+                    onClick={sortKeys}
+                    disabled={!hasJson}
+                    title="Sort keys"
+                    leftIcon={<ArrowUpDown className="w-3.5 h-3.5" />}
+                    label="Sort"
+                    hideLabelOnMobile
+                  />
+                  <AppButton
                     onClick={handleRepairJson}
                     disabled={!hasJson || !error}
-                    className="toolbar-btn text-muted-foreground disabled:opacity-30"
                     title="Repair invalid JSON (quotes, commas, brackets, etc.)"
-                  >
-                    <Wrench className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Fix</span>
-                  </button>
+                    leftIcon={<Wrench className="w-3.5 h-3.5" />}
+                    label="Fix"
+                    hideLabelOnMobile
+                  />
                 </div>
-                <button onClick={handleCopy} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Copy JSON">
-                  {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span className="hidden sm:inline text-xs">{copied ? "Copied!" : "Copy"}</span>
-                </button>
-                <button onClick={() => handleDownload()} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Export .json">
-                  <Download className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Export</span>
-                </button>
-                <button onClick={() => fileRef.current?.click()} className="toolbar-btn text-muted-foreground" title="Import file">
-                  <Upload className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Import</span>
-                </button>
+                <AppButton
+                  onClick={handleCopy}
+                  disabled={!hasJson}
+                  title="Copy JSON"
+                  leftIcon={copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+                  label={copied ? "Copied!" : "Copy"}
+                  hideLabelOnMobile
+                />
+                <AppButton
+                  onClick={() => handleDownload()}
+                  disabled={!hasJson}
+                  title="Export .json"
+                  leftIcon={<Download className="w-3.5 h-3.5" />}
+                  label="Export"
+                  hideLabelOnMobile
+                />
+                <AppButton
+                  onClick={() => fileRef.current?.click()}
+                  title="Import file"
+                  leftIcon={<Upload className="w-3.5 h-3.5" />}
+                  label="Import"
+                  hideLabelOnMobile
+                />
                 <input ref={fileRef} type="file" accept=".json,.txt" onChange={handleFileChange} className="hidden" />
-                <button onClick={handleShare} disabled={!hasJson} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Share & Export">
-                  <Share2 className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Share</span>
-                </button>
-                <button onClick={handleSave} disabled={!hasJson || !!error} className="toolbar-btn text-muted-foreground disabled:opacity-30" title="Save to browser (persists across refresh)">
-                  {saved ? <Check className="w-3.5 h-3.5 text-primary" /> : <Save className="w-3.5 h-3.5" />}
-                  <span className="hidden sm:inline text-xs">{saved ? "Saved!" : "Save"}</span>
-                </button>
+                <AppButton
+                  onClick={handleSave}
+                  disabled={!hasJson || !!error}
+                  title="Save to browser (persists across refresh)"
+                  leftIcon={saved ? <Check className="w-3.5 h-3.5 text-primary" /> : <Save className="w-3.5 h-3.5" />}
+                  label={saved ? "Saved!" : "Save"}
+                  hideLabelOnMobile
+                />
                 {hasSaved && (
-                  <button onClick={handleClearSaved} className="toolbar-btn text-muted-foreground hover:text-destructive" title="Delete saved data">
-                    <Trash2 className="w-3.5 h-3.5" /><span className="hidden sm:inline text-xs">Clear saved</span>
-                  </button>
+                  <AppButton
+                    variant="danger"
+                    onClick={handleClearSaved}
+                    title="Delete saved data"
+                    leftIcon={<Trash2 className="w-3.5 h-3.5" />}
+                    label="Clear saved"
+                    hideLabelOnMobile
+                  />
                 )}
-                <button onClick={toggle} className="toolbar-btn text-muted-foreground ml-auto" title="Toggle theme (⌘L)">
-                  {dark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-                </button>
-                <span className="text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
+                <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
               </div>
               <div className="flex-1 min-h-0">
                 <JsonEditor value={json} onChange={setJson} error={error} dark={dark} editorSettings={settings.editor} />
@@ -580,7 +529,6 @@ export default function JsonViewerClient() {
             </section>
 
             <section className="flex flex-col min-w-0 bg-surface2 min-h-[60vh] md:flex-1 md:min-h-0 shrink-0">
-              {/* Show search overlay on tree mode */}
               {(mode === "tree" || mode === "visual") && searchOpen && (
                 <JsonSearchPanel query={query} matchCount={matchCount} onQueryChange={setQuery} onClose={() => { setSearchOpen(false); setQuery(""); }} />
               )}
@@ -592,35 +540,32 @@ export default function JsonViewerClient() {
                       {mode === "visual" ? "Visual Editor" : mode === "flow" ? "Flow View" : "Tree View"}
                     </span>
                     <div className="flex items-center gap-1.5 ml-2">
-                      <button
+                      <AppButton
                         onClick={handleCopy}
                         disabled={!json.trim()}
-                        className="toolbar-btn text-muted-foreground disabled:opacity-30"
                         title="Copy JSON"
-                      >
-                        {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
-                        <span className="hidden sm:inline text-xs">{copied ? "Copied!" : "Copy"}</span>
-                      </button>
+                        leftIcon={copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+                        label={copied ? "Copied!" : "Copy"}
+                        hideLabelOnMobile
+                      />
                       {mode === "tree" && (
                         <>
-                          <button
+                          <AppButton
                             onClick={() => setExpandAll(true)}
                             disabled={!parsed}
-                            className="toolbar-btn text-muted-foreground disabled:opacity-30"
                             title="Expand all"
-                          >
-                            <ChevronsUpDown className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline text-xs">Expand</span>
-                          </button>
-                          <button
+                            leftIcon={<ChevronsUpDown className="w-3.5 h-3.5" />}
+                            label="Expand"
+                            hideLabelOnMobile
+                          />
+                          <AppButton
                             onClick={() => setExpandAll(false)}
                             disabled={!parsed}
-                            className="toolbar-btn text-muted-foreground disabled:opacity-30"
                             title="Collapse all"
-                          >
-                            <ChevronsDownUp className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline text-xs">Collapse</span>
-                          </button>
+                            leftIcon={<ChevronsDownUp className="w-3.5 h-3.5" />}
+                            label="Collapse"
+                            hideLabelOnMobile
+                          />
                         </>
                       )}
                     </div>
@@ -696,23 +641,11 @@ export default function JsonViewerClient() {
 
       <footer className="status-bar flex-wrap gap-y-1.5 px-3 sm:px-4">
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          {shareOpen ? (
+          {statusLabel ? (
             <>
-              <span>Share & Export</span>
+              <span>{statusLabel}</span>
               <span className="text-border">·</span>
-              <span className="opacity-50">Esc to close</span>
-            </>
-          ) : settingsOpen ? (
-            <>
-              <span>Settings</span>
-              <span className="text-border">·</span>
-              <span className="opacity-50">Esc to close</span>
-            </>
-          ) : modeLabel ? (
-            <>
-              <span>{modeLabel}</span>
-              <span className="text-border">·</span>
-              <span className="opacity-50">Esc to exit</span>
+              <span className="opacity-50">Esc to {shareOpen || settingsOpen ? "close" : "exit"}</span>
             </>
           ) : (
             <>

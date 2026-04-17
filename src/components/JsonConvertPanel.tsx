@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { Copy, Download, Check } from "lucide-react";
 import { useJsonConvert, type ConvertFormat } from "@/hooks/useJsonConvert";
+import { AppButton } from "@/components/app/AppButton";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -64,26 +65,20 @@ export default function JsonConvertPanel({ parsed, dark }: JsonConvertPanelProps
           ))}
         </div>
         <div className="flex-1" />
-        <button
+        <AppButton
           onClick={handleCopy}
-          className="toolbar-btn text-muted-foreground"
           title="Copy output"
-        >
-          {copied ? (
-            <Check className="w-3.5 h-3.5 text-primary" />
-          ) : (
-            <Copy className="w-3.5 h-3.5" />
-          )}
-          <span className="hidden md:inline">{copied ? "Copied!" : "Copy"}</span>
-        </button>
-        <button
+          leftIcon={copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+          label={copied ? "Copied!" : "Copy"}
+          hideLabelOnMobile
+        />
+        <AppButton
           onClick={handleDownload}
-          className="toolbar-btn text-muted-foreground"
           title={`Download .${fileExtension}`}
-        >
-          <Download className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">Download .{fileExtension}</span>
-        </button>
+          leftIcon={<Download className="w-3.5 h-3.5" />}
+          label={`Download .${fileExtension}`}
+          hideLabelOnMobile
+        />
       </div>
 
       {/* Output */}
