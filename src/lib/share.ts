@@ -1,7 +1,13 @@
 import LZString from "lz-string";
 import { lzEncodeAsync, lzDecodeAsync } from "./lz-worker-client";
+import { compressToBase64Url, decompressFromBase64Url } from "./compress-stream";
 
 const MAX_SAFE_URL = 2000;
+
+// Prefix marker for the new deflate-raw+base64url format. Legacy lz-string
+// payloads contain only [A-Za-z0-9+-$_], never `~`, so presence of the marker
+// unambiguously identifies the new encoding.
+const V2_MARKER = "~";
 
 export function encodeJson(json: string): string {
   return LZString.compressToEncodedURIComponent(json);
@@ -48,23 +54,33 @@ export function safeDecodeJson(encoded: string): string | null {
   return null;
 }
 
-/* ── Async variants (Web Worker-backed, with sync fallback) ───────────────── */
+/* ── Async variants (deflate-raw primary, lz-string fallback) ─────────────── */
+// deflate-raw via browser CompressionStream produces links ~30–60% shorter than
+// lz-string on realistic JSON (measured — see scripts/compare-compression.mjs).
 
 export async function encodeJsonAsync(json: string): Promise<string> {
-  const viaWorker = await lzEncodeAsync(json).catch(() => null);
-  return viaWorker ?? encodeJson(json);
+  try {
+    return V2_MARKER + (await compressToBase64Url(json));
+  } catch {
+    // CompressionStream unavailable — fall back to worker-backed lz-string.
+    const viaWorker = await lzEncodeAsync(json).catch(() => null);
+    return viaWorker ?? encodeJson(json);
+  }
 }
 
 export async function encodeBundleAsync(entries: BundleEntry[]): Promise<string> {
   const serialized = JSON.stringify(entries);
-  const viaWorker = await lzEncodeAsync(serialized).catch(() => null);
-  return viaWorker ?? LZString.compressToEncodedURIComponent(serialized);
+  try {
+    return V2_MARKER + (await compressToBase64Url(serialized));
+  } catch {
+    const viaWorker = await lzEncodeAsync(serialized).catch(() => null);
+    return viaWorker ?? LZString.compressToEncodedURIComponent(serialized);
+  }
 }
 
 export async function decodeBundleAsync(encoded: string): Promise<BundleEntry[]> {
   try {
-    const raw = (await lzDecodeAsync(encoded).catch(() => null))
-      ?? LZString.decompressFromEncodedURIComponent(encoded);
+    const raw = await decodeAnyAsync(encoded);
     if (!raw) return [];
     return JSON.parse(raw);
   } catch {
@@ -73,9 +89,21 @@ export async function decodeBundleAsync(encoded: string): Promise<BundleEntry[]>
 }
 
 export async function safeDecodeJsonAsync(encoded: string): Promise<string | null> {
+  return decodeAnyAsync(encoded);
+}
+
+async function decodeAnyAsync(encoded: string): Promise<string | null> {
+  if (encoded.startsWith(V2_MARKER)) {
+    try {
+      const out = await decompressFromBase64Url(encoded.slice(V2_MARKER.length));
+      if (out) return out;
+    } catch {}
+    return null;
+  }
+  // Legacy lz-string payload.
   try {
-    const lz = await lzDecodeAsync(encoded).catch(() => null);
-    if (lz && lz.length > 0) return lz;
+    const viaWorker = await lzDecodeAsync(encoded).catch(() => null);
+    if (viaWorker && viaWorker.length > 0) return viaWorker;
   } catch {}
   return safeDecodeJson(encoded);
 }

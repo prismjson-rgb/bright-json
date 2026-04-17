@@ -2,12 +2,12 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Link2, Plus, Trash2, Copy, Check, Download,
-  FileCode, Package, Lock, ChevronDown, Sparkles, Zap, Loader2, X, AlertTriangle,
+  FileCode, Package, Lock, ChevronDown, Sparkles, X, AlertTriangle,
 } from "lucide-react";
 import { encodeJsonAsync, encodeBundleAsync, type BundleEntry } from "@/lib/share";
-import { shortenUrl, isShortenable, type ShortenReason } from "@/lib/shorten";
 import { generateHtml } from "@/lib/html-export";
 import type { TabData } from "@/lib/tabs-storage";
+import { AppButton } from "@/components/app/AppButton";
 
 interface JsonSharePanelProps {
   json: string;
@@ -19,9 +19,11 @@ interface JsonSharePanelProps {
 
 type Section = "link" | "bundle" | "export";
 
-type LinkStatus = "empty" | "pending" | "ok" | "too-large" | "failed";
+type LinkStatus = "empty" | "ok" | "too-large" | "failed";
 
-const SHORTEN_DEBOUNCE_MS = 400;
+// Rough cap where URLs start running into browser/server limits. Past this,
+// nudge the user toward file export rather than a shared link.
+const URL_LENGTH_WARN = 8000;
 
 export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [], activeTabId }: JsonSharePanelProps) {
   const [open, setOpen] = useState<Section>("link");
@@ -53,13 +55,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     return entries.length ? { kind: "bundle", data: entries } : { kind: "empty" };
   }, [json, tabs, shareScope, selectedTabIds, useBundleForShare]);
 
-  // Used by the Export section for downloads.
-  const getShareJson = (): string => {
-    if (shareInput.kind === "empty") return "";
-    if (shareInput.kind === "single") return shareInput.data;
-    return JSON.stringify(shareInput.data);
-  };
-
   const toggleTabSelection = (id: string) => {
     setSelectedTabIds((prev) => {
       const next = new Set(prev);
@@ -70,73 +65,40 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   };
 
   /* ── Share via Link ─────────────────────────────── */
-  const [shareUrl, setShareUrl]           = useState("");
-  const [shortLinkUrl, setShortLinkUrl]   = useState("");
-  const [linkStatus, setLinkStatus]       = useState<LinkStatus>("empty");
-  const [useFullLink, setUseFullLink]     = useState(false);
-  const [copiedLink, setCopiedLink]       = useState(false);
+  const [shareUrl, setShareUrl]     = useState("");
+  const [linkStatus, setLinkStatus] = useState<LinkStatus>("empty");
+  const [copiedLink, setCopiedLink] = useState(false);
 
   const shareHasJson = shareInput.kind !== "empty";
 
   useEffect(() => {
     if (shareInput.kind === "empty") {
       setShareUrl("");
-      setShortLinkUrl("");
       setLinkStatus("empty");
       return;
     }
 
     let cancelled = false;
-    const shortenCtrl = new AbortController();
-    let shortenTimer = 0;
 
     (async () => {
-      let url = "";
       try {
-        if (shareInput.kind === "bundle") {
-          const encoded = await encodeBundleAsync(shareInput.data);
-          url = window.location.origin + "/bundle/#bundle=" + encoded;
-        } else {
-          const encoded = await encodeJsonAsync(shareInput.data);
-          url = window.location.origin + "/#json=" + encoded;
-        }
+        const url = shareInput.kind === "bundle"
+          ? window.location.origin + "/bundle/#bundle=" + await encodeBundleAsync(shareInput.data)
+          : window.location.origin + "/#json=" + await encodeJsonAsync(shareInput.data);
+        if (cancelled) return;
+        setShareUrl(url);
+        setLinkStatus(url.length > URL_LENGTH_WARN ? "too-large" : "ok");
       } catch {
         if (!cancelled) setLinkStatus("failed");
-        return;
       }
-      if (cancelled) return;
-
-      setShareUrl(url);
-      setShortLinkUrl("");
-      setUseFullLink(false);
-
-      if (!isShortenable(url)) {
-        setLinkStatus("too-large");
-        return;
-      }
-
-      setLinkStatus("pending");
-      shortenTimer = window.setTimeout(() => {
-        shortenUrl(url, shortenCtrl.signal).then(({ shortUrl, reason }) => {
-          if (shortenCtrl.signal.aborted) return;
-          applyShortenResult(shortUrl, reason, setShortLinkUrl, setLinkStatus);
-        });
-      }, SHORTEN_DEBOUNCE_MS);
     })();
 
-    return () => {
-      cancelled = true;
-      window.clearTimeout(shortenTimer);
-      shortenCtrl.abort();
-    };
+    return () => { cancelled = true; };
   }, [shareInput]);
 
-  const displayLinkUrl =
-    linkStatus === "ok" && shortLinkUrl && !useFullLink ? shortLinkUrl : shareUrl;
-
   const handleCopyLink = () => {
-    if (!displayLinkUrl) return;
-    navigator.clipboard.writeText(displayLinkUrl);
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 1600);
   };
@@ -148,11 +110,9 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     const entries = tabs.filter((t) => t.json.trim()).map((t) => ({ title: t.name, json: t.json }));
     if (entries.length) setBundleEntries(entries);
   }, [tabs]);
-  const [bundleUrl, setBundleUrl]             = useState("");
-  const [shortBundleUrl, setShortBundleUrl]   = useState("");
-  const [bundleStatus, setBundleStatus]       = useState<LinkStatus>("empty");
-  const [useFullBundle, setUseFullBundle]     = useState(false);
-  const [copiedBundle, setCopiedBundle]       = useState(false);
+  const [bundleUrl, setBundleUrl]       = useState("");
+  const [bundleStatus, setBundleStatus] = useState<LinkStatus>("empty");
+  const [copiedBundle, setCopiedBundle] = useState(false);
   const bundleAbortRef = useRef<AbortController | null>(null);
 
   const generateBundleUrl = useCallback(async () => {
@@ -162,34 +122,23 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     bundleAbortRef.current?.abort();
     const ctrl = new AbortController();
     bundleAbortRef.current = ctrl;
-    setBundleStatus("pending");
 
-    const encoded = await encodeBundleAsync(valid);
-    if (ctrl.signal.aborted) return;
-
-    const url = window.location.origin + "/bundle/#bundle=" + encoded;
-    setBundleUrl(url);
-    setShortBundleUrl("");
-    setUseFullBundle(false);
-
-    if (!isShortenable(url)) {
-      setBundleStatus("too-large");
-      return;
+    try {
+      const encoded = await encodeBundleAsync(valid);
+      if (ctrl.signal.aborted) return;
+      const url = window.location.origin + "/bundle/#bundle=" + encoded;
+      setBundleUrl(url);
+      setBundleStatus(url.length > URL_LENGTH_WARN ? "too-large" : "ok");
+    } catch {
+      if (!ctrl.signal.aborted) setBundleStatus("failed");
     }
-
-    const { shortUrl, reason } = await shortenUrl(url, ctrl.signal);
-    if (ctrl.signal.aborted) return;
-    applyShortenResult(shortUrl, reason, setShortBundleUrl, setBundleStatus);
   }, [bundleEntries]);
 
   useEffect(() => () => bundleAbortRef.current?.abort(), []);
 
-  const displayBundleUrl =
-    bundleStatus === "ok" && shortBundleUrl && !useFullBundle ? shortBundleUrl : bundleUrl;
-
   const handleCopyBundle = () => {
-    if (!displayBundleUrl) return;
-    navigator.clipboard.writeText(displayBundleUrl);
+    if (!bundleUrl) return;
+    navigator.clipboard.writeText(bundleUrl);
     setCopiedBundle(true);
     setTimeout(() => setCopiedBundle(false), 1600);
   };
@@ -261,8 +210,8 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
       <div className="flex items-start gap-2 px-4 py-2.5 border-b border-border bg-primary/5 text-xs text-muted-foreground">
         <Lock className="w-3 h-3 text-primary mt-0.5 shrink-0" />
         <span>
-          <strong className="text-foreground font-medium">We do not store your data.</strong>{" "}
-          Everything runs in your browser — no servers, no tracking, no accounts.
+          <strong className="text-foreground font-medium">Zero storage, zero third-parties.</strong>{" "}
+          Your JSON is encoded into the link itself — no server ever sees it.
         </span>
       </div>
 
@@ -310,26 +259,19 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
             )}
             {!shareHasJson ? (
               <p className="text-xs text-muted-foreground">Paste JSON in the editor first.</p>
-            ) : linkStatus === "pending" ? (
-              <ShortenPendingPlaceholder />
             ) : (
               <>
                 {/* URL display + copy */}
                 <div className="flex items-center gap-2">
                   <input
-                    readOnly value={displayLinkUrl}
+                    readOnly value={shareUrl}
                     className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
                     onClick={e => (e.target as HTMLInputElement).select()}
                   />
                   <CopyBtn copied={copiedLink} onClick={handleCopyLink} />
                 </div>
 
-                <ShortenStatusLine
-                  status={linkStatus}
-                  usingFull={useFullLink}
-                  onToggleFull={() => setUseFullLink((v) => !v)}
-                  charCount={shareUrl.length}
-                />
+                <LinkStatusLine status={linkStatus} charCount={shareUrl.length} />
               </>
             )}
           </div>
@@ -385,42 +327,39 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <button onClick={addEntry} className="toolbar-btn text-muted-foreground">
-                <Plus className="w-3.5 h-3.5" /><span>Add JSON</span>
-              </button>
+              <AppButton
+                onClick={addEntry}
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
+                label="Add JSON"
+              />
               {hasMultipleTabs && (
-                <button onClick={useAllTabsAsBundle} className="toolbar-btn text-primary">
-                  <Package className="w-3.5 h-3.5" /><span>Use all tabs</span>
-                </button>
+                <AppButton
+                  variant="accent"
+                  onClick={useAllTabsAsBundle}
+                  leftIcon={<Package className="w-3.5 h-3.5" />}
+                  label="Use all tabs"
+                />
               )}
-              <button onClick={generateBundleUrl} className="toolbar-btn ml-auto">
-                <Package className="w-3.5 h-3.5 text-primary" /><span>Generate Bundle Link</span>
-              </button>
+              <AppButton
+                onClick={generateBundleUrl}
+                className="ml-auto"
+                leftIcon={<Package className="w-3.5 h-3.5 text-primary" />}
+                label="Generate Bundle Link"
+              />
             </div>
 
             {bundleUrl && (
                 <div className="flex flex-col gap-2">
-                  {bundleStatus === "pending" ? (
-                    <ShortenPendingPlaceholder />
-                  ) : (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <input
-                          readOnly value={displayBundleUrl}
-                          className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
-                          onClick={e => (e.target as HTMLInputElement).select()}
-                        />
-                        <CopyBtn copied={copiedBundle} onClick={handleCopyBundle} />
-                      </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      readOnly value={bundleUrl}
+                      className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
+                      onClick={e => (e.target as HTMLInputElement).select()}
+                    />
+                    <CopyBtn copied={copiedBundle} onClick={handleCopyBundle} />
+                  </div>
 
-                      <ShortenStatusLine
-                        status={bundleStatus}
-                        usingFull={useFullBundle}
-                        onToggleFull={() => setUseFullBundle((v) => !v)}
-                        charCount={bundleUrl.length}
-                      />
-                    </>
-                  )}
+                  <LinkStatusLine status={bundleStatus} charCount={bundleUrl.length} />
 
                   <p className="text-[10px] text-muted-foreground/50">
                     Recipients see a list and can open each JSON in the editor.
@@ -530,54 +469,25 @@ function SectionHeader({ label, icon, open, onToggle, badge }: {
 
 function CopyBtn({ copied, onClick }: { copied: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="toolbar-btn shrink-0" title="Copy to clipboard">
-      {copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
-      <span className="hidden sm:inline">{copied ? "Copied!" : "Copy"}</span>
-    </button>
+    <AppButton
+      onClick={onClick}
+      className="shrink-0"
+      title="Copy to clipboard"
+      leftIcon={copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
+      label={copied ? "Copied!" : "Copy"}
+      hideLabelOnMobile
+    />
   );
 }
 
-function ShortenPendingPlaceholder() {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 min-w-0 h-9 rounded-lg bg-secondary/50 border border-border flex items-center gap-2 px-3">
-        <Loader2 className="w-3 h-3 animate-spin text-primary" />
-        <span className="text-[11px] text-muted-foreground">Generating short link…</span>
-      </div>
-    </div>
-  );
-}
-
-function ShortenStatusLine({
-  status, usingFull, onToggleFull, charCount,
-}: {
-  status: LinkStatus;
-  usingFull: boolean;
-  onToggleFull: () => void;
-  charCount: number;
-}) {
-  if (status === "ok") {
-    return (
-      <div className="flex items-center gap-2">
-        <span className="flex items-center gap-1.5 text-[11px] text-primary">
-          <Zap className="w-3 h-3" />
-          {usingFull ? "Using full link" : "Shortened"}
-          <button
-            onClick={onToggleFull}
-            className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
-          >
-            {usingFull ? "use short link" : "use full link"}
-          </button>
-        </span>
-      </div>
-    );
-  }
+function LinkStatusLine({ status, charCount }: { status: LinkStatus; charCount: number }) {
   if (status === "too-large") {
     return (
       <div className="flex items-start gap-1.5 text-[11px] text-amber-600 dark:text-amber-400">
         <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
         <span>
-          JSON is too large ({charCount.toLocaleString()} chars) to shorten. Consider using <strong>Export</strong> below to share a file instead.
+          Link is long ({charCount.toLocaleString()} chars) and may exceed some browser or chat-app limits.
+          Consider <strong>Export</strong> below to share a file instead.
         </span>
       </div>
     );
@@ -586,27 +496,9 @@ function ShortenStatusLine({
     return (
       <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
         <AlertTriangle className="w-3 h-3" />
-        Could not reach shortener — using full link.
+        Couldn't build link. Check that your JSON is valid.
       </span>
     );
   }
   return null;
-}
-
-function applyShortenResult(
-  shortUrl: string | null,
-  reason: ShortenReason,
-  setShort: (v: string) => void,
-  setStatus: (s: LinkStatus) => void,
-) {
-  if (reason === "ok" && shortUrl) {
-    setShort(shortUrl);
-    setStatus("ok");
-  } else if (reason === "too-large") {
-    setStatus("too-large");
-  } else if (reason === "aborted") {
-    // no-op — a newer request is in flight
-  } else {
-    setStatus("failed");
-  }
 }

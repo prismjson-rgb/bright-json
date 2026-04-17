@@ -117,20 +117,6 @@
 }
 
 @layer components {
-  .toolbar-btn {
-    @apply flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium
-           transition-all duration-150 ease-out
-           disabled:opacity-30 disabled:cursor-not-allowed;
-  }
-  .toolbar-btn:not(:disabled):hover {
-    background: hsl(var(--accent) / 0.12);
-    color: hsl(var(--accent));
-    transform: translateY(-0.5px);
-  }
-  .toolbar-btn:not(:disabled):active {
-    transform: translateY(0);
-  }
-  
   .pane-header {
     @apply flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-wider
            border-b border-border select-none;

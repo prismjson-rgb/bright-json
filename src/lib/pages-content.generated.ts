@@ -19,7 +19,7 @@ export const PAGES: PageContent[] = [
     "title": "Privacy Policy",
     "metaTitle": "Privacy Policy — JSON Prism",
     "metaDescription": "JSON Prism processes data locally. No server storage. No analytics by default.",
-    "contentMarkdown": "JSON Prism is designed with privacy in mind.\r\n\r\n- **No server storage** — All JSON processing happens in your browser\r\n- **No data sent** — Your JSON is never transmitted to our servers\r\n- **Share links** — When you share, JSON is encoded in the URL (client-side). Large payloads may use optional shortening services\r\n\r\nWe do not collect, store, or sell your data."
+    "contentMarkdown": "JSON Prism is designed with privacy in mind.\r\n\r\n- **No server storage** — All JSON processing happens in your browser\r\n- **No data sent** — Your JSON is never transmitted to our servers\r\n- **Share links** — When you share, JSON is encoded directly into the URL fragment (client-side only). Nothing is uploaded, and no third-party shortener is involved\r\n\r\nWe do not collect, store, or sell your data."
   }
 ];
 export const PAGE_SLUGS: string[] = ["about","privacy"];

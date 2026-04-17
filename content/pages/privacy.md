@@ -8,6 +8,6 @@ JSON Prism is designed with privacy in mind.
 
 - **No server storage** — All JSON processing happens in your browser
 - **No data sent** — Your JSON is never transmitted to our servers
-- **Share links** — When you share, JSON is encoded in the URL (client-side). Large payloads may use optional shortening services
+- **Share links** — When you share, JSON is encoded directly into the URL fragment (client-side only). Nothing is uploaded, and no third-party shortener is involved
 
 We do not collect, store, or sell your data.
