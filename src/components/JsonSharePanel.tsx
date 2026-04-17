@@ -1,10 +1,11 @@
 "use client";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Link2, Plus, Trash2, Copy, Check, Download,
-  FileCode, Package, Lock, ChevronDown, Sparkles, Zap, Loader2, X,
+  FileCode, Package, Lock, ChevronDown, Sparkles, Zap, Loader2, X, AlertTriangle,
 } from "lucide-react";
-import { encodeJson, encodeBundle, type BundleEntry } from "@/lib/share";
+import { encodeJsonAsync, encodeBundleAsync, type BundleEntry } from "@/lib/share";
+import { shortenUrl, isShortenable, type ShortenReason } from "@/lib/shorten";
 import { generateHtml } from "@/lib/html-export";
 import type { TabData } from "@/lib/tabs-storage";
 
@@ -18,17 +19,9 @@ interface JsonSharePanelProps {
 
 type Section = "link" | "bundle" | "export";
 
-/** Shorten any URL via is.gd public CORS API — handles URL fragments correctly */
-async function shortenUrl(longUrl: string): Promise<string> {
-  const res = await fetch(
-    `https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`,
-    { headers: { Accept: "application/json" } }
-  );
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-  if (data.errorcode) throw new Error(data.errormessage ?? "Shortening failed");
-  return data.shorturl as string;
-}
+type LinkStatus = "empty" | "pending" | "ok" | "too-large" | "failed";
+
+const SHORTEN_DEBOUNCE_MS = 400;
 
 export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [], activeTabId }: JsonSharePanelProps) {
   const [open, setOpen] = useState<Section>("link");
@@ -41,27 +34,30 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   const hasMultipleTabs = tabs.length > 1;
   const hasJson = !!json.trim();
 
-  const getShareJson = (): string => {
-    if (!hasMultipleTabs || shareScope === "current") return json;
-    const ids = shareScope === "all" ? tabs.map((t) => t.id) : Array.from(selectedTabIds);
-    const entries = tabs.filter((t) => ids.includes(t.id)).map((t) => ({ title: t.name, json: t.json }));
-    return JSON.stringify(entries);
-  };
+  const useBundleForShare = hasMultipleTabs && shareScope !== "current";
 
-  const getShareUrl = (): string => {
-    const toShare = getShareJson();
-    if (!toShare.trim()) return "";
-    if (hasMultipleTabs && shareScope !== "current") {
-      try {
-        const entries = JSON.parse(toShare) as BundleEntry[];
-        const encoded = encodeBundle(entries);
-        return window.location.origin + "/bundle/#bundle=" + encoded;
-      } catch {
-        return "";
-      }
+  // Cheap, memoized: builds the string/entries to encode. Encoding itself happens
+  // off the main thread in the effect below so typing large JSON stays smooth.
+  const shareInput = useMemo<
+    | { kind: "empty" }
+    | { kind: "single"; data: string }
+    | { kind: "bundle"; data: BundleEntry[] }
+  >(() => {
+    if (!useBundleForShare) {
+      return json.trim() ? { kind: "single", data: json } : { kind: "empty" };
     }
-    const encoded = encodeJson(toShare);
-    return window.location.origin + "/#json=" + encoded;
+    const ids = shareScope === "all" ? tabs.map((t) => t.id) : Array.from(selectedTabIds);
+    const entries = tabs
+      .filter((t) => ids.includes(t.id) && t.json.trim())
+      .map((t) => ({ title: t.name, json: t.json }));
+    return entries.length ? { kind: "bundle", data: entries } : { kind: "empty" };
+  }, [json, tabs, shareScope, selectedTabIds, useBundleForShare]);
+
+  // Used by the Export section for downloads.
+  const getShareJson = (): string => {
+    if (shareInput.kind === "empty") return "";
+    if (shareInput.kind === "single") return shareInput.data;
+    return JSON.stringify(shareInput.data);
   };
 
   const toggleTabSelection = (id: string) => {
@@ -74,32 +70,72 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   };
 
   /* ── Share via Link ─────────────────────────────── */
-  const [shareUrl, setShareUrl]         = useState("");
-  const [shortLinkUrl, setShortLinkUrl] = useState("");
-  const [copiedLink, setCopiedLink]     = useState(false);
-  const [shorteningLink, setShorteningLink] = useState(false);
+  const [shareUrl, setShareUrl]           = useState("");
+  const [shortLinkUrl, setShortLinkUrl]   = useState("");
+  const [linkStatus, setLinkStatus]       = useState<LinkStatus>("empty");
+  const [useFullLink, setUseFullLink]     = useState(false);
+  const [copiedLink, setCopiedLink]       = useState(false);
 
-  const shareUrlComputed = getShareUrl();
-  const shareHasJson = (() => {
-    if (!hasMultipleTabs || shareScope === "current") return !!json.trim();
-    if (shareScope === "all") return tabs.some((t) => t.json.trim());
-    return tabs.some((t) => selectedTabIds.has(t.id) && t.json.trim());
-  })();
+  const shareHasJson = shareInput.kind !== "empty";
 
   useEffect(() => {
-    if (!shareHasJson) { setShareUrl(""); return; }
-    const computed = shareUrlComputed;
-    setShareUrl(computed);
-    setShortLinkUrl("");
-    setShorteningLink(true);
-    shortenUrl(computed)
-      .then(setShortLinkUrl)
-      .catch(() => {})
-      .finally(() => setShorteningLink(false));
-  }, [shareUrlComputed, shareHasJson]);
+    if (shareInput.kind === "empty") {
+      setShareUrl("");
+      setShortLinkUrl("");
+      setLinkStatus("empty");
+      return;
+    }
 
-  const displayLinkUrl = shortLinkUrl || shareUrl;
+    let cancelled = false;
+    const shortenCtrl = new AbortController();
+    let shortenTimer = 0;
+
+    (async () => {
+      let url = "";
+      try {
+        if (shareInput.kind === "bundle") {
+          const encoded = await encodeBundleAsync(shareInput.data);
+          url = window.location.origin + "/bundle/#bundle=" + encoded;
+        } else {
+          const encoded = await encodeJsonAsync(shareInput.data);
+          url = window.location.origin + "/#json=" + encoded;
+        }
+      } catch {
+        if (!cancelled) setLinkStatus("failed");
+        return;
+      }
+      if (cancelled) return;
+
+      setShareUrl(url);
+      setShortLinkUrl("");
+      setUseFullLink(false);
+
+      if (!isShortenable(url)) {
+        setLinkStatus("too-large");
+        return;
+      }
+
+      setLinkStatus("pending");
+      shortenTimer = window.setTimeout(() => {
+        shortenUrl(url, shortenCtrl.signal).then(({ shortUrl, reason }) => {
+          if (shortenCtrl.signal.aborted) return;
+          applyShortenResult(shortUrl, reason, setShortLinkUrl, setLinkStatus);
+        });
+      }, SHORTEN_DEBOUNCE_MS);
+    })();
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(shortenTimer);
+      shortenCtrl.abort();
+    };
+  }, [shareInput]);
+
+  const displayLinkUrl =
+    linkStatus === "ok" && shortLinkUrl && !useFullLink ? shortLinkUrl : shareUrl;
+
   const handleCopyLink = () => {
+    if (!displayLinkUrl) return;
     navigator.clipboard.writeText(displayLinkUrl);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 1600);
@@ -114,25 +150,45 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   }, [tabs]);
   const [bundleUrl, setBundleUrl]             = useState("");
   const [shortBundleUrl, setShortBundleUrl]   = useState("");
+  const [bundleStatus, setBundleStatus]       = useState<LinkStatus>("empty");
+  const [useFullBundle, setUseFullBundle]     = useState(false);
   const [copiedBundle, setCopiedBundle]       = useState(false);
-  const [shorteningBundle, setShorteningBundle] = useState(false);
+  const bundleAbortRef = useRef<AbortController | null>(null);
 
-  const generateBundleUrl = useCallback(() => {
+  const generateBundleUrl = useCallback(async () => {
     const valid = bundleEntries.filter(e => e.title.trim() && e.json.trim());
     if (!valid.length) return;
-    const encoded = encodeBundle(valid);
+
+    bundleAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    bundleAbortRef.current = ctrl;
+    setBundleStatus("pending");
+
+    const encoded = await encodeBundleAsync(valid);
+    if (ctrl.signal.aborted) return;
+
     const url = window.location.origin + "/bundle/#bundle=" + encoded;
-    setShortBundleUrl("");
     setBundleUrl(url);
-    setShorteningBundle(true);
-    shortenUrl(url)
-      .then(setShortBundleUrl)
-      .catch(() => {})
-      .finally(() => setShorteningBundle(false));
+    setShortBundleUrl("");
+    setUseFullBundle(false);
+
+    if (!isShortenable(url)) {
+      setBundleStatus("too-large");
+      return;
+    }
+
+    const { shortUrl, reason } = await shortenUrl(url, ctrl.signal);
+    if (ctrl.signal.aborted) return;
+    applyShortenResult(shortUrl, reason, setShortBundleUrl, setBundleStatus);
   }, [bundleEntries]);
 
-  const displayBundleUrl = shortBundleUrl || bundleUrl;
+  useEffect(() => () => bundleAbortRef.current?.abort(), []);
+
+  const displayBundleUrl =
+    bundleStatus === "ok" && shortBundleUrl && !useFullBundle ? shortBundleUrl : bundleUrl;
+
   const handleCopyBundle = () => {
+    if (!displayBundleUrl) return;
     navigator.clipboard.writeText(displayBundleUrl);
     setCopiedBundle(true);
     setTimeout(() => setCopiedBundle(false), 1600);
@@ -254,6 +310,8 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
             )}
             {!shareHasJson ? (
               <p className="text-xs text-muted-foreground">Paste JSON in the editor first.</p>
+            ) : linkStatus === "pending" ? (
+              <ShortenPendingPlaceholder />
             ) : (
               <>
                 {/* URL display + copy */}
@@ -266,26 +324,12 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                   <CopyBtn copied={copiedLink} onClick={handleCopyLink} />
                 </div>
 
-                {/* Shorten status */}
-                <div className="flex items-center gap-2">
-                  {shorteningLink ? (
-                    <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                      Generating short link…
-                    </span>
-                  ) : shortLinkUrl ? (
-                    <span className="flex items-center gap-1.5 text-[11px] text-primary">
-                      <Zap className="w-3 h-3" />
-                      Shortened via is.gd
-                      <button
-                        onClick={() => { setShortLinkUrl(""); }}
-                        className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
-                      >
-                        use full link
-                      </button>
-                    </span>
-                  ) : null}
-                </div>
+                <ShortenStatusLine
+                  status={linkStatus}
+                  usingFull={useFullLink}
+                  onToggleFull={() => setUseFullLink((v) => !v)}
+                  charCount={shareUrl.length}
+                />
               </>
             )}
           </div>
@@ -356,35 +400,27 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
 
             {bundleUrl && (
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <input
-                      readOnly value={displayBundleUrl}
-                      className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
-                      onClick={e => (e.target as HTMLInputElement).select()}
-                    />
-                    <CopyBtn copied={copiedBundle} onClick={handleCopyBundle} />
-                  </div>
+                  {bundleStatus === "pending" ? (
+                    <ShortenPendingPlaceholder />
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <input
+                          readOnly value={displayBundleUrl}
+                          className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
+                          onClick={e => (e.target as HTMLInputElement).select()}
+                        />
+                        <CopyBtn copied={copiedBundle} onClick={handleCopyBundle} />
+                      </div>
 
-                  {/* Shorten bundle status */}
-                  <div className="flex items-center gap-2">
-                    {shorteningBundle ? (
-                      <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        Generating short link…
-                      </span>
-                    ) : shortBundleUrl ? (
-                      <span className="flex items-center gap-1.5 text-[11px] text-primary">
-                        <Zap className="w-3 h-3" />
-                        Shortened via is.gd
-                        <button
-                          onClick={() => { setShortBundleUrl(""); }}
-                          className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
-                        >
-                          use full link
-                        </button>
-                      </span>
-                    ) : null}
-                  </div>
+                      <ShortenStatusLine
+                        status={bundleStatus}
+                        usingFull={useFullBundle}
+                        onToggleFull={() => setUseFullBundle((v) => !v)}
+                        charCount={bundleUrl.length}
+                      />
+                    </>
+                  )}
 
                   <p className="text-[10px] text-muted-foreground/50">
                     Recipients see a list and can open each JSON in the editor.
@@ -499,4 +535,78 @@ function CopyBtn({ copied, onClick }: { copied: boolean; onClick: () => void }) 
       <span className="hidden sm:inline">{copied ? "Copied!" : "Copy"}</span>
     </button>
   );
+}
+
+function ShortenPendingPlaceholder() {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex-1 min-w-0 h-9 rounded-lg bg-secondary/50 border border-border flex items-center gap-2 px-3">
+        <Loader2 className="w-3 h-3 animate-spin text-primary" />
+        <span className="text-[11px] text-muted-foreground">Generating short link…</span>
+      </div>
+    </div>
+  );
+}
+
+function ShortenStatusLine({
+  status, usingFull, onToggleFull, charCount,
+}: {
+  status: LinkStatus;
+  usingFull: boolean;
+  onToggleFull: () => void;
+  charCount: number;
+}) {
+  if (status === "ok") {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="flex items-center gap-1.5 text-[11px] text-primary">
+          <Zap className="w-3 h-3" />
+          {usingFull ? "Using full link" : "Shortened"}
+          <button
+            onClick={onToggleFull}
+            className="ml-1 text-muted-foreground hover:text-foreground underline text-[10px]"
+          >
+            {usingFull ? "use short link" : "use full link"}
+          </button>
+        </span>
+      </div>
+    );
+  }
+  if (status === "too-large") {
+    return (
+      <div className="flex items-start gap-1.5 text-[11px] text-amber-600 dark:text-amber-400">
+        <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+        <span>
+          JSON is too large ({charCount.toLocaleString()} chars) to shorten. Consider using <strong>Export</strong> below to share a file instead.
+        </span>
+      </div>
+    );
+  }
+  if (status === "failed") {
+    return (
+      <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <AlertTriangle className="w-3 h-3" />
+        Could not reach shortener — using full link.
+      </span>
+    );
+  }
+  return null;
+}
+
+function applyShortenResult(
+  shortUrl: string | null,
+  reason: ShortenReason,
+  setShort: (v: string) => void,
+  setStatus: (s: LinkStatus) => void,
+) {
+  if (reason === "ok" && shortUrl) {
+    setShort(shortUrl);
+    setStatus("ok");
+  } else if (reason === "too-large") {
+    setStatus("too-large");
+  } else if (reason === "aborted") {
+    // no-op — a newer request is in flight
+  } else {
+    setStatus("failed");
+  }
 }

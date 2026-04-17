@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Braces, ChevronRight, ChevronDown, ExternalLink, Lock, Package } from "lucide-react";
-import { decodeBundle, encodeJson, type BundleEntry } from "@/lib/share";
+import { decodeBundleAsync, encodeJsonAsync, type BundleEntry } from "@/lib/share";
 import { useTheme } from "@/hooks/useTheme";
 
 const JsonTreeView = dynamic(() => import("@/components/JsonTreeView"), { ssr: false });
@@ -23,24 +23,27 @@ export default function BundleViewer() {
       setStatus("error");
       return;
     }
-    const decoded = decodeBundle(hash[1]);
-    if (!decoded.length) {
-      setErrorMsg("Could not decode the bundle. The link may be incomplete or corrupted.");
-      setStatus("error");
-      return;
-    }
-    // Parse all JSON entries
-    const p: Record<number, unknown> = {};
-    decoded.forEach((entry, i) => {
-      try { p[i] = JSON.parse(entry.json); } catch {}
+    let cancelled = false;
+    void decodeBundleAsync(hash[1]).then((decoded) => {
+      if (cancelled) return;
+      if (!decoded.length) {
+        setErrorMsg("Could not decode the bundle. The link may be incomplete or corrupted.");
+        setStatus("error");
+        return;
+      }
+      const p: Record<number, unknown> = {};
+      decoded.forEach((entry, i) => {
+        try { p[i] = JSON.parse(entry.json); } catch {}
+      });
+      setEntries(decoded);
+      setParsed(p);
+      setStatus("ok");
     });
-    setEntries(decoded);
-    setParsed(p);
-    setStatus("ok");
+    return () => { cancelled = true; };
   }, []);
 
-  const openInEditor = (json: string) => {
-    const encoded = encodeJson(json);
+  const openInEditor = async (json: string) => {
+    const encoded = await encodeJsonAsync(json);
     window.open("/#json=" + encoded, "_blank");
   };
 

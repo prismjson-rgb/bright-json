@@ -13,7 +13,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "@/components/Sidebar";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import JsonEditor from "@/components/JsonEditor";
-import JsonTreeView from "@/components/JsonTreeView";
 import JsonTabBar from "@/components/JsonTabBar";
 import OverlaySidebar from "@/components/OverlaySidebar";
 
@@ -23,6 +22,7 @@ const panelLoading = () => (
   </div>
 );
 
+const JsonTreeView = dynamic(() => import("@/components/JsonTreeView"), { ssr: false, loading: panelLoading });
 const JsonVisualEditor = dynamic(() => import("@/components/JsonVisualEditor"), { ssr: false, loading: panelLoading });
 const JsonDiffViewer = dynamic(() => import("@/components/JsonDiffViewer"), { ssr: false, loading: panelLoading });
 const JsonConvertPanel = dynamic(() => import("@/components/JsonConvertPanel"), { ssr: false, loading: panelLoading });
@@ -42,7 +42,7 @@ const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), { ssr:
 const JsonFlowView = dynamic(() => import("@/components/JsonFlowView"), { ssr: false, loading: panelLoading });
 import { useSettings } from "@/contexts/SettingsContext";
 import { repairJson } from "@/lib/json-debug";
-import { safeDecodeJson } from "@/lib/share";
+import { safeDecodeJsonAsync } from "@/lib/share";
 import { saveJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
 import {
   loadTabs,
@@ -183,10 +183,12 @@ export default function JsonViewerClient() {
   useEffect(() => {
     if (!tabsHydrated) return;
     const m = window.location.hash.match(/^#json=(.+)/);
-    if (m) {
-      const decoded = safeDecodeJson(m[1]);
-      if (decoded) setJson(decoded);
-    }
+    if (!m) return;
+    let cancelled = false;
+    void safeDecodeJsonAsync(m[1]).then((decoded) => {
+      if (!cancelled && decoded) setJson(decoded);
+    });
+    return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabsHydrated]);
 
