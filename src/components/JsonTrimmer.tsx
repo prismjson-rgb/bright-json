@@ -3,6 +3,8 @@ import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { Scissors, Download, Copy, Check } from "lucide-react";
 import { extractPath, firstN, removeKeys, collapseDepth, getAllKeys } from "@/lib/json-trim";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -50,7 +52,11 @@ export default function JsonTrimmer({ parsed, dark }: { parsed: unknown; dark: b
 
   return (
     <div className="flex flex-col h-full">
-      <div className="pane-header"><Scissors className="w-3.5 h-3.5" /><span>JSON Trimmer</span></div>
+      <div className="pane-header">
+        <Scissors className="w-3.5 h-3.5" />
+        <span>JSON Trimmer</span>
+        <InfoHelp text={MODES.trim.help} label="About JSON Trimmer" side="bottom" />
+      </div>
       <div className="flex flex-1 min-h-0">
         {/* Config */}
         <div className="w-60 shrink-0 border-r border-border flex flex-col overflow-y-auto p-4 gap-4">

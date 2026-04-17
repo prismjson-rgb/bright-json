@@ -1,13 +1,19 @@
 "use client";
 import { BarChart3 } from "lucide-react";
 import { useJsonAnalyze } from "@/hooks/useJsonAnalyze";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 export default function JsonStructureAnalyzer({ parsed }: { parsed: unknown }) {
   const stats = useJsonAnalyze(parsed);
 
   if (!parsed) return (
     <div className="flex flex-col h-full">
-      <div className="pane-header"><BarChart3 className="w-3.5 h-3.5" /><span>Structure Analyzer</span></div>
+      <div className="pane-header">
+        <BarChart3 className="w-3.5 h-3.5" />
+        <span>Structure Analyzer</span>
+        <InfoHelp text={MODES.structure.help} label="About Structure Analyzer" side="bottom" />
+      </div>
       <div className="flex items-center justify-center flex-1 text-muted-foreground text-sm">
         <div className="text-center"><BarChart3 className="w-8 h-8 opacity-30 mx-auto mb-2" /><p>No valid JSON loaded</p></div>
       </div>
@@ -37,7 +43,11 @@ export default function JsonStructureAnalyzer({ parsed }: { parsed: unknown }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="pane-header"><BarChart3 className="w-3.5 h-3.5" /><span>Structure Analyzer</span></div>
+      <div className="pane-header">
+        <BarChart3 className="w-3.5 h-3.5" />
+        <span>Structure Analyzer</span>
+        <InfoHelp text={MODES.structure.help} label="About Structure Analyzer" side="bottom" />
+      </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* Stat cards */}
         <div>

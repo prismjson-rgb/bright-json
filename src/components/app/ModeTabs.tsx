@@ -13,7 +13,7 @@ export default function ModeTabs({ mode, onChange, className }: ModeTabsProps) {
     <nav
       role="tablist"
       aria-label="View modes"
-      className={`flex items-stretch gap-1 ${className ?? ""}`}
+      className={`flex items-stretch gap-1 min-w-0 overflow-x-auto ${className ?? ""}`}
     >
       {VIEW_MODES.map((m) => {
         const cfg = MODES[m];

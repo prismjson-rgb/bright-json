@@ -4,6 +4,8 @@ import { Hash } from "lucide-react";
 import { estimateTokens, estimateCost, MODELS } from "@/lib/token-estimate";
 import { jsonToYaml } from "@/lib/json-to-yaml";
 import { jsonToXml } from "@/lib/json-to-xml";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 export default function JsonTokenEstimator({ json, parsed }: { json: string; parsed: unknown }) {
   const [selectedModel, setSelectedModel] = useState(MODELS[0].name);
@@ -32,7 +34,11 @@ export default function JsonTokenEstimator({ json, parsed }: { json: string; par
 
   return (
     <div className="flex flex-col h-full">
-      <div className="pane-header"><Hash className="w-3.5 h-3.5" /><span>Token Estimator</span></div>
+      <div className="pane-header">
+        <Hash className="w-3.5 h-3.5" />
+        <span>Token Estimator</span>
+        <InfoHelp text={MODES.tokens.help} label="About Token Estimator" side="bottom" />
+      </div>
       {!json.trim() ? (
         <div className="flex items-center justify-center flex-1 text-muted-foreground text-sm">
           <div className="text-center"><Hash className="w-8 h-8 opacity-30 mx-auto mb-2" /><p>No JSON loaded</p></div>

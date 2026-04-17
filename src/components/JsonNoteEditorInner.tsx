@@ -21,6 +21,8 @@ import {
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 function ToolBtn({
   onClick,
@@ -140,6 +142,8 @@ export default function JsonNoteEditorInner() {
         </ToolBtn>
 
         <div className="h-4 w-px bg-border mx-1" />
+
+        <InfoHelp text={MODES.notes.help} label="About Notes" side="bottom" className="shrink-0" />
 
         <ToolBtn
           onClick={() =>

@@ -24,6 +24,23 @@ export const metadata: Metadata = {
   },
 };
 
+const BREADCRUMB_LD = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+    { "@type": "ListItem", position: 2, name: "Bundle Viewer", item: `${BASE}/bundle/` },
+  ],
+};
+
 export default function BundlePage() {
-  return <BundleViewerWrapper />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_LD) }}
+      />
+      <BundleViewerWrapper />
+    </>
+  );
 }

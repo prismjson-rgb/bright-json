@@ -9,6 +9,8 @@ import { encodeJsonAsync, encodeBundleAsync, type BundleEntry } from "@/lib/shar
 import { generateHtml } from "@/lib/html-export";
 import type { TabData } from "@/lib/tabs-storage";
 import { AppButton } from "@/components/app/AppButton";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 import {
   createShortLink,
   extractSharePayload,
@@ -158,7 +160,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
       });
       return;
     }
-    if (result.code !== "aborted") {
+    if (!result.ok && result.code !== "aborted") {
       setShortLinkState({ kind: "error", message: shortErrorMessage(result) });
     }
   }, [shareUrl]);
@@ -247,7 +249,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
       });
       return;
     }
-    if (result.code !== "aborted") {
+    if (!result.ok && result.code !== "aborted") {
       setShortBundleState({ kind: "error", message: shortErrorMessage(result) });
     }
   }, [bundleUrl]);
@@ -306,9 +308,10 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Header */}
       <div className="pane-header flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-primary" />
+        <div className="flex items-center gap-2 min-w-0">
+          <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
           <span>Share &amp; Export</span>
+          <InfoHelp text={MODES.share.help} label="About sharing" side="bottom" className="shrink-0" />
         </div>
         {onClose && (
           <button
@@ -342,6 +345,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
           open={open === "link"}
           onToggle={() => setOpen(s => s === "link" ? "export" : "link")}
           badge={shareHasJson ? "Ready" : undefined}
+          help="Builds a URL whose fragment holds your JSON (or a bundle). Recipients open the same app and decode locally. Very long payloads may need export or a short link instead."
         />
 
         {open === "link" && (
@@ -411,6 +415,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
           open={open === "bundle"}
           onToggle={() => setOpen(s => s === "bundle" ? "link" : "bundle")}
           badge={bundleUrl ? "Ready" : undefined}
+          help="Combine several named JSON documents into one shareable link. The bundle page lists entries so people can open each in the editor."
         />
 
         {open === "bundle" && (
@@ -511,6 +516,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
           icon={<FileCode className="w-3.5 h-3.5 text-primary" />}
           open={open === "export"}
           onToggle={() => setOpen(s => s === "export" ? "link" : "export")}
+          help="Download .json, a multi-tab bundle file, or a standalone HTML file that embeds your data for offline viewing."
         />
 
         {open === "export" && (
@@ -582,24 +588,33 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
 
 /* ── Reusable sub-components ─────────────────────── */
 
-function SectionHeader({ label, icon, open, onToggle, badge }: {
+function SectionHeader({ label, icon, open, onToggle, badge, help }: {
   label: string; icon: React.ReactNode;
   open: boolean; onToggle: () => void; badge?: string;
+  help?: string;
 }) {
   return (
-    <button
-      onClick={onToggle}
-      className="flex items-center gap-2 w-full px-4 py-3 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-colors border-b border-border select-none"
-    >
-      {icon}
-      <span className="uppercase tracking-wider">{label}</span>
-      {badge && (
-        <span className="ml-1 text-[9px] bg-primary/15 text-primary rounded-full px-1.5 py-0.5 font-medium">
-          {badge}
-        </span>
-      )}
-      <ChevronDown className={`w-3.5 h-3.5 ml-auto transition-transform duration-200 ${open ? "" : "-rotate-90"}`} />
-    </button>
+    <div className="flex items-stretch border-b border-border">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex flex-1 min-w-0 items-center gap-2 px-4 py-3 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary/30 transition-colors select-none text-left"
+      >
+        {icon}
+        <span className="uppercase tracking-wider">{label}</span>
+        {badge && (
+          <span className="ml-1 text-[9px] bg-primary/15 text-primary rounded-full px-1.5 py-0.5 font-medium">
+            {badge}
+          </span>
+        )}
+        <ChevronDown className={`w-3.5 h-3.5 ml-auto shrink-0 transition-transform duration-200 ${open ? "" : "-rotate-90"}`} />
+      </button>
+      {help ? (
+        <div className="flex items-center pr-3 pl-1 border-l border-border/60 bg-transparent">
+          <InfoHelp text={help} label={`About ${label}`} side="left" className="self-center" />
+        </div>
+      ) : null}
+    </div>
   );
 }
 

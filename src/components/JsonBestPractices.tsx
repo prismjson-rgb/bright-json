@@ -1,6 +1,8 @@
 "use client";
 import { Lightbulb, AlertTriangle, Info } from "lucide-react";
 import { useJsonAnalyze } from "@/hooks/useJsonAnalyze";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 import type { JsonStructure } from "@/lib/json-analyze";
 
 interface Issue {
@@ -61,7 +63,11 @@ export default function JsonBestPractices({ parsed }: { parsed: unknown }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="pane-header"><Lightbulb className="w-3.5 h-3.5" /><span>Best Practices</span></div>
+      <div className="pane-header">
+        <Lightbulb className="w-3.5 h-3.5" />
+        <span>Best Practices</span>
+        <InfoHelp text={MODES.practices.help} label="About Best Practices" side="bottom" />
+      </div>
       {!parsed ? (
         <div className="flex items-center justify-center flex-1 text-muted-foreground text-sm">
           <div className="text-center"><Lightbulb className="w-8 h-8 opacity-30 mx-auto mb-2" /><p>No valid JSON loaded</p></div>

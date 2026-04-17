@@ -19,6 +19,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { InfoHelp } from "@/components/app/InfoHelp";
 import { Slider } from "@/components/ui/slider";
 
 interface SettingsPanelProps {
@@ -76,7 +77,14 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
-        <h2 className="font-semibold text-sm">Settings</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="font-semibold text-sm">Settings</h2>
+          <InfoHelp
+            text="These preferences are stored in your browser on this device. Reset restores defaults for editor, tree, and format options."
+            label="About settings"
+            side="bottom"
+          />
+        </div>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -102,13 +110,21 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
         {/* Editor Settings */}
         <Collapsible open={editorOpen} onOpenChange={setEditorOpen}>
-          <CollapsibleTrigger className="flex items-center gap-2 w-full py-2 text-left hover:text-foreground text-muted-foreground transition-colors">
-            <Type className="w-4 h-4 shrink-0" />
-            <span className="font-medium text-sm">Editor</span>
-            <ChevronDown
-              className={`w-4 h-4 ml-auto transition-transform ${editorOpen ? "rotate-180" : ""}`}
+          <div className="flex items-center gap-1 w-full py-2">
+            <CollapsibleTrigger className="flex flex-1 min-w-0 items-center gap-2 text-left hover:text-foreground text-muted-foreground transition-colors">
+              <Type className="w-4 h-4 shrink-0" />
+              <span className="font-medium text-sm">Editor</span>
+              <ChevronDown
+                className={`w-4 h-4 ml-auto shrink-0 transition-transform ${editorOpen ? "rotate-180" : ""}`}
+              />
+            </CollapsibleTrigger>
+            <InfoHelp
+              text="Monaco editor options: font, tabs, line numbers, wrap, minimap, and bracket colors. Applies to the JSON editor only."
+              label="About editor settings"
+              side="left"
+              className="shrink-0"
             />
-          </CollapsibleTrigger>
+          </div>
           <CollapsibleContent className="pt-2 pb-4 space-y-4 pl-6">
             <SliderRow
               label="Font size"
@@ -207,13 +223,21 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
 
         {/* Tree View Settings */}
         <Collapsible open={treeOpen} onOpenChange={setTreeOpen}>
-          <CollapsibleTrigger className="flex items-center gap-2 w-full py-2 text-left hover:text-foreground text-muted-foreground transition-colors">
-            <TreePine className="w-4 h-4 shrink-0" />
-            <span className="font-medium text-sm">Tree View</span>
-            <ChevronDown
-              className={`w-4 h-4 ml-auto transition-transform ${treeOpen ? "rotate-180" : ""}`}
+          <div className="flex items-center gap-1 w-full py-2">
+            <CollapsibleTrigger className="flex flex-1 min-w-0 items-center gap-2 text-left hover:text-foreground text-muted-foreground transition-colors">
+              <TreePine className="w-4 h-4 shrink-0" />
+              <span className="font-medium text-sm">Tree View</span>
+              <ChevronDown
+                className={`w-4 h-4 ml-auto shrink-0 transition-transform ${treeOpen ? "rotate-180" : ""}`}
+              />
+            </CollapsibleTrigger>
+            <InfoHelp
+              text="Controls how the hierarchical tree is indented, sized, truncated, and whether child counts show on nodes."
+              label="About tree settings"
+              side="left"
+              className="shrink-0"
             />
-          </CollapsibleTrigger>
+          </div>
           <CollapsibleContent className="pt-2 pb-4 space-y-4 pl-6">
             <SliderRow
               label="Indent (px)"
@@ -266,13 +290,21 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
 
         {/* Format Settings */}
         <Collapsible open={formatOpen} onOpenChange={setFormatOpen}>
-          <CollapsibleTrigger className="flex items-center gap-2 w-full py-2 text-left hover:text-foreground text-muted-foreground transition-colors">
-            <FileJson className="w-4 h-4 shrink-0" />
-            <span className="font-medium text-sm">Formatting</span>
-            <ChevronDown
-              className={`w-4 h-4 ml-auto transition-transform ${formatOpen ? "rotate-180" : ""}`}
+          <div className="flex items-center gap-1 w-full py-2">
+            <CollapsibleTrigger className="flex flex-1 min-w-0 items-center gap-2 text-left hover:text-foreground text-muted-foreground transition-colors">
+              <FileJson className="w-4 h-4 shrink-0" />
+              <span className="font-medium text-sm">Formatting</span>
+              <ChevronDown
+                className={`w-4 h-4 ml-auto shrink-0 transition-transform ${formatOpen ? "rotate-180" : ""}`}
+              />
+            </CollapsibleTrigger>
+            <InfoHelp
+              text="Beautify indent width and optional key sorting when you run Beautify from the editor toolbar (Ctrl/Cmd+Shift+F)."
+              label="About formatting settings"
+              side="left"
+              className="shrink-0"
             />
-          </CollapsibleTrigger>
+          </div>
           <CollapsibleContent className="pt-2 pb-4 space-y-4 pl-6">
             <SliderRow
               label="Beautify indent"

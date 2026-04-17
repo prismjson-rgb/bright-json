@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check, Download, Upload,
-  Minimize2, ArrowUpDown, Sparkles, Save, Trash2, Wrench,
+  Minimize2, ArrowUpDown, Sparkles, Save, Trash2, Wrench, Link2, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
@@ -11,6 +11,8 @@ import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 import JsonEditor from "@/components/JsonEditor";
 import JsonTabBar from "@/components/JsonTabBar";
 import OverlaySidebar from "@/components/OverlaySidebar";
@@ -18,6 +20,7 @@ import AppHeader from "@/components/app/AppHeader";
 import LeftRail from "@/components/app/LeftRail";
 import MobileHeader from "@/components/app/MobileHeader";
 import { AppButton } from "@/components/app/AppButton";
+import { InfoHelp } from "@/components/app/InfoHelp";
 import { MODES, getModeLayout, type PanelMode } from "@/lib/modes";
 
 const panelLoading = () => (
@@ -47,6 +50,7 @@ const JsonFlowView = dynamic(() => import("@/components/JsonFlowView"), { ssr: f
 import { useSettings } from "@/contexts/SettingsContext";
 import { repairJson } from "@/lib/json-debug";
 import { safeDecodeJsonAsync } from "@/lib/share";
+import { fetchTextViaGet } from "@/lib/fetch-json-url";
 import { saveJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
 import {
   loadTabs,
@@ -67,6 +71,25 @@ function getInitialTabs(): TabsState {
 
 /** Debounce tab persistence so we do not stringify/write multi‑MB JSON on every keystroke. */
 const TABS_SAVE_DEBOUNCE_MS = 400;
+
+function isJsonLikeFile(file: File): boolean {
+  const name = file.name.toLowerCase();
+  if (name.endsWith(".json") || name.endsWith(".txt")) return true;
+  const t = file.type;
+  return t === "application/json" || t === "text/plain";
+}
+
+function readFileAsText(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") resolve(reader.result);
+      else reject(new Error("Could not read file"));
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("Read failed"));
+    reader.readAsText(file);
+  });
+}
 
 export default function JsonViewerClient() {
   const [tabsState, setTabsState] = useState<TabsState>(getInitialTabs);
@@ -99,6 +122,11 @@ export default function JsonViewerClient() {
   const [hasSaved, setHasSaved] = useState(false);
   const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
   const fileRef = useRef<HTMLInputElement>(null);
+  const fetchUrlAbortRef = useRef<AbortController | null>(null);
+  const [fileDragOver, setFileDragOver] = useState(false);
+  const [fetchUrlOpen, setFetchUrlOpen] = useState(false);
+  const [fetchUrlValue, setFetchUrlValue] = useState("");
+  const [fetchUrlLoading, setFetchUrlLoading] = useState(false);
 
   const { query, setQuery, matchCount } = useJsonSearch(parsed);
 
@@ -244,36 +272,143 @@ export default function JsonViewerClient() {
     URL.revokeObjectURL(url);
   }, [json]);
 
-  const handleUpload = useCallback(
-    (content: string, filename?: string) => {
-      let parsed = content;
-      try {
-        parsed = JSON.stringify(JSON.parse(content), null, 2);
-      } catch {}
-      const newTab = createTab(filename?.replace(/\.json$/i, "") || "Imported");
-      newTab.json = parsed;
-      setTabsState((prev) => ({
-        tabs: [...prev.tabs, newTab],
-        activeId: newTab.id,
-      }));
-      setParserJson(parsed);
+  const importJsonTextItems = useCallback(
+    (items: { content: string; filename?: string }[]) => {
+      if (!items.length) return;
+      const normalized = items.map(({ content, filename }) => {
+        let parsed = content;
+        try {
+          parsed = JSON.stringify(JSON.parse(content), null, 2);
+        } catch {
+          /* keep raw so user can fix in editor */
+        }
+        return { parsed, filename };
+      });
+      const lastParsed = normalized[normalized.length - 1].parsed;
+      setTabsState((prev) => {
+        let tabs = prev.tabs;
+        let activeId = prev.activeId;
+        for (const { parsed, filename } of normalized) {
+          const newTab = createTab(filename?.replace(/\.json$/i, "") || "Imported");
+          newTab.json = parsed;
+          tabs = [...tabs, newTab];
+          activeId = newTab.id;
+        }
+        return { tabs, activeId };
+      });
+      setParserJson(lastParsed);
     },
     [setParserJson]
   );
 
   const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") handleUpload(reader.result, file.name);
-      };
-      reader.readAsText(file);
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files?.length) return;
+      const list = Array.from(files);
+      const picked = list.filter(isJsonLikeFile);
+      const toRead = picked.length ? picked : list.length === 1 ? list : [];
+      if (!toRead.length) {
+        toast.error("Choose .json or .txt files");
+        e.target.value = "";
+        return;
+      }
+      try {
+        const items = await Promise.all(
+          toRead.map(async (file) => ({
+            content: await readFileAsText(file),
+            filename: file.name,
+          }))
+        );
+        importJsonTextItems(items);
+      } catch {
+        toast.error("Could not read file");
+      }
       e.target.value = "";
     },
-    [handleUpload]
+    [importJsonTextItems]
   );
+
+  const onEditorDragEnter = useCallback((e: React.DragEvent<HTMLElement>) => {
+    if (!e.dataTransfer.types.includes("Files")) return;
+    e.preventDefault();
+    setFileDragOver(true);
+  }, []);
+
+  const onEditorDragLeave = useCallback((e: React.DragEvent<HTMLElement>) => {
+    if (!e.dataTransfer.types.includes("Files")) return;
+    const related = e.relatedTarget as Node | null;
+    if (related && e.currentTarget.contains(related)) return;
+    setFileDragOver(false);
+  }, []);
+
+  /** Capture phase so file drops work over Monaco (which otherwise consumes drag/drop). */
+  const onEditorDragOverCapture = useCallback((e: React.DragEvent<HTMLElement>) => {
+    if (!e.dataTransfer.types.includes("Files")) return;
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "copy";
+  }, []);
+
+  const onEditorDropCapture = useCallback(
+    async (e: React.DragEvent<HTMLElement>) => {
+      if (!e.dataTransfer.types.includes("Files")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setFileDragOver(false);
+      const raw = Array.from(e.dataTransfer.files ?? []);
+      const jsonLike = raw.filter(isJsonLikeFile);
+      const toImport = jsonLike.length ? jsonLike : raw.length === 1 ? raw : [];
+      if (!toImport.length) {
+        toast.error("Drop one or more .json or .txt files");
+        return;
+      }
+      try {
+        const items = await Promise.all(
+          toImport.map(async (file) => ({
+            content: await readFileAsText(file),
+            filename: file.name,
+          }))
+        );
+        importJsonTextItems(items);
+        toast.success(toImport.length === 1 ? "File imported" : `${toImport.length} files imported`);
+      } catch {
+        toast.error("Could not read dropped file");
+      }
+    },
+    [importJsonTextItems]
+  );
+
+  const runFetchFromUrl = useCallback(async () => {
+    fetchUrlAbortRef.current?.abort();
+    const ac = new AbortController();
+    fetchUrlAbortRef.current = ac;
+    setFetchUrlLoading(true);
+    try {
+      const { text, label } = await fetchTextViaGet(fetchUrlValue, ac.signal);
+      importJsonTextItems([{ content: text, filename: label }]);
+      toast.success("Loaded from URL");
+      setFetchUrlOpen(false);
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
+      const msg = e instanceof Error ? e.message : "Request failed";
+      const isNetwork =
+        e instanceof TypeError ||
+        /failed to fetch/i.test(msg) ||
+        /networkerror/i.test(msg) ||
+        msg === "Load failed";
+      toast.error(
+        isNetwork
+          ? "Could not reach URL. Check the address, HTTPS, and CORS (the server must allow this site)."
+          : msg,
+      );
+    } finally {
+      if (fetchUrlAbortRef.current === ac) {
+        fetchUrlAbortRef.current = null;
+        setFetchUrlLoading(false);
+      }
+    }
+  }, [fetchUrlValue, importJsonTextItems]);
 
   const handleSave = useCallback(() => {
     void (async () => {
@@ -323,6 +458,7 @@ export default function JsonViewerClient() {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
       if (e.key === "Escape") {
+        if (fetchUrlOpen) { setFetchUrlOpen(false); return; }
         if (shareOpen) { setShareOpen(false); return; }
         if (settingsOpen) { setSettingsOpen(false); return; }
         if (mode !== "tree" && mode !== "visual") { setMode("tree"); setSearchOpen(false); }
@@ -349,7 +485,7 @@ export default function JsonViewerClient() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [mode, searchOpen, shareOpen, settingsOpen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
+  }, [mode, searchOpen, shareOpen, settingsOpen, fetchUrlOpen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
 
   const lineCount = json.split("\n").length;
   const modeCfg = MODES[mode];
@@ -428,7 +564,10 @@ export default function JsonViewerClient() {
               />
             )}
             <div className="pane-header">
-              <span>Diff Viewer</span>
+              <span className="inline-flex items-center gap-1">
+                Diff Viewer
+                <InfoHelp text={MODES.diff.help} label="About Diff Viewer" side="bottom" />
+              </span>
               <span className="text-[10px] font-normal normal-case tracking-normal opacity-50 ml-3">Left = current editor · Right = paste to compare</span>
               <button onClick={() => setMode("tree")} className="ml-auto flex items-center gap-1 text-[10px] px-2 py-1 rounded-md bg-muted/60 hover:bg-destructive/15 hover:text-destructive text-muted-foreground transition-colors duration-150" title="Exit (Esc)">&times; Exit · Esc</button>
             </div>
@@ -470,7 +609,23 @@ export default function JsonViewerClient() {
                 hasJson={hasJson}
               />
             )}
-            <section className="flex flex-col min-w-0 border-r border-border bg-surface1 min-h-[70vh] md:flex-1 md:min-h-0 shrink-0">
+            <section
+              className="flex flex-col min-w-0 border-r border-border bg-surface1 min-h-[70vh] md:flex-1 md:min-h-0 shrink-0 relative"
+              onDragEnter={onEditorDragEnter}
+              onDragLeave={onEditorDragLeave}
+              onDragOverCapture={onEditorDragOverCapture}
+              onDropCapture={onEditorDropCapture}
+            >
+              {fileDragOver && (
+                <div
+                  className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none rounded-[inherit] m-px bg-primary/10 border-2 border-dashed border-primary/80 backdrop-blur-[1px]"
+                  aria-hidden
+                >
+                  <span className="text-sm font-medium text-foreground px-4 py-2 rounded-lg bg-background/95 shadow-sm border border-border">
+                    Drop JSON files to open
+                  </span>
+                </div>
+              )}
               <JsonTabBar
                 tabs={tabsState.tabs}
                 activeId={tabsState.activeId}
@@ -480,7 +635,14 @@ export default function JsonViewerClient() {
                 onAdd={addTab}
               />
               <div className="pane-header flex items-center gap-2 flex-wrap">
-                <span>Editor</span>
+                <span className="inline-flex items-center gap-1 shrink-0">
+                  Editor
+                  <InfoHelp
+                    text="Edit the active tab here. Beautify, minify, import files, drag JSON onto this column, or fetch from a URL. Tabs persist in this browser."
+                    label="About the editor"
+                    side="bottom"
+                  />
+                </span>
                 <div className="flex items-center gap-0.5 bg-secondary/50 rounded-lg p-0.5 ml-1">
                   <AppButton
                     onClick={() => format({ indent: settings.format.beautifyIndent, sortKeys: settings.format.sortKeysOnBeautify })}
@@ -533,12 +695,80 @@ export default function JsonViewerClient() {
                 />
                 <AppButton
                   onClick={() => fileRef.current?.click()}
-                  title="Import file"
+                  title="Import .json / .txt (or drag files onto the editor)"
                   leftIcon={<Upload className="w-3.5 h-3.5" />}
                   label="Import"
                   hideLabelOnMobile
                 />
-                <input ref={fileRef} type="file" accept=".json,.txt" onChange={handleFileChange} className="hidden" />
+                <Popover
+                  open={fetchUrlOpen}
+                  onOpenChange={(open) => {
+                    setFetchUrlOpen(open);
+                    if (!open) fetchUrlAbortRef.current?.abort();
+                  }}
+                >
+                  <PopoverTrigger asChild>
+                    <AppButton
+                      title="Fetch JSON with GET from a URL"
+                      leftIcon={<Link2 className="w-3.5 h-3.5" />}
+                      label="From URL"
+                      hideLabelOnMobile
+                    />
+                  </PopoverTrigger>
+                  <PopoverContent align="start" sideOffset={8} className="w-[min(100vw-2rem,22rem)] space-y-3">
+                    <div className="space-y-1.5">
+                      <div className="flex items-start gap-2">
+                        <p className="text-xs font-medium text-foreground flex-1">GET from URL</p>
+                        <InfoHelp
+                          text="Runs a GET request in your browser to the address you enter. The response opens as a new tab. Many APIs block cross-origin requests unless they send CORS headers. Only http(s) URLs are allowed."
+                          label="About fetch from URL"
+                          side="left"
+                          className="shrink-0 mt-0.5"
+                        />
+                      </div>
+                      <p className="text-[10px] text-muted-foreground leading-snug">
+                        Opens a new tab with the response. Cross-origin APIs must send CORS headers.
+                      </p>
+                    </div>
+                    <Input
+                      value={fetchUrlValue}
+                      onChange={(e) => setFetchUrlValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !fetchUrlLoading) {
+                          e.preventDefault();
+                          void runFetchFromUrl();
+                        }
+                      }}
+                      placeholder="https://api.example.com/data.json"
+                      className="h-9 text-xs font-mono"
+                      disabled={fetchUrlLoading}
+                      autoComplete="url"
+                      spellCheck={false}
+                    />
+                    <AppButton
+                      variant="accent"
+                      className="w-full justify-center"
+                      onClick={() => void runFetchFromUrl()}
+                      disabled={fetchUrlLoading || !fetchUrlValue.trim()}
+                      leftIcon={
+                        fetchUrlLoading ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Link2 className="w-3.5 h-3.5" />
+                        )
+                      }
+                      label={fetchUrlLoading ? "Loading…" : "Fetch"}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept=".json,.txt,application/json,text/plain"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
                 <AppButton
                   onClick={handleSave}
                   disabled={!hasJson || !!error}
@@ -572,8 +802,9 @@ export default function JsonViewerClient() {
               {(mode === "tree" || mode === "visual" || mode === "flow") && (
                 <>
                   <div className="pane-header">
-                    <span>
+                    <span className="inline-flex items-center gap-1">
                       {mode === "visual" ? "Visual Editor" : mode === "flow" ? "Flow View" : "Tree View"}
+                      <InfoHelp text={MODES[mode].help} label={`About ${MODES[mode].label}`} side="bottom" />
                     </span>
                     <div className="flex items-center gap-1.5 ml-2">
                       <AppButton
@@ -708,7 +939,14 @@ export default function JsonViewerClient() {
             <span>No input</span>
           )}
         </div>
-        <span>UTF-8 · JSON</span>
+        <span className="inline-flex items-center gap-1.5">
+          UTF-8 · JSON
+          <InfoHelp
+            text="Counts and validation refer to the active tab. Invalid JSON still loads in the editor so you can fix it. Processing stays in your browser unless you use optional short links."
+            label="About status bar"
+            side="top"
+          />
+        </span>
       </footer>
     </div>
   );

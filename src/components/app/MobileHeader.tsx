@@ -2,6 +2,7 @@
 import { Menu, Search, Settings, Share2 } from "lucide-react";
 import Logo from "./Logo";
 import { AppButton } from "./AppButton";
+import { InfoHelp } from "./InfoHelp";
 import { MODES, type PanelMode } from "@/lib/modes";
 
 interface MobileHeaderProps {
@@ -67,10 +68,16 @@ export default function MobileHeader({
         </div>
       </div>
       {label && (
-        <div className="px-3 pb-2 pt-0 pl-[3.25rem]">
-          <span className="text-xs font-semibold uppercase tracking-wider text-foreground/90 truncate block">
+        <div className="px-3 pb-2 pt-0 pl-[3.25rem] flex items-center gap-1.5 min-w-0">
+          <span className="text-xs font-semibold uppercase tracking-wider text-foreground/90 truncate flex-1 min-w-0">
             {label}
           </span>
+          <InfoHelp
+            text={MODES[mode].help}
+            label={`About ${label}`}
+            side="left"
+            className="shrink-0"
+          />
         </div>
       )}
     </div>

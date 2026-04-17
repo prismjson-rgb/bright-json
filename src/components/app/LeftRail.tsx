@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
 import Logo from "./Logo";
 import { AppButton } from "./AppButton";
+import { InfoHelp } from "./InfoHelp";
 import { RAIL_GROUPS, railModesForGroup, type PanelMode } from "@/lib/modes";
 
 interface LeftRailProps {
@@ -51,30 +52,50 @@ export default function LeftRail({
         return (
           <div key={group.key} className={`flex flex-col ${gi > 0 ? "border-t border-border/60" : ""}`}>
             {!iconOnly && (
-              <span className="px-3 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-widest text-text3/60 select-none">
-                {group.label}
-              </span>
+              <div className="px-3 pt-3 pb-1 flex items-center gap-1.5 select-none">
+                <span className="text-[9px] font-semibold uppercase tracking-widest text-text3/60">
+                  {group.label}
+                </span>
+                <InfoHelp
+                  text={group.help}
+                  label={`About ${group.label}`}
+                  side="right"
+                  className="opacity-80"
+                />
+              </div>
             )}
             <div className={`flex flex-col ${iconOnly ? "items-center py-1.5 gap-1" : ""}`}>
               {items.map((cfg) => {
                 const Icon = cfg.icon;
                 const isActive = mode === cfg.id;
                 return (
-                  <AppButton
+                  <div
                     key={cfg.id}
-                    variant="rail"
-                    size={iconOnly ? "icon" : "sm"}
-                    active={isActive}
-                    onClick={() => onModeChange(cfg.id)}
-                    title={cfg.shortcut ? `${cfg.label} (${cfg.shortcut})` : cfg.label}
-                    aria-label={cfg.label}
-                    leftIcon={<Icon className="w-[15px] h-[15px]" />}
-                    label={<span className="text-xs">{cfg.label}</span>}
-                    rightIcon={cfg.hint ? <span>{cfg.hint}</span> : undefined}
-                    shortcut={cfg.shortcut}
-                    iconOnly={iconOnly}
-                    className={iconOnly ? "" : "px-3 py-2"}
-                  />
+                    className={`flex items-stretch w-full min-w-0 ${iconOnly ? "justify-center" : ""}`}
+                  >
+                    <AppButton
+                      variant="rail"
+                      size={iconOnly ? "icon" : "sm"}
+                      active={isActive}
+                      onClick={() => onModeChange(cfg.id)}
+                      title={cfg.shortcut ? `${cfg.label} (${cfg.shortcut})` : cfg.label}
+                      aria-label={cfg.label}
+                      leftIcon={<Icon className="w-[15px] h-[15px]" />}
+                      label={<span className="text-xs truncate">{cfg.label}</span>}
+                      rightIcon={cfg.hint ? <span>{cfg.hint}</span> : undefined}
+                      shortcut={cfg.shortcut}
+                      iconOnly={iconOnly}
+                      className={iconOnly ? "" : "flex-1 min-w-0 px-3 py-2"}
+                    />
+                    {!iconOnly && (
+                      <InfoHelp
+                        text={cfg.help}
+                        label={`About ${cfg.label}`}
+                        side="right"
+                        className="shrink-0 self-center mr-0.5"
+                      />
+                    )}
+                  </div>
                 );
               })}
             </div>

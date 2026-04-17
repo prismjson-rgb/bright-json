@@ -7,47 +7,135 @@ const FEATURES = [
   {
     title: "JSON Formatter & Beautifier",
     description:
-      "Instantly format messy, minified, or hand-written JSON into clean, indented output with configurable indent levels.",
+      "Instantly format messy, minified, or hand-written JSON into clean, indented output. Configurable indent width and optional alphabetical key sorting.",
   },
   {
     title: "JSON Validator",
     description:
-      "Validate JSON syntax in real time. Errors are highlighted inline with line numbers so you can fix issues immediately.",
-  },
-  {
-    title: "JSON Diff Viewer",
-    description:
-      "Compare two JSON documents side-by-side. Added, removed, and changed keys are color-coded for fast review.",
-  },
-  {
-    title: "JSON to YAML / XML / CSV",
-    description:
-      "Convert JSON to YAML, XML, or CSV with a single click. Copy the output or download it as a file.",
+      "Real-time syntax validation with inline error highlighting, exact line and column positions, and safe auto-fixes for common mistakes.",
   },
   {
     title: "Collapsible Tree View",
     description:
-      "Explore deeply nested JSON structures with an interactive, collapsible tree. Click any node to expand or collapse it.",
+      "Navigate deeply nested JSON with an interactive tree. Expand, collapse, or jump to matches with in-browser search (Ctrl/Cmd+K).",
   },
   {
-    title: "JSON Search",
+    title: "Visual (No-Code) Editor",
     description:
-      "Search across keys and values in large JSON documents. Results are highlighted and navigable with keyboard shortcuts.",
+      "Edit objects and arrays through form fields. Changes stay in sync with the raw JSON — ideal for non-developers reviewing config.",
   },
   {
-    title: "JSON Minifier",
+    title: "Flow / Graph View",
     description:
-      "Strip all whitespace from JSON to produce the smallest possible output for network transmission or storage.",
+      "Explore large structures as an interactive node graph. Pan, zoom, and drag nodes to understand relationships at a glance.",
+  },
+  {
+    title: "JSON Diff Viewer",
+    description:
+      "Side-by-side compare of two JSON documents with added, removed, and changed keys color-coded for fast review.",
+  },
+  {
+    title: "JSON to YAML / XML / CSV",
+    description:
+      "Convert valid JSON to YAML, XML, or CSV with a single click. Copy the output or download it as a file.",
+  },
+  {
+    title: "JSON Debugger",
+    description:
+      "Inspect parse errors, jump to the failing position, and apply targeted auto-fixes for missing commas, mismatched brackets, and bad escapes.",
+  },
+  {
+    title: "JSON Trimmer",
+    description:
+      "Strip comments, trailing commas, and extra whitespace to turn JSON5-style input into strict, standards-compliant JSON.",
+  },
+  {
+    title: "AI Response Cleaner",
+    description:
+      "Extract and clean JSON from messy LLM output — code fences, prose, and partial results included.",
+  },
+  {
+    title: "Minimal Mode (Path Filter)",
+    description:
+      "Include or exclude specific paths to produce a smaller JSON subset from the same document, with a live size-savings indicator.",
+  },
+  {
+    title: "Structure Analyzer",
+    description:
+      "At-a-glance stats: key counts, type mix, nesting depth, and payload size for quick complexity review.",
+  },
+  {
+    title: "Best Practices Checker",
+    description:
+      "Heuristic audit for nesting depth, naming consistency, payload size, and other maintainability issues.",
+  },
+  {
+    title: "Token Estimator for LLMs",
+    description:
+      "Approximate token counts for LLM context windows. Compare JSON vs YAML and XML to pick the cheapest format.",
   },
   {
     title: "Mock JSON Generator",
     description:
-      "Generate realistic mock JSON data from a schema. Useful for prototyping APIs or populating UI components.",
+      "Generate realistic sample JSON from templates or custom fields. Useful for prototyping APIs and UI components.",
   },
   {
-    title: "JSON Structure Analyzer",
+    title: "Share via URL & Short Links",
     description:
-      "Analyze JSON structure at a glance: key counts, nesting depth, data types, and potential schema inference.",
+      "Encode JSON directly into a shareable link (nothing uploaded), or opt into 30-day short links via our Cloudflare Worker for longer payloads.",
+  },
+  {
+    title: "Bundle Multiple JSONs",
+    description:
+      "Combine several JSON documents into one shareable link — like a Linktree for JSON — openable in the bundle viewer.",
+  },
+  {
+    title: "Load from URL & Drag-Drop",
+    description:
+      "Import JSON directly from a URL or drop a .json / .txt file onto the editor — no file picker required.",
+  },
+];
+
+const FAQS = [
+  {
+    question: "Is JSON Prism free to use?",
+    answer:
+      "Yes. JSON Prism is completely free with no sign-up, no ads, and no usage limits. It runs entirely in your browser.",
+  },
+  {
+    question: "Does JSON Prism send my JSON to a server?",
+    answer:
+      "No. All parsing, formatting, validation, and conversion happen locally in your browser. Your JSON never leaves your device unless you explicitly opt into a 30-day short link, which stores only the already-encoded payload.",
+  },
+  {
+    question: "Can JSON Prism handle large JSON files?",
+    answer:
+      "Yes. The editor uses Monaco (same engine as VS Code) and the tree view virtualizes large documents. Tabs and content persist in IndexedDB so large files remain responsive.",
+  },
+  {
+    question: "Does it work offline?",
+    answer:
+      "Yes, once loaded. JSON Prism is a static web app with no server-side processing, so it continues to work without a network connection.",
+  },
+  {
+    question: "Can I share a JSON document with someone?",
+    answer:
+      "Yes. Use Share via Link to generate a URL that encodes your JSON in the URL fragment — nothing is uploaded. For very large payloads, opt into a short link that stores the encoded payload on our Cloudflare KV for 30 days.",
+  },
+  {
+    question: "What formats can JSON Prism convert to?",
+    answer:
+      "YAML, XML, and CSV. Conversion is one-click from the Convert panel. Output is read-only; edit the source JSON on the left to change it.",
+  },
+  {
+    question: "Does JSON Prism support JSON5 or JSON with comments?",
+    answer:
+      "The Trimmer panel strips comments, trailing commas, and JSON5-style extras to produce strict JSON. The Debugger also applies safe auto-fixes for common problems.",
+  },
+  {
+    question: "Is my data stored anywhere?",
+    answer:
+      "Only on your own device — tabs, editor content, notes, and settings are saved in IndexedDB, and the theme preference in localStorage. Clearing site data removes everything.",
   },
 ];
 
@@ -57,7 +145,16 @@ const WEBSITE_LD = {
   name: "JSON Prism",
   url: `${BASE}/`,
   description:
-    "Free online JSON formatter, validator, and beautifier. Format, minify, diff, convert to YAML/XML/CSV, and explore JSON with a tree view.",
+    "Free online JSON formatter, validator, tree viewer, graph view, diff, debugger, and YAML/XML/CSV converter. Runs entirely in the browser.",
+  publisher: {
+    "@type": "Organization",
+    name: "JSON Prism",
+    url: `${BASE}/`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${BASE}/icons/icon-512.png`,
+    },
+  },
   potentialAction: {
     "@type": "SearchAction",
     target: {
@@ -76,7 +173,12 @@ const APP_LD = {
   operatingSystem: "Web",
   url: `${BASE}/`,
   description:
-    "Free online JSON formatter, validator, and beautifier. Format, minify, diff, convert to YAML/XML/CSV, and explore JSON with a tree view. Runs entirely in the browser — no data stored.",
+    "Free online JSON formatter, validator, tree viewer, graph view, diff, debugger, and YAML/XML/CSV converter. Runs entirely in the browser — nothing is uploaded by default.",
+  publisher: {
+    "@type": "Organization",
+    name: "JSON Prism",
+    url: `${BASE}/`,
+  },
   offers: {
     "@type": "Offer",
     price: "0",
@@ -84,19 +186,41 @@ const APP_LD = {
   },
   featureList: [
     "JSON formatting and beautification",
-    "JSON syntax validation",
-    "JSON diff / comparison",
+    "JSON syntax validation with inline errors",
+    "Collapsible tree view",
+    "Visual (form-based) no-code editor",
+    "Interactive flow / graph view",
+    "JSON diff and comparison",
     "JSON to YAML conversion",
     "JSON to XML conversion",
     "JSON to CSV conversion",
-    "Collapsible tree view",
-    "In-browser JSON search",
-    "JSON minification",
-    "Mock JSON data generator",
-    "JSON structure analyzer",
+    "JSON debugger with auto-fix",
+    "JSON trimmer (strict-mode cleanup)",
+    "AI response cleaner (LLM output to JSON)",
+    "Minimal mode / path-based filtering",
+    "Structure analyzer",
+    "Best-practices checker",
     "Token estimator for LLMs",
+    "Mock JSON generator",
+    "In-browser search across keys and values",
+    "JSON minification",
+    "Rich-text notes beside your session",
+    "Share via URL fragment (no upload)",
+    "Opt-in 30-day short links",
+    "Bundle multiple JSONs into one link",
+    "Import from URL or drag-drop",
   ],
   screenshot: `${BASE}/icons/icon-512.png`,
+};
+
+const FAQ_LD = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((f) => ({
+    "@type": "Question",
+    name: f.question,
+    acceptedAnswer: { "@type": "Answer", text: f.answer },
+  })),
 };
 
 export default function HomepageSEO() {
@@ -112,16 +236,20 @@ export default function HomepageSEO() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(APP_LD) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_LD) }}
+      />
 
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* H1 — primary keyword target for the homepage */}
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">
-          Free Online JSON Formatter, Validator &amp; Beautifier
+          Free Online JSON Formatter, Validator, Tree Viewer &amp; Diff Tool
         </h1>
         <p className="text-muted-foreground text-base max-w-3xl mb-12 leading-relaxed">
-          JSON Prism is a fast, privacy-first JSON tool that runs entirely in your browser. Paste
-          or type JSON above to format, validate, diff, convert, and explore your data — no sign-up
-          required, no data sent to any server.
+          JSON Prism is a fast, privacy-first JSON workspace that runs entirely in your browser.
+          Paste or type JSON above to format, validate, diff, debug, convert, and explore your data
+          with tree, visual, and graph views — no sign-up, no uploads by default.
         </p>
 
         {/* Feature grid */}
@@ -136,6 +264,27 @@ export default function HomepageSEO() {
                 <h3 className="text-sm font-semibold text-foreground mb-1">{f.title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{f.description}</p>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* FAQ — drives FAQ rich results */}
+        <div className="mb-14">
+          <h2 className="text-xl font-semibold text-foreground mb-6">Frequently asked questions</h2>
+          <div className="space-y-4">
+            {FAQS.map((f) => (
+              <details
+                key={f.question}
+                className="group rounded-xl border border-border bg-surface1 p-4"
+              >
+                <summary className="cursor-pointer list-none text-sm font-medium text-foreground flex items-center justify-between">
+                  {f.question}
+                  <span className="text-muted-foreground text-xs group-open:rotate-180 transition-transform">
+                    ▾
+                  </span>
+                </summary>
+                <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{f.answer}</p>
+              </details>
             ))}
           </div>
         </div>
@@ -176,9 +325,9 @@ export default function HomepageSEO() {
           <h2 className="text-base font-semibold text-foreground mb-2">Privacy by design</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
             Every operation in JSON Prism runs locally in your browser using JavaScript. No JSON
-            data is ever transmitted to a server, stored in a database, or shared with third
-            parties. You can safely use JSON Prism with confidential API responses, internal
-            configs, and sensitive data.
+            data is uploaded, stored, or shared by default. Short links are strictly opt-in and
+            store only the compressed payload on our own Cloudflare KV for 30 days. You can safely
+            use JSON Prism with confidential API responses, internal configs, and sensitive data.
           </p>
         </div>
 

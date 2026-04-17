@@ -5,7 +5,7 @@ import { SettingsProvider } from "@/contexts/SettingsContext";
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SettingsProvider>
-      <TooltipProvider>{children}</TooltipProvider>
+      <TooltipProvider delayDuration={320}>{children}</TooltipProvider>
     </SettingsProvider>
   );
 }

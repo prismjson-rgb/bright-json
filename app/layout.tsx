@@ -15,35 +15,25 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-jetbrains",
-  weight: ["400", "500", "600"],
+  weight: ["400", "600"],
 });
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
+const SITE_TITLE = "JSON Prism — Free Online JSON Formatter, Viewer & Diff Tool";
+const SITE_DESCRIPTION =
+  "Free browser-based JSON formatter, validator, tree viewer, graph view, diff, debugger, and YAML/XML/CSV converter. Nothing is uploaded by default.";
+
 export const metadata: Metadata = {
-  title: "JSON Prism — Format, Validate & Beautify",
-  description:
-    "Free online JSON formatter, validator, and beautifier. Format, minify, diff, convert to YAML/XML/CSV, and explore JSON with a tree view. No data stored.",
-  keywords: [
-    "JSON formatter",
-    "JSON validator",
-    "JSON beautifier",
-    "JSON viewer",
-    "JSON editor",
-    "JSON to YAML",
-    "JSON to XML",
-    "JSON diff",
-    "online JSON tool",
-    "JSON Prism",
-  ],
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   authors: [{ name: "JSON Prism" }],
   alternates: {
     canonical: `${BASE}/`,
   },
   openGraph: {
-    title: "JSON Prism — Format, Validate & Beautify",
-    description:
-      "Free online JSON formatter, validator, and beautifier. Format, minify, diff, convert to YAML/XML/CSV, and explore JSON with a tree view. No data stored.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: "website",
     siteName: "JSON Prism",
     url: `${BASE}/`,
@@ -52,15 +42,14 @@ export const metadata: Metadata = {
         url: `${BASE}/icons/icon-512.png`,
         width: 512,
         height: 512,
-        alt: "JSON Prism — Format, Validate & Beautify",
+        alt: "JSON Prism — format, validate, diff, and explore JSON in your browser",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "JSON Prism — Format, Validate & Beautify",
-    description:
-      "Free online JSON formatter, validator, and beautifier. Format, minify, diff, and convert JSON.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [`${BASE}/icons/icon-512.png`],
   },
   manifest: "/manifest.json",

@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useEffect } from "react";
 import { Search, X } from "lucide-react";
+import { InfoHelp } from "@/components/app/InfoHelp";
 
 interface JsonSearchPanelProps {
   query: string;
@@ -24,6 +25,12 @@ export default function JsonSearchPanel({
   return (
     <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-surface shrink-0 animate-slide-up">
       <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+      <InfoHelp
+        text="Matches keys and values in Tree or Visual view. Esc closes search. Counts update as you type."
+        label="About search"
+        side="bottom"
+        className="shrink-0 -mr-1"
+      />
       <input
         ref={inputRef}
         type="text"

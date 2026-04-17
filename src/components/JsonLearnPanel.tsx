@@ -11,6 +11,8 @@ import {
   getSectionsByLevel,
   type Level,
 } from "@/lib/learn-content";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 interface JsonLearnPanelProps {
   onTryInEditor?: (json: string) => void;
@@ -42,9 +44,10 @@ export default function JsonLearnPanel({ onTryInEditor }: JsonLearnPanelProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="pane-header flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2">
-          <BookOpen className="w-3.5 h-3.5 text-primary" />
+        <div className="flex items-center gap-2 min-w-0">
+          <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
           <span>Learn JSON</span>
+          <InfoHelp text={MODES.learn.help} label="About Learn JSON" side="bottom" className="shrink-0" />
         </div>
         <Link
           href="/learn/"

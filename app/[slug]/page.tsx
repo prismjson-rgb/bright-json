@@ -45,8 +45,21 @@ export default async function StaticPageRoute({
   const page = getPageBySlug(slug);
   if (!page) notFound();
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+      { "@type": "ListItem", position: 2, name: page.title, item: `${BASE}/${slug}/` },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-bg">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <header className="border-b border-border bg-surface1 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link
@@ -71,11 +84,14 @@ export default async function StaticPageRoute({
       </main>
 
       <footer className="border-t border-border mt-16 py-8 text-center text-sm text-muted-foreground">
-        <p>
-          Part of{" "}
-          <Link href="/" className="text-primary hover:underline">
-            JSON Prism
-          </Link>
+        <p className="space-x-3">
+          <Link href="/" className="text-primary hover:underline">JSON Prism</Link>
+          <span>·</span>
+          <Link href="/about/" className="hover:text-foreground hover:underline transition-colors">About</Link>
+          <span>·</span>
+          <Link href="/privacy/" className="hover:text-foreground hover:underline transition-colors">Privacy</Link>
+          <span>·</span>
+          <Link href="/terms/" className="hover:text-foreground hover:underline transition-colors">Terms</Link>
         </p>
       </footer>
     </div>

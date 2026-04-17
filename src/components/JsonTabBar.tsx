@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { InfoHelp } from "@/components/app/InfoHelp";
 import type { TabData } from "@/lib/tabs-storage";
 
 interface JsonTabBarProps {
@@ -60,18 +61,33 @@ export default function JsonTabBar({
           onClick={() => editingId !== tab.id && onSwitch(tab.id)}
         >
           {editingId === tab.id ? (
-            <Input
-              ref={inputRef}
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleCommitRename}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleCommitRename();
-                if (e.key === "Escape") setEditingId(null);
-              }}
-              onClick={(e) => e.stopPropagation()}
-              className="h-6 text-xs px-2 py-0.5 min-w-[60px] max-w-[120px]"
-            />
+            <div className="flex items-center gap-1 flex-1 min-w-0">
+              <Input
+                ref={inputRef}
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={handleCommitRename}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCommitRename();
+                  if (e.key === "Escape") setEditingId(null);
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className="h-6 text-xs px-2 py-0 min-w-0 flex-1 max-w-[140px]"
+              />
+              <button
+                type="button"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setEditingId(null);
+                }}
+                className="shrink-0 flex h-6 w-6 items-center justify-center rounded border border-border/80 bg-secondary/50 text-muted-foreground hover:bg-destructive/15 hover:text-destructive hover:border-destructive/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                title="Cancel rename"
+                aria-label="Cancel rename"
+              >
+                <X className="w-3 h-3" strokeWidth={2.25} />
+              </button>
+            </div>
           ) : (
             <span
               className="truncate flex-1 min-w-0"
@@ -81,28 +97,40 @@ export default function JsonTabBar({
               {tab.name}
             </span>
           )}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose(tab.id);
-            }}
-            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-destructive/20 hover:text-destructive transition-opacity shrink-0"
-            title="Close tab"
-            aria-label="Close tab"
-          >
-            <X className="w-3 h-3" />
-          </button>
+          {editingId !== tab.id && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose(tab.id);
+              }}
+              className={`shrink-0 flex h-6 w-6 items-center justify-center rounded border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
+                tab.id === activeId
+                  ? "border-border/70 bg-secondary/40 text-muted-foreground hover:bg-destructive/15 hover:text-destructive hover:border-destructive/25"
+                  : "border-transparent text-muted-foreground/85 hover:bg-destructive/12 hover:text-destructive hover:border-destructive/15"
+              }`}
+              title="Close tab"
+              aria-label="Close tab"
+            >
+              <X className="w-3 h-3" strokeWidth={2.25} />
+            </button>
+          )}
         </div>
       ))}
+      <InfoHelp
+        text="Each tab has its own JSON buffer. Double-click a name to rename; use the adjacent button or Esc to cancel. Close a tab with the X on the right (at least one tab stays open). New tab: Ctrl/Cmd+T."
+        label="About tabs"
+        side="bottom"
+        className="shrink-0 self-center mx-0.5"
+      />
       <button
         type="button"
         onClick={onAdd}
-        className="flex items-center justify-center w-7 h-7 shrink-0 text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-colors"
+        className="flex h-6 w-6 shrink-0 items-center justify-center rounded border border-transparent text-muted-foreground hover:border-border/60 hover:bg-secondary/40 hover:text-foreground transition-colors"
         title="New tab"
         aria-label="New tab"
       >
-        <Plus className="w-4 h-4" />
+        <Plus className="w-3.5 h-3.5" strokeWidth={2.25} />
       </button>
     </div>
   );

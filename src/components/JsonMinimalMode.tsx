@@ -2,6 +2,8 @@
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { PackageMinus, Copy, Download, Check } from "lucide-react";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -60,8 +62,15 @@ export default function JsonMinimalMode({ parsed, dark }: { parsed: unknown; dar
 
   return (
     <div className="flex flex-col h-full">
-      <div className="pane-header"><PackageMinus className="w-3.5 h-3.5" /><span>Minimal Mode</span>
-        {savings > 0 && <span className="ml-auto text-[10px] text-emerald-500 font-normal normal-case tracking-normal">-{savings}% smaller</span>}
+      <div className="pane-header">
+        <PackageMinus className="w-3.5 h-3.5" />
+        <span>Minimal Mode</span>
+        <InfoHelp text={MODES.minimal.help} label="About Minimal Mode" side="bottom" />
+        {savings > 0 && (
+          <span className="ml-auto text-[10px] text-emerald-500 font-normal normal-case tracking-normal">
+            -{savings}% smaller
+          </span>
+        )}
       </div>
       <div className="flex flex-1 min-h-0">
         {/* Config */}

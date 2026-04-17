@@ -3,6 +3,8 @@ import { Bug, Wrench, CheckCircle2, AlertCircle, AlertTriangle } from "lucide-re
 import { useJsonDebug } from "@/hooks/useJsonDebug";
 import { applyAutoFix } from "@/lib/json-debug";
 import { toast } from "sonner";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 interface Props { json: string; onFix: (json: string) => void; }
 
@@ -21,6 +23,7 @@ export default function JsonDebugger({ json, onFix }: Props) {
       <div className="pane-header">
         <Bug className="w-3.5 h-3.5" />
         <span>JSON Debugger</span>
+        <InfoHelp text={MODES.debug.help} label="About JSON Debugger" side="bottom" />
         {issues.length === 0 && json.trim() && (
           <span className="ml-auto flex items-center gap-1 text-[10px] text-emerald-500">
             <CheckCircle2 className="w-3 h-3" /> Valid JSON

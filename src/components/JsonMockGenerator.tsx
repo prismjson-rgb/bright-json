@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { Wand2, RefreshCw, Download, ArrowRight, Plus, Trash2 } from "lucide-react";
 import { generateMockJson, type MockTemplate, type DateFormat, type CustomField } from "@/lib/json-mock";
 import { toast } from "sonner";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -50,6 +52,7 @@ export default function JsonMockGenerator({ onUseJson, dark }: { onUseJson: (j: 
       <div className="pane-header">
         <Wand2 className="w-3.5 h-3.5" />
         <span>Mock Generator</span>
+        <InfoHelp text={MODES.mock.help} label="About Mock Generator" side="bottom" />
       </div>
       <div className="flex flex-1 min-h-0">
         {/* Config panel */}

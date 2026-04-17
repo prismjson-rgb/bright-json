@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Copy, Download, Check } from "lucide-react";
 import { useJsonConvert, type ConvertFormat } from "@/hooks/useJsonConvert";
 import { AppButton } from "@/components/app/AppButton";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -49,6 +51,7 @@ export default function JsonConvertPanel({ parsed, dark }: JsonConvertPanelProps
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-surface shrink-0">
+        <InfoHelp text={MODES.convert.help} label="About Convert" side="bottom" className="shrink-0" />
         <div className="flex items-center gap-1 bg-secondary/50 rounded-lg p-0.5">
           {TABS.map((tab) => (
             <button

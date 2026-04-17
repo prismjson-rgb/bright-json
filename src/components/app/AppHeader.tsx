@@ -3,6 +3,7 @@ import { Moon, Search, Settings, Share2, Sun } from "lucide-react";
 import Logo from "./Logo";
 import ModeTabs from "./ModeTabs";
 import { AppButton } from "./AppButton";
+import { InfoHelp } from "./InfoHelp";
 import type { PanelMode } from "@/lib/modes";
 
 interface AppHeaderProps {
@@ -30,9 +31,15 @@ export default function AppHeader({
 
       <div className="h-6 w-px bg-border shrink-0" aria-hidden />
 
-      <ModeTabs mode={mode} onChange={onModeChange} className="flex-1 min-w-0 overflow-x-auto" />
+      <ModeTabs mode={mode} onChange={onModeChange} className="flex-1 min-w-0" />
 
-      <div className="flex items-center gap-0.5 shrink-0">
+      <div className="flex items-center shrink-0 gap-0.5 pl-2.5 ml-0.5 border-l border-border/70">
+        <InfoHelp
+          text="View tabs switch the right panel (Tree, Visual, Flow, full-screen Diff). Tree and Visual work with Search (Ctrl/Cmd+K). Icons here: Search, Share (needs JSON), Theme (Ctrl/Cmd+L), Settings. New editor tab: Ctrl/Cmd+T. Other tools are in the left sidebar."
+          label="About the header and view modes"
+          side="bottom"
+          className="self-center mr-0.5"
+        />
         <AppButton
           variant="icon"
           size="icon"

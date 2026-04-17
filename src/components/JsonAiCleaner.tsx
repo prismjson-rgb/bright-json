@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Eraser, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
+import { InfoHelp } from "@/components/app/InfoHelp";
+import { MODES } from "@/lib/modes";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -64,8 +66,13 @@ export default function JsonAiCleaner({ onUseJson, dark }: { onUseJson: (j: stri
 
   return (
     <div className="flex flex-col h-full">
-      <div className="pane-header"><Eraser className="w-3.5 h-3.5" /><span>AI Response Cleaner</span>
-        <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-50">Extracts JSON from mixed AI output</span>
+      <div className="pane-header">
+        <Eraser className="w-3.5 h-3.5" />
+        <span>AI Response Cleaner</span>
+        <InfoHelp text={MODES.clean.help} label="About AI Cleaner" side="bottom" />
+        <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-50">
+          Extracts JSON from mixed AI output
+        </span>
       </div>
       <div className="flex flex-1 min-h-0">
         {/* Input */}

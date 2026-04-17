@@ -397,7 +397,9 @@ export default function JsonTreeView({ data, expandAll, searchTerm, treeSettings
         </div>
         <div className="text-center">
           <p className="text-sm font-medium">No JSON to display</p>
-          <p className="text-xs mt-1">Paste or upload JSON to see the tree view</p>
+          <p className="text-xs mt-1 max-w-[16rem]">
+            Paste JSON, Import, From URL, or drop a .json file on the editor
+          </p>
         </div>
       </div>
     );
