@@ -72,6 +72,77 @@ function jsonResponse(
   });
 }
 
+function htmlEscape(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => {
+    switch (c) {
+      case "&": return "&amp;";
+      case "<": return "&lt;";
+      case ">": return "&gt;";
+      case "\"": return "&quot;";
+      case "'": return "&#39;";
+      default: return c;
+    }
+  });
+}
+
+/** HTML page served on successful slug hits.
+ *
+ *  Why not a 302? Many social-card scrapers (Slack, Discord, Twitter, iMessage)
+ *  either don't follow redirects or follow them and land on the site root,
+ *  where the OG tags describe the app generically instead of "a shared JSON".
+ *  Returning HTML directly gives us tailored OG tags AND still bounces real
+ *  browsers to the target via meta-refresh + JS — all while preserving the
+ *  fragment that holds the payload. */
+function redirectHtml(target: string, kind: Kind, siteUrl: string): string {
+  const title = kind === "bundle"
+    ? "JSON Prism — Shared JSON Bundle"
+    : "JSON Prism — Shared JSON";
+  const description = kind === "bundle"
+    ? "A bundle of JSON documents shared via JSON Prism. Opens locally in your browser — nothing is uploaded."
+    : "A JSON document shared via JSON Prism. Opens locally in your browser — nothing is uploaded.";
+  const image = `${siteUrl}/icons/icon-512.png`;
+  const safeTarget = htmlEscape(target);
+  const safeSite = htmlEscape(siteUrl);
+  const safeImage = htmlEscape(image);
+  const targetJson = JSON.stringify(target);
+
+  return `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title}</title>
+<meta name="description" content="${description}">
+<link rel="canonical" href="${safeSite}/">
+
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${description}">
+<meta property="og:url" content="${safeSite}/">
+<meta property="og:site_name" content="JSON Prism">
+<meta property="og:type" content="website">
+<meta property="og:image" content="${safeImage}">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="JSON Prism — format, validate, diff, and explore JSON in your browser">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${description}">
+<meta name="twitter:image" content="${safeImage}">
+
+<meta http-equiv="refresh" content="0; url=${safeTarget}">
+<script>window.location.replace(${targetJson});</script>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 520px; margin: 12vh auto; padding: 0 1rem; line-height: 1.5; color: #555; }
+  @media (prefers-color-scheme: dark) { body { color: #aaa; background: #0d1117; } }
+  a { color: #06b6d4; text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; }
+</style>
+</head><body>
+<p>Loading shared JSON… <a href="${safeTarget}">Continue →</a></p>
+</body></html>`;
+}
+
 function notFoundHtml(siteUrl: string): Response {
   const html = `<!doctype html>
 <html lang="en"><head>
@@ -188,11 +259,12 @@ async function handleGet(url: URL, env: Env): Promise<Response> {
       ? `${env.SITE_URL}/bundle/#bundle=${record.p}`
       : `${env.SITE_URL}/#json=${record.p}`;
 
-  // Hand-build the redirect so the fragment (#…) is preserved verbatim —
-  // Response.redirect runs URL normalization that can strip it.
-  return new Response(null, {
-    status: 302,
-    headers: { Location: target, "Cache-Control": "no-store" },
+  return new Response(redirectHtml(target, record.k, env.SITE_URL), {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
   });
 }
 

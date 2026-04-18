@@ -43,8 +43,14 @@ export default function BundleViewer() {
   }, []);
 
   const openInEditor = async (json: string) => {
+    // Open synchronously inside the click handler so the browser keeps
+    // user-activation — otherwise `_blank` silently falls back to same-tab
+    // after the `await` below. The tab gets its real URL once encoding finishes.
+    const tab = window.open("about:blank", "_blank");
     const encoded = await encodeJsonAsync(json);
-    window.open("/#json=" + encoded, "_blank");
+    const target = "/#json=" + encoded;
+    if (tab) tab.location.replace(target);
+    else window.location.href = target;
   };
 
   return (

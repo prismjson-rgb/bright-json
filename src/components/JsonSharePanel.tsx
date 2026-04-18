@@ -131,13 +131,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     return () => { cancelled = true; };
   }, [shareInput]);
 
-  // Invalidate the short link whenever the underlying full link changes — a
-  // stale short link would silently redirect to the old payload.
-  useEffect(() => {
-    shortLinkAbortRef.current?.abort();
-    setShortLinkState({ kind: "idle" });
-  }, [shareUrl]);
-
   useEffect(() => () => shortLinkAbortRef.current?.abort(), []);
 
   const handleCreateShortLink = useCallback(async () => {
@@ -164,6 +157,18 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
       setShortLinkState({ kind: "error", message: shortErrorMessage(result) });
     }
   }, [shareUrl]);
+
+  // Auto-create the short link once a share URL is ready, debounced so
+  // typing in the editor doesn't hammer the Worker on every keystroke.
+  useEffect(() => {
+    shortLinkAbortRef.current?.abort();
+    if (!shortEnabled || !shareUrl) {
+      setShortLinkState({ kind: "idle" });
+      return;
+    }
+    const timer = setTimeout(() => { void handleCreateShortLink(); }, 500);
+    return () => clearTimeout(timer);
+  }, [shareUrl, handleCreateShortLink]);
 
   const handleCopyLink = () => {
     if (!shareUrl) return;
@@ -215,11 +220,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
 
   useEffect(() => () => bundleAbortRef.current?.abort(), []);
 
-  useEffect(() => {
-    shortBundleAbortRef.current?.abort();
-    setShortBundleState({ kind: "idle" });
-  }, [bundleUrl]);
-
   useEffect(() => () => shortBundleAbortRef.current?.abort(), []);
 
   const handleCopyBundle = () => {
@@ -253,6 +253,16 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
       setShortBundleState({ kind: "error", message: shortErrorMessage(result) });
     }
   }, [bundleUrl]);
+
+  useEffect(() => {
+    shortBundleAbortRef.current?.abort();
+    if (!shortEnabled || !bundleUrl) {
+      setShortBundleState({ kind: "idle" });
+      return;
+    }
+    const timer = setTimeout(() => { void handleCreateShortBundleLink(); }, 300);
+    return () => clearTimeout(timer);
+  }, [bundleUrl, handleCreateShortBundleLink]);
 
   const handleCopyShortBundle = () => {
     if (shortBundleState.kind !== "success") return;
@@ -383,18 +393,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
               <p className="text-xs text-muted-foreground">Paste JSON in the editor first.</p>
             ) : (
               <>
-                {/* URL display + copy */}
-                <div className="flex items-center gap-2">
-                  <input
-                    readOnly value={shareUrl}
-                    className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
-                    onClick={e => (e.target as HTMLInputElement).select()}
-                  />
-                  <CopyBtn copied={copiedLink} onClick={handleCopyLink} />
-                </div>
-
-                <LinkStatusLine status={linkStatus} charCount={shareUrl.length} />
-
                 {shortEnabled && shareUrl && (
                   <ShortLinkControls
                     state={shortLinkState}
@@ -402,6 +400,29 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                     onCreate={handleCreateShortLink}
                     onCopy={handleCopyShortLink}
                   />
+                )}
+
+                {/* Long URL acts as a fallback: always shown when the shortener
+                 *  isn't configured, and only revealed as a recovery path when
+                 *  the shortener fails (too-large, network error, etc.). */}
+                {(!shortEnabled || shortLinkState.kind === "error") && (
+                  <>
+                    {shortEnabled && (
+                      <p className="text-[11px] text-muted-foreground">
+                        Fallback — share the full link directly:
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <input
+                        readOnly value={shareUrl}
+                        className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
+                        onClick={e => (e.target as HTMLInputElement).select()}
+                      />
+                      <CopyBtn copied={copiedLink} onClick={handleCopyLink} />
+                    </div>
+
+                    <LinkStatusLine status={linkStatus} charCount={shareUrl.length} />
+                  </>
                 )}
               </>
             )}
@@ -482,17 +503,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
 
             {bundleUrl && (
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <input
-                      readOnly value={bundleUrl}
-                      className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
-                      onClick={e => (e.target as HTMLInputElement).select()}
-                    />
-                    <CopyBtn copied={copiedBundle} onClick={handleCopyBundle} />
-                  </div>
-
-                  <LinkStatusLine status={bundleStatus} charCount={bundleUrl.length} />
-
                   {shortEnabled && (
                     <ShortLinkControls
                       state={shortBundleState}
@@ -500,6 +510,26 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                       onCreate={handleCreateShortBundleLink}
                       onCopy={handleCopyShortBundle}
                     />
+                  )}
+
+                  {(!shortEnabled || shortBundleState.kind === "error") && (
+                    <>
+                      {shortEnabled && (
+                        <p className="text-[11px] text-muted-foreground">
+                          Fallback — share the full link directly:
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <input
+                          readOnly value={bundleUrl}
+                          className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
+                          onClick={e => (e.target as HTMLInputElement).select()}
+                        />
+                        <CopyBtn copied={copiedBundle} onClick={handleCopyBundle} />
+                      </div>
+
+                      <LinkStatusLine status={bundleStatus} charCount={bundleUrl.length} />
+                    </>
                   )}
 
                   <p className="text-[10px] text-muted-foreground/50">
@@ -643,13 +673,9 @@ function ShortLinkControls({
   onCopy: () => void;
 }) {
   if (state.kind === "idle") {
-    return (
-      <AppButton
-        onClick={onCreate}
-        leftIcon={<Zap className="w-3.5 h-3.5 text-primary" />}
-        label="Create short link (30-day)"
-      />
-    );
+    // Auto-create fires immediately via useEffect; idle is a transient
+    // state we don't need to render anything for.
+    return null;
   }
   if (state.kind === "pending") {
     return (
@@ -661,9 +687,16 @@ function ShortLinkControls({
   }
   if (state.kind === "error") {
     return (
-      <div className="flex items-start gap-1.5 text-[11px] text-amber-600 dark:text-amber-400">
-        <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
-        <span>{state.message}</span>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-start gap-1.5 text-[11px] text-amber-600 dark:text-amber-400">
+          <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+          <span>{state.message}</span>
+        </div>
+        <AppButton
+          onClick={onCreate}
+          leftIcon={<Zap className="w-3.5 h-3.5 text-primary" />}
+          label="Try again"
+        />
       </div>
     );
   }
