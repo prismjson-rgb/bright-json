@@ -2,7 +2,7 @@
 # See: https://docs.digitalocean.com/products/app-platform/reference/app-spec/
 name: bright-json
 static_sites:
-  - name: web
+  - name: bright-json
     environment_slug: node-js
     build_command: npm run build
     output_dir: out
