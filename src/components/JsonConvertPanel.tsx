@@ -18,7 +18,7 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
 
 const TABS: { id: ConvertFormat; label: string; lang: string }[] = [
   { id: "yaml", label: "YAML", lang: "yaml" },
-  { id: "toml", label: "TOML", lang: "ini" }, // using ini language for rough syntax highlighting
+  { id: "toon", label: "TOON", lang: "yaml" }, // using yaml language for rough syntax highlighting since it is similar
   { id: "xml", label: "XML", lang: "xml" },
   { id: "csv", label: "CSV", lang: "plaintext" },
 ];
