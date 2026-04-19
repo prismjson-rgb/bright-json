@@ -3,8 +3,9 @@ import { useState, useMemo } from "react";
 import { jsonToYaml } from "@/lib/json-to-yaml";
 import { jsonToXml } from "@/lib/json-to-xml";
 import { jsonToCsv } from "@/lib/json-to-csv";
+import { jsonToToml } from "@/lib/json-to-toml";
 
-export type ConvertFormat = "yaml" | "xml" | "csv";
+export type ConvertFormat = "yaml" | "toml" | "xml" | "csv";
 
 export function useJsonConvert(parsed: unknown) {
   const [format, setFormat] = useState<ConvertFormat>("yaml");
@@ -12,17 +13,20 @@ export function useJsonConvert(parsed: unknown) {
   const output = useMemo(() => {
     if (parsed === null || parsed === undefined) return "";
     if (format === "yaml") return jsonToYaml(parsed);
+    if (format === "toml") return jsonToToml(parsed);
     if (format === "xml") return jsonToXml(parsed);
     return jsonToCsv(parsed);
   }, [parsed, format]);
 
-  const fileExtension = format === "yaml" ? "yaml" : format === "xml" ? "xml" : "csv";
+  const fileExtension = format === "yaml" ? "yaml" : format === "toml" ? "toml" : format === "xml" ? "xml" : "csv";
   const mimeType =
     format === "yaml"
       ? "text/yaml"
-      : format === "xml"
-        ? "application/xml"
-        : "text/csv";
+      : format === "toml"
+        ? "application/toml"
+        : format === "xml"
+          ? "application/xml"
+          : "text/csv";
 
   return { format, setFormat, output, fileExtension, mimeType };
 }
