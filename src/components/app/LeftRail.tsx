@@ -90,11 +90,11 @@ export default function LeftRail({
           {!iconOnly && (
             <div className="px-3 pt-3 pb-1 flex items-center gap-1.5 select-none">
               <span className="text-[9px] font-semibold uppercase tracking-widest text-text3/60">
-                Input
+                Get started
               </span>
               <InfoHelp
                 text="Load JSON into a new tab (pick files, fetch a URL, or drag files onto the editor) and export the current tab as a .json file."
-                label="About Input"
+                label="About Get started"
                 side="right"
                 className="opacity-80"
               />
