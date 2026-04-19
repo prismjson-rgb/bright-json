@@ -2,8 +2,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
-  ChevronsDownUp, ChevronsUpDown, Copy, Check, Download, Upload,
-  Minimize2, ArrowUpDown, Sparkles, Save, Trash2, Wrench, Link2, Loader2,
+  ChevronsDownUp, ChevronsUpDown, Copy, Check,
+  Minimize2, ArrowUpDown, Sparkles, Save, Trash2, Wrench, Upload, Link2, MousePointerClick,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
@@ -11,8 +11,6 @@ import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
 import JsonEditor from "@/components/JsonEditor";
 import JsonTabBar from "@/components/JsonTabBar";
 import OverlaySidebar from "@/components/OverlaySidebar";
@@ -122,11 +120,7 @@ export default function JsonViewerClient() {
   const [hasSaved, setHasSaved] = useState(false);
   const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
   const fileRef = useRef<HTMLInputElement>(null);
-  const fetchUrlAbortRef = useRef<AbortController | null>(null);
   const [fileDragOver, setFileDragOver] = useState(false);
-  const [fetchUrlOpen, setFetchUrlOpen] = useState(false);
-  const [fetchUrlValue, setFetchUrlValue] = useState("");
-  const [fetchUrlLoading, setFetchUrlLoading] = useState(false);
 
   const { query, setQuery, matchCount } = useJsonSearch(parsed);
 
@@ -379,36 +373,33 @@ export default function JsonViewerClient() {
     [importJsonTextItems]
   );
 
-  const runFetchFromUrl = useCallback(async () => {
-    fetchUrlAbortRef.current?.abort();
-    const ac = new AbortController();
-    fetchUrlAbortRef.current = ac;
-    setFetchUrlLoading(true);
-    try {
-      const { text, label } = await fetchTextViaGet(fetchUrlValue, ac.signal);
-      importJsonTextItems([{ content: text, filename: label }]);
-      toast.success("Loaded from URL");
-      setFetchUrlOpen(false);
-    } catch (e) {
-      if (e instanceof DOMException && e.name === "AbortError") return;
-      const msg = e instanceof Error ? e.message : "Request failed";
-      const isNetwork =
-        e instanceof TypeError ||
-        /failed to fetch/i.test(msg) ||
-        /networkerror/i.test(msg) ||
-        msg === "Load failed";
-      toast.error(
-        isNetwork
-          ? "Could not reach URL. Check the address, HTTPS, and CORS (the server must allow this site)."
-          : msg,
-      );
-    } finally {
-      if (fetchUrlAbortRef.current === ac) {
-        fetchUrlAbortRef.current = null;
-        setFetchUrlLoading(false);
+  /** LeftRail's From-URL popover calls this. Resolves true on success so the
+   *  rail can close/reset its popover. */
+  const fetchAndImportFromUrl = useCallback(
+    async (url: string, signal: AbortSignal): Promise<boolean> => {
+      try {
+        const { text, label } = await fetchTextViaGet(url, signal);
+        importJsonTextItems([{ content: text, filename: label }]);
+        toast.success("Loaded from URL");
+        return true;
+      } catch (e) {
+        if (e instanceof DOMException && e.name === "AbortError") return false;
+        const msg = e instanceof Error ? e.message : "Request failed";
+        const isNetwork =
+          e instanceof TypeError ||
+          /failed to fetch/i.test(msg) ||
+          /networkerror/i.test(msg) ||
+          msg === "Load failed";
+        toast.error(
+          isNetwork
+            ? "Could not reach URL. Check the address, HTTPS, and CORS (the server must allow this site)."
+            : msg,
+        );
+        return false;
       }
-    }
-  }, [fetchUrlValue, importJsonTextItems]);
+    },
+    [importJsonTextItems],
+  );
 
   const handleSave = useCallback(() => {
     void (async () => {
@@ -458,7 +449,6 @@ export default function JsonViewerClient() {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
       if (e.key === "Escape") {
-        if (fetchUrlOpen) { setFetchUrlOpen(false); return; }
         if (shareOpen) { setShareOpen(false); return; }
         if (settingsOpen) { setSettingsOpen(false); return; }
         if (mode !== "tree" && mode !== "visual") { setMode("tree"); setSearchOpen(false); }
@@ -485,7 +475,7 @@ export default function JsonViewerClient() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [mode, searchOpen, shareOpen, settingsOpen, fetchUrlOpen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
+  }, [mode, searchOpen, shareOpen, settingsOpen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
 
   const lineCount = json.split("\n").length;
   const modeCfg = MODES[mode];
@@ -510,6 +500,10 @@ export default function JsonViewerClient() {
   const railProps = {
     mode,
     onModeChange: handleModeSelect,
+    hasJson,
+    onImport: () => fileRef.current?.click(),
+    onExport: () => handleDownload(),
+    onImportFromUrl: fetchAndImportFromUrl,
   };
 
   const headerProps = {
@@ -524,6 +518,8 @@ export default function JsonViewerClient() {
     shareActive: shareOpen,
     settingsActive: settingsOpen,
     hasJson,
+    railCollapsed,
+    onToggleRail: () => setRailCollapsed((c) => !c),
   };
 
   return (
@@ -535,7 +531,6 @@ export default function JsonViewerClient() {
           <LeftRail
             {...railProps}
             collapsed={railCollapsed}
-            onToggleCollapse={() => setRailCollapsed((c) => !c)}
           />
         )}
 
@@ -677,90 +672,6 @@ export default function JsonViewerClient() {
                     hideLabelOnMobile
                   />
                 </div>
-                <AppButton
-                  onClick={handleCopy}
-                  disabled={!hasJson}
-                  title="Copy JSON"
-                  leftIcon={copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
-                  label={copied ? "Copied!" : "Copy"}
-                  hideLabelOnMobile
-                />
-                <AppButton
-                  onClick={() => handleDownload()}
-                  disabled={!hasJson}
-                  title="Export .json"
-                  leftIcon={<Download className="w-3.5 h-3.5" />}
-                  label="Export"
-                  hideLabelOnMobile
-                />
-                <AppButton
-                  onClick={() => fileRef.current?.click()}
-                  title="Import .json / .txt (or drag files onto the editor)"
-                  leftIcon={<Upload className="w-3.5 h-3.5" />}
-                  label="Import"
-                  hideLabelOnMobile
-                />
-                <Popover
-                  open={fetchUrlOpen}
-                  onOpenChange={(open) => {
-                    setFetchUrlOpen(open);
-                    if (!open) fetchUrlAbortRef.current?.abort();
-                  }}
-                >
-                  <PopoverTrigger asChild>
-                    <AppButton
-                      title="Fetch JSON with GET from a URL"
-                      leftIcon={<Link2 className="w-3.5 h-3.5" />}
-                      label="From URL"
-                      hideLabelOnMobile
-                    />
-                  </PopoverTrigger>
-                  <PopoverContent align="start" sideOffset={8} className="w-[min(100vw-2rem,22rem)] space-y-3">
-                    <div className="space-y-1.5">
-                      <div className="flex items-start gap-2">
-                        <p className="text-xs font-medium text-foreground flex-1">GET from URL</p>
-                        <InfoHelp
-                          text="Runs a GET request in your browser to the address you enter. The response opens as a new tab. Many APIs block cross-origin requests unless they send CORS headers. Only http(s) URLs are allowed."
-                          label="About fetch from URL"
-                          side="left"
-                          className="shrink-0 mt-0.5"
-                        />
-                      </div>
-                      <p className="text-[10px] text-muted-foreground leading-snug">
-                        Opens a new tab with the response. Cross-origin APIs must send CORS headers.
-                      </p>
-                    </div>
-                    <Input
-                      value={fetchUrlValue}
-                      onChange={(e) => setFetchUrlValue(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !fetchUrlLoading) {
-                          e.preventDefault();
-                          void runFetchFromUrl();
-                        }
-                      }}
-                      placeholder="https://api.example.com/data.json"
-                      className="h-9 text-xs font-mono"
-                      disabled={fetchUrlLoading}
-                      autoComplete="url"
-                      spellCheck={false}
-                    />
-                    <AppButton
-                      variant="accent"
-                      className="w-full justify-center"
-                      onClick={() => void runFetchFromUrl()}
-                      disabled={fetchUrlLoading || !fetchUrlValue.trim()}
-                      leftIcon={
-                        fetchUrlLoading ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Link2 className="w-3.5 h-3.5" />
-                        )
-                      }
-                      label={fetchUrlLoading ? "Loading…" : "Fetch"}
-                    />
-                  </PopoverContent>
-                </Popover>
                 <input
                   ref={fileRef}
                   type="file"
@@ -789,8 +700,33 @@ export default function JsonViewerClient() {
                 )}
                 <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
               </div>
-              <div className="flex-1 min-h-0">
+              <div className="flex-1 min-h-0 relative">
                 <JsonEditor value={json} onChange={setJson} error={error} dark={dark} editorSettings={settings.editor} />
+                {!hasJson && (
+                  <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center p-6 text-center">
+                    <div className="max-w-[280px] bg-surface1/60 backdrop-blur-md border border-border/80 rounded-xl p-6 shadow-sm text-sm text-foreground/80 pointer-events-auto cursor-default">
+                      <p className="font-medium mb-4 text-[13px]">Editor is empty</p>
+                      <div className="text-xs text-muted-foreground flex flex-col gap-2">
+                        <AppButton
+                          variant="ghost"
+                          onClick={() => fileRef.current?.click()}
+                          leftIcon={<Upload className="w-[14px] h-[14px]" />}
+                          label="Import from device"
+                          className="w-full justify-center bg-secondary/30 hover:bg-secondary/60 text-foreground"
+                        />
+                        <div className="flex items-center gap-2 my-1 opacity-50">
+                          <div className="flex-1 h-px bg-border" />
+                          <span className="text-[10px] uppercase tracking-wider">or</span>
+                          <div className="flex-1 h-px bg-border" />
+                        </div>
+                        <div className="flex items-center justify-center gap-1.5 text-text3/80 font-medium py-1.5 select-none bg-secondary/20 rounded-md border border-border/30 border-dashed">
+                          <MousePointerClick className="w-[14px] h-[14px]" />
+                          Drag & drop files here
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
 

@@ -1,9 +1,12 @@
 "use client";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { Download, Link2, Loader2, Upload, X } from "lucide-react";
 import Link from "next/link";
 import Logo from "./Logo";
 import { AppButton } from "./AppButton";
 import { InfoHelp } from "./InfoHelp";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 import { RAIL_GROUPS, railModesForGroup, type PanelMode } from "@/lib/modes";
 
 interface LeftRailProps {
@@ -11,18 +14,51 @@ interface LeftRailProps {
   onModeChange: (mode: PanelMode) => void;
   /** Desktop: collapse to icon-only rail. Ignored in mobile sheet. */
   collapsed?: boolean;
-  onToggleCollapse?: () => void;
   /** Present only in mobile sheet; shows close button + hides collapse control. */
   onClose?: () => void;
+  /** Input actions shown at the top of the rail (Import / From URL / Export). */
+  hasJson?: boolean;
+  onImport?: () => void;
+  onExport?: () => void;
+  /** Resolves true on success so the rail can close its popover. */
+  onImportFromUrl?: (url: string, signal: AbortSignal) => Promise<boolean>;
 }
 
 export default function LeftRail({
   mode, onModeChange,
-  collapsed = false, onToggleCollapse,
+  collapsed = false,
   onClose,
+  hasJson, onImport, onExport, onImportFromUrl,
 }: LeftRailProps) {
   const isMobile = !!onClose;
   const iconOnly = !isMobile && collapsed;
+
+  const [fetchOpen, setFetchOpen] = useState(false);
+  const [fetchValue, setFetchValue] = useState("");
+  const [fetchLoading, setFetchLoading] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const runFetch = async () => {
+    if (!onImportFromUrl || fetchLoading) return;
+    abortRef.current?.abort();
+    const ac = new AbortController();
+    abortRef.current = ac;
+    setFetchLoading(true);
+    try {
+      const ok = await onImportFromUrl(fetchValue, ac.signal);
+      if (ok) {
+        setFetchOpen(false);
+        setFetchValue("");
+      }
+    } finally {
+      if (abortRef.current === ac) {
+        abortRef.current = null;
+        setFetchLoading(false);
+      }
+    }
+  };
+
+  const hasInputActions = !!(onImport || onExport || onImportFromUrl);
 
   return (
     <aside
@@ -42,6 +78,152 @@ export default function LeftRail({
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+      )}
+
+      {/* Input section (Import / From URL / Export) — surfaced here because
+       *  users kept missing these buried in the editor toolbar, especially
+       *  From URL. Keeping it as the first rail group makes the entry
+       *  points obvious and gives drag-drop a visible neighbor. */}
+      {hasInputActions && (
+        <div className="flex flex-col border-b border-border/60">
+          {!iconOnly && (
+            <div className="px-3 pt-3 pb-1 flex items-center gap-1.5 select-none">
+              <span className="text-[9px] font-semibold uppercase tracking-widest text-text3/60">
+                Input
+              </span>
+              <InfoHelp
+                text="Load JSON into a new tab (pick files, fetch a URL, or drag files onto the editor) and export the current tab as a .json file."
+                label="About Input"
+                side="right"
+                className="opacity-80"
+              />
+            </div>
+          )}
+          <div className={`flex flex-col ${iconOnly ? "items-center py-1.5 gap-1" : ""}`}>
+            {onImport && (
+              <AppButton
+                variant="rail"
+                size={iconOnly ? "icon" : "sm"}
+                onClick={onImport}
+                title="Import .json / .txt files (or drag files onto the editor)"
+                aria-label="Import files"
+                leftIcon={<Upload className="w-[15px] h-[15px]" />}
+                label={
+                  <span className="inline-flex items-center gap-1 min-w-0 text-xs">
+                    <span className="truncate">Import</span>
+                    <InfoHelp
+                      text="Pick one or more .json / .txt files. You can also drag files from your file manager onto the editor column — every file opens as its own tab."
+                      label="About Import"
+                      side="right"
+                      className="shrink-0"
+                    />
+                  </span>
+                }
+                iconOnly={iconOnly}
+                className={iconOnly ? "justify-center w-9" : "px-3 py-2"}
+              />
+            )}
+            {onImportFromUrl && (
+              <Popover
+                open={fetchOpen}
+                onOpenChange={(open) => {
+                  setFetchOpen(open);
+                  if (!open) abortRef.current?.abort();
+                }}
+              >
+                <PopoverTrigger asChild>
+                  <AppButton
+                    variant="rail"
+                    size={iconOnly ? "icon" : "sm"}
+                    active={fetchOpen}
+                    title="Fetch JSON with GET from a URL"
+                    aria-label="Import from URL"
+                    leftIcon={<Link2 className="w-[15px] h-[15px]" />}
+                    label={
+                      <span className="inline-flex items-center gap-1 min-w-0 text-xs">
+                        <span className="truncate">From URL</span>
+                        <InfoHelp
+                          text="Runs a GET request from your browser and opens the response as a new tab. Only http(s) URLs; the target server must allow CORS."
+                          label="About From URL"
+                          side="right"
+                          className="shrink-0"
+                        />
+                      </span>
+                    }
+                    iconOnly={iconOnly}
+                    className={iconOnly ? "justify-center w-9" : "px-3 py-2"}
+                  />
+                </PopoverTrigger>
+                <PopoverContent
+                  align="start"
+                  side="right"
+                  sideOffset={8}
+                  className="w-[min(100vw-2rem,22rem)] space-y-3"
+                >
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-medium text-foreground">GET from URL</p>
+                    <p className="text-[10px] text-muted-foreground leading-snug">
+                      Opens the response as a new tab. Cross-origin APIs must send CORS headers.
+                    </p>
+                  </div>
+                  <Input
+                    value={fetchValue}
+                    onChange={(e) => setFetchValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !fetchLoading) {
+                        e.preventDefault();
+                        void runFetch();
+                      }
+                    }}
+                    placeholder="https://api.example.com/data.json"
+                    className="h-9 text-xs font-mono"
+                    disabled={fetchLoading}
+                    autoComplete="url"
+                    spellCheck={false}
+                  />
+                  <AppButton
+                    variant="accent"
+                    className="w-full justify-center"
+                    onClick={() => void runFetch()}
+                    disabled={fetchLoading || !fetchValue.trim()}
+                    leftIcon={
+                      fetchLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Link2 className="w-3.5 h-3.5" />
+                      )
+                    }
+                    label={fetchLoading ? "Loading…" : "Fetch"}
+                  />
+                </PopoverContent>
+              </Popover>
+            )}
+            {onExport && (
+              <AppButton
+                variant="rail"
+                size={iconOnly ? "icon" : "sm"}
+                onClick={onExport}
+                disabled={!hasJson}
+                title="Export current tab as .json"
+                aria-label="Export"
+                leftIcon={<Download className="w-[15px] h-[15px]" />}
+                label={
+                  <span className="inline-flex items-center gap-1 min-w-0 text-xs">
+                    <span className="truncate">Export</span>
+                    <InfoHelp
+                      text="Download the active tab's JSON as a .json file."
+                      label="About Export"
+                      side="right"
+                      className="shrink-0"
+                    />
+                  </span>
+                }
+                iconOnly={iconOnly}
+                className={iconOnly ? "justify-center w-9" : "px-3 py-2"}
+              />
+            )}
+          </div>
         </div>
       )}
 
@@ -69,33 +251,35 @@ export default function LeftRail({
                 const Icon = cfg.icon;
                 const isActive = mode === cfg.id;
                 return (
-                  <div
+                  <AppButton
                     key={cfg.id}
-                    className={`flex items-stretch w-full min-w-0 ${iconOnly ? "justify-center" : ""}`}
-                  >
-                    <AppButton
-                      variant="rail"
-                      size={iconOnly ? "icon" : "sm"}
-                      active={isActive}
-                      onClick={() => onModeChange(cfg.id)}
-                      title={cfg.shortcut ? `${cfg.label} (${cfg.shortcut})` : cfg.label}
-                      aria-label={cfg.label}
-                      leftIcon={<Icon className="w-[15px] h-[15px]" />}
-                      label={<span className="text-xs truncate">{cfg.label}</span>}
-                      rightIcon={cfg.hint ? <span>{cfg.hint}</span> : undefined}
-                      shortcut={cfg.shortcut}
-                      iconOnly={iconOnly}
-                      className={iconOnly ? "" : "flex-1 min-w-0 px-3 py-2"}
-                    />
-                    {!iconOnly && (
-                      <InfoHelp
-                        text={cfg.help}
-                        label={`About ${cfg.label}`}
-                        side="right"
-                        className="shrink-0 self-center mr-0.5"
-                      />
-                    )}
-                  </div>
+                    variant="rail"
+                    size={iconOnly ? "icon" : "sm"}
+                    active={isActive}
+                    onClick={() => onModeChange(cfg.id)}
+                    title={cfg.shortcut ? `${cfg.label} (${cfg.shortcut})` : cfg.label}
+                    aria-label={cfg.label}
+                    leftIcon={<Icon className="w-[15px] h-[15px]" />}
+                    label={
+                      <span className="inline-flex items-center gap-1 min-w-0 text-xs">
+                        <span className="truncate">{cfg.label}</span>
+                        {/* Nested inside the button so the icon sits right next
+                         *  to the label instead of getting pushed to the row's
+                         *  right edge. InfoHelp stops propagation so clicks
+                         *  don't accidentally switch modes. */}
+                        <InfoHelp
+                          text={cfg.help}
+                          label={`About ${cfg.label}`}
+                          side="right"
+                          className="shrink-0"
+                        />
+                      </span>
+                    }
+                    rightIcon={cfg.hint ? <span>{cfg.hint}</span> : undefined}
+                    shortcut={cfg.shortcut}
+                    iconOnly={iconOnly}
+                    className={iconOnly ? "justify-center w-9" : "px-3 py-2"}
+                  />
                 );
               })}
             </div>
@@ -103,27 +287,16 @@ export default function LeftRail({
         );
       })}
 
-      {/* Footer: collapse toggle (desktop) + legal links */}
-      <div className="mt-auto border-t border-border/60 p-2 flex flex-col gap-1">
-        {!isMobile && onToggleCollapse && (
-          <AppButton
-            variant="icon"
-            size="icon"
-            onClick={onToggleCollapse}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            leftIcon={collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-            className="w-full"
-          />
-        )}
-        {!iconOnly && (
+      {/* Footer: legal links */}
+      {!iconOnly && (
+        <div className="mt-auto border-t border-border/60 p-2">
           <div className="flex items-center justify-center gap-2 pb-1">
             <Link href="/privacy" className="text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">Privacy</Link>
             <span className="text-[9px] text-muted-foreground/30">·</span>
             <Link href="/terms" className="text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">Terms</Link>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </aside>
   );
 }

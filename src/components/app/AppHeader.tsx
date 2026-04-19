@@ -1,5 +1,5 @@
 "use client";
-import { Moon, Search, Settings, Share2, Sun } from "lucide-react";
+import { Menu, Moon, Search, Settings, Share2, Sun } from "lucide-react";
 import Logo from "./Logo";
 import ModeTabs from "./ModeTabs";
 import { AppButton } from "./AppButton";
@@ -18,20 +18,55 @@ interface AppHeaderProps {
   shareActive?: boolean;
   settingsActive?: boolean;
   hasJson: boolean;
+  railCollapsed?: boolean;
+  onToggleRail?: () => void;
 }
 
 export default function AppHeader({
   mode, onModeChange, dark, onToggleTheme,
   onOpenShare, onOpenSettings, searchOpen, onSearchToggle,
   shareActive, settingsActive, hasJson,
+  railCollapsed, onToggleRail,
 }: AppHeaderProps) {
   return (
-    <header className="toolbar-header flex items-center gap-4 px-4 h-12 border-b border-border bg-surface1 shrink-0">
-      <Logo className="shrink-0" />
+    <header className="toolbar-header flex items-stretch h-12 border-b border-border bg-surface1 shrink-0">
+      {onToggleRail && !railCollapsed && (
+        <div className="flex items-center border-r border-border shrink-0 gap-2 w-44 pl-2 pr-2">
+          <AppButton
+            variant="icon"
+            size="icon"
+            onClick={onToggleRail}
+            title="Collapse sidebar"
+            aria-label="Collapse sidebar"
+            leftIcon={<Menu className="w-4 h-4" />}
+          />
+          <Logo className="min-w-0 flex-1" />
+        </div>
+      )}
+      <div className="flex items-center gap-3 px-4 flex-1 min-w-0">
+        {onToggleRail && railCollapsed && (
+          <>
+            <AppButton
+              variant="icon"
+              size="icon"
+              onClick={onToggleRail}
+              title="Expand sidebar"
+              aria-label="Expand sidebar"
+              leftIcon={<Menu className="w-4 h-4" />}
+              className="shrink-0"
+            />
+            <Logo className="shrink-0" />
+            <div className="h-6 w-px bg-border shrink-0 ml-1" aria-hidden />
+          </>
+        )}
+        {!onToggleRail && (
+          <>
+            <Logo className="shrink-0" />
+            <div className="h-6 w-px bg-border shrink-0 ml-1" aria-hidden />
+          </>
+        )}
 
-      <div className="h-6 w-px bg-border shrink-0" aria-hidden />
-
-      <ModeTabs mode={mode} onChange={onModeChange} className="flex-1 min-w-0" />
+        <ModeTabs mode={mode} onChange={onModeChange} className="flex-1 min-w-0" />
 
       <div className="flex items-center shrink-0 gap-0.5 pl-2.5 ml-0.5 border-l border-border/70">
         <InfoHelp
@@ -76,6 +111,7 @@ export default function AppHeader({
           aria-label="Settings"
           leftIcon={<Settings className="w-4 h-4" />}
         />
+      </div>
       </div>
     </header>
   );

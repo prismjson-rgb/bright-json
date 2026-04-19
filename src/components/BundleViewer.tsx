@@ -4,14 +4,13 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Braces, ChevronRight, ChevronDown, ExternalLink, Lock, Package } from "lucide-react";
 import { decodeBundleAsync, encodeJsonAsync, type BundleEntry } from "@/lib/share";
-import { useTheme } from "@/hooks/useTheme";
 
 const JsonTreeView = dynamic(() => import("@/components/JsonTreeView"), { ssr: false });
 
 export default function BundleViewer() {
-  const { dark } = useTheme();
   const [entries, setEntries] = useState<BundleEntry[]>([]);
   const [parsed, setParsed] = useState<Record<number, unknown>>({});
+  const [encodedUrls, setEncodedUrls] = useState<Record<number, string>>({});
   const [selected, setSelected] = useState<number | null>(null);
   const [status, setStatus] = useState<"loading" | "ok" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
@@ -24,7 +23,8 @@ export default function BundleViewer() {
       return;
     }
     let cancelled = false;
-    void decodeBundleAsync(hash[1]).then((decoded) => {
+    void (async () => {
+      const decoded = await decodeBundleAsync(hash[1]);
       if (cancelled) return;
       if (!decoded.length) {
         setErrorMsg("Could not decode the bundle. The link may be incomplete or corrupted.");
@@ -38,20 +38,32 @@ export default function BundleViewer() {
       setEntries(decoded);
       setParsed(p);
       setStatus("ok");
-    });
+
+      // Pre-encode each entry so "Open in Editor" can be a native
+      // <a target="_blank">. Doing it up front avoids the async-inside-
+      // click-handler problem where browsers consume user-activation
+      // before window.open runs and silently fall back to same-tab.
+      const urls: Record<number, string> = {};
+      for (let i = 0; i < decoded.length; i++) {
+        try {
+          const encoded = await encodeJsonAsync(decoded[i].json);
+          if (cancelled) return;
+          urls[i] = `/#json=${encoded}`;
+          setEncodedUrls({ ...urls });
+        } catch {}
+      }
+    })();
     return () => { cancelled = true; };
   }, []);
 
-  const openInEditor = async (json: string) => {
-    // Open synchronously inside the click handler so the browser keeps
-    // user-activation — otherwise `_blank` silently falls back to same-tab
-    // after the `await` below. The tab gets its real URL once encoding finishes.
-    const tab = window.open("about:blank", "_blank");
-    const encoded = await encodeJsonAsync(json);
-    const target = "/#json=" + encoded;
-    if (tab) tab.location.replace(target);
-    else window.location.href = target;
+  const openAllInNewTabs = () => {
+    entries.forEach((_, i) => {
+      const url = encodedUrls[i];
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
+    });
   };
+
+  const allEncoded = entries.length > 0 && entries.every((_, i) => !!encodedUrls[i]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -94,14 +106,27 @@ export default function BundleViewer() {
         {status === "ok" && (
           <>
             {/* Bundle summary */}
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-1">
-                <Package className="w-4 h-4 text-primary" />
-                <h1 className="text-lg font-semibold">JSON Bundle</h1>
+            <div className="mb-6 flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Package className="w-4 h-4 text-primary" />
+                  <h1 className="text-lg font-semibold">JSON Bundle</h1>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {entries.length} JSON{entries.length !== 1 ? "s" : ""} shared — click an entry to view it
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {entries.length} JSON{entries.length !== 1 ? "s" : ""} shared — click an entry to view it
-              </p>
+              {entries.length > 1 && (
+                <button
+                  onClick={openAllInNewTabs}
+                  disabled={!allEncoded}
+                  className="shrink-0 flex items-center gap-1.5 text-[11px] px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={allEncoded ? "Open every entry in a new tab" : "Preparing links…"}
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Open all in new tabs
+                </button>
+              )}
             </div>
 
             {/* Entry list */}
@@ -149,14 +174,18 @@ export default function BundleViewer() {
                                 : `Object · ${Object.keys(parsed[i] as object).length} keys`
                               : "Could not parse JSON"}
                           </span>
-                          <button
-                            onClick={() => openInEditor(entry.json)}
-                            className="flex items-center gap-1 text-[11px] text-primary hover:underline"
-                            title="Open in JSON Prism editor"
+                          <a
+                            href={encodedUrls[i] ?? undefined}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-disabled={!encodedUrls[i]}
+                            onClick={(e) => { if (!encodedUrls[i]) e.preventDefault(); }}
+                            className={`flex items-center gap-1 text-[11px] text-primary hover:underline ${!encodedUrls[i] ? "opacity-50 cursor-not-allowed" : ""}`}
+                            title={encodedUrls[i] ? "Open in JSON Prism editor" : "Preparing link…"}
                           >
                             <ExternalLink className="w-3 h-3" />
                             Open in Editor
-                          </button>
+                          </a>
                         </div>
 
                         {/* Tree or fallback */}
