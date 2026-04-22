@@ -37,6 +37,7 @@ interface JsonTreeViewProps {
   data: unknown;
   expandAll?: boolean;
   searchTerm?: string;
+  activeMatchPath?: string;
   treeSettings?: TreeViewSettings;
 }
 
@@ -129,14 +130,30 @@ function buildRows(
   return rows;
 }
 
-function highlightText(text: string, searchTerm: string): React.ReactNode {
+function getAncestorPaths(path: string): string[] {
+  if (path === "root") return [];
+  const ancestors: string[] = ["root"];
+  const rest = path.slice(4);
+  const re = /\.([^.[]+)|\[(\d+)\]/g;
+  let m: RegExpExecArray | null;
+  let built = "root";
+  const segments: string[] = [];
+  while ((m = re.exec(rest)) !== null) segments.push(m[0]);
+  for (let i = 0; i < segments.length - 1; i++) {
+    built += segments[i];
+    ancestors.push(built);
+  }
+  return ancestors;
+}
+
+function highlightText(text: string, searchTerm: string, isActive = false): React.ReactNode {
   if (!searchTerm) return text;
   const idx = text.toLowerCase().indexOf(searchTerm.toLowerCase());
   if (idx === -1) return text;
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="bg-primary/30 text-foreground rounded px-0.5">
+      <mark className={isActive ? "bg-primary text-primary-foreground rounded px-0.5" : "bg-primary/30 text-foreground rounded px-0.5"}>
         {text.slice(idx, idx + searchTerm.length)}
       </mark>
       {text.slice(idx + searchTerm.length)}
@@ -151,6 +168,7 @@ function TreeRow({
   onCopyBranch,
   copiedPath,
   searchTerm,
+  activeMatchPath,
   indentPx,
   fontSize,
   showChildCount,
@@ -162,6 +180,7 @@ function TreeRow({
   onCopyBranch: (path: string) => void;
   copiedPath: string | null;
   searchTerm?: string;
+  activeMatchPath?: string;
   indentPx: number;
   fontSize: number;
   showChildCount: boolean;
@@ -169,6 +188,7 @@ function TreeRow({
 }) {
   const indent = row.depth * indentPx;
   const isCopied = copiedPath === row.id;
+  const isActive = !!activeMatchPath && row.id === activeMatchPath;
 
   if (row.isClosingBracket) {
     return (
@@ -195,19 +215,19 @@ function TreeRow({
       const display = str.length > stringTruncateLength ? str.slice(0, stringTruncateLength) + "…" : str;
       valueEl = (
         <span className="text-json-string" title={str}>
-          "{searchTerm ? highlightText(display, searchTerm) : display}"
+          "{searchTerm ? highlightText(display, searchTerm, isActive) : display}"
         </span>
       );
     }
 
     return (
       <div
-        className="group flex items-center gap-1 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-colors font-mono"
+        className={`group flex items-center gap-1 py-[2px] rounded-md px-2 -mx-2 transition-colors font-mono ${isActive ? "bg-primary/10 ring-1 ring-primary/30" : "hover:bg-secondary/40"}`}
         style={{ marginLeft: indent, fontSize }}
       >
         {row.keyName !== undefined && (
           <span className="text-json-key shrink-0">
-            "{searchTerm ? highlightText(row.keyName, searchTerm) : row.keyName}"
+            "{searchTerm ? highlightText(row.keyName, searchTerm, isActive) : row.keyName}"
             <span className="text-json-bracket">: </span>
           </span>
         )}
@@ -234,7 +254,7 @@ function TreeRow({
   const TypeIcon = isArray ? Brackets : Braces;
 
   return (
-    <div className="group flex items-center gap-0.5 w-fit" style={{ marginLeft: indent }}>
+    <div className={`group flex items-center gap-0.5 w-fit ${isActive ? "rounded-md ring-1 ring-primary/30 bg-primary/10" : ""}`} style={{ marginLeft: indent }}>
       <button
         onClick={() => onToggle(row.id)}
         className="flex items-center gap-1.5 py-[2px] hover:bg-secondary/40 rounded-md px-2 -mx-2 transition-all duration-100 text-left font-mono"
@@ -248,7 +268,7 @@ function TreeRow({
         </span>
         {row.keyName !== undefined && (
           <span className="text-json-key shrink-0">
-            "{searchTerm ? highlightText(row.keyName, searchTerm) : row.keyName}"
+            "{searchTerm ? highlightText(row.keyName, searchTerm, isActive) : row.keyName}"
             <span className="text-json-bracket">: </span>
           </span>
         )}
@@ -281,7 +301,7 @@ function TreeRow({
   );
 }
 
-export default function JsonTreeView({ data, expandAll, searchTerm, treeSettings }: JsonTreeViewProps) {
+export default function JsonTreeView({ data, expandAll, searchTerm, activeMatchPath, treeSettings }: JsonTreeViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const ts = treeSettings ?? DEFAULT_TREE_SETTINGS;
 
@@ -319,10 +339,36 @@ export default function JsonTreeView({ data, expandAll, searchTerm, treeSettings
     }
   }, [data, ts.defaultExpandDepth]);
 
+  // Auto-expand ancestors of activeMatchPath and scroll to it
+  useEffect(() => {
+    if (!activeMatchPath) return;
+    const ancestors = getAncestorPaths(activeMatchPath);
+    if (ancestors.length > 0) {
+      setExpanded((prev) => {
+        const next = new Set(prev);
+        let changed = false;
+        for (const a of ancestors) {
+          if (!next.has(a)) { next.add(a); changed = true; }
+        }
+        return changed ? next : prev;
+      });
+    }
+  }, [activeMatchPath]);
+
   const rows = useMemo(() => {
     if (data === null || data === undefined) return [];
     return buildRows(data, expanded, 0, undefined, "root");
   }, [data, expanded]);
+
+  // Scroll to active match after rows settle
+  useEffect(() => {
+    if (!activeMatchPath) return;
+    const idx = rows.findIndex((r) => r.id === activeMatchPath);
+    if (idx !== -1) {
+      virtualizer.scrollToIndex(idx, { align: "center", behavior: "smooth" });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeMatchPath, rows]);
 
   const virtualizer = useVirtualizer({
     count: rows.length,
@@ -439,6 +485,7 @@ export default function JsonTreeView({ data, expandAll, searchTerm, treeSettings
                 onCopyBranch={handleCopyBranch}
                 copiedPath={copiedPath}
                 searchTerm={searchTerm}
+                activeMatchPath={activeMatchPath}
                 indentPx={ts.indentPx}
                 fontSize={ts.fontSize}
                 showChildCount={ts.showChildCount}

@@ -122,7 +122,7 @@ export default function JsonViewerClient() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileDragOver, setFileDragOver] = useState(false);
 
-  const { query, setQuery, matchCount } = useJsonSearch(parsed);
+  const { query, setQuery, matchCount, currentMatchIndex, currentMatch, nextMatch, prevMatch } = useJsonSearch(parsed);
 
   const setJson = useCallback(
     (value: string) => {
@@ -732,7 +732,7 @@ export default function JsonViewerClient() {
 
             <section className="flex flex-col min-w-0 bg-surface2 min-h-[60vh] md:flex-1 md:min-h-0 shrink-0">
               {(mode === "tree" || mode === "visual") && searchOpen && (
-                <JsonSearchPanel query={query} matchCount={matchCount} onQueryChange={setQuery} onClose={() => { setSearchOpen(false); setQuery(""); }} />
+                <JsonSearchPanel query={query} matchCount={matchCount} currentMatchIndex={currentMatchIndex} onQueryChange={setQuery} onNext={nextMatch} onPrev={prevMatch} onClose={() => { setSearchOpen(false); setQuery(""); }} />
               )}
 
               {(mode === "tree" || mode === "visual" || mode === "flow") && (
@@ -793,7 +793,7 @@ export default function JsonViewerClient() {
                     ) : mode === "flow" ? (
                       <JsonFlowView parsed={parsed} dark={dark} />
                     ) : (
-                      <JsonTreeView data={parsed} expandAll={expandAll} searchTerm={searchOpen ? query : undefined} treeSettings={settings.treeView} />
+                      <JsonTreeView data={parsed} expandAll={expandAll} searchTerm={searchOpen ? query : undefined} activeMatchPath={searchOpen && currentMatch ? currentMatch.path : undefined} treeSettings={settings.treeView} />
                     )}
                   </div>
                 </>

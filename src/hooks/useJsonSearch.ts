@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 
 export interface SearchMatch {
   path: string;
@@ -40,6 +40,7 @@ function findMatches(
 
 export function useJsonSearch(parsed: unknown) {
   const [query, setQuery] = useState("");
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
 
   const matches = useMemo(() => {
     if (!query.trim() || parsed === null || parsed === undefined) return [];
@@ -51,11 +52,33 @@ export function useJsonSearch(parsed: unknown) {
     [matches]
   );
 
+  const safeIndex = matches.length === 0 ? 0 : currentMatchIndex % matches.length;
+  const currentMatch = matches[safeIndex] ?? null;
+
+  const nextMatch = useCallback(() => {
+    if (matches.length === 0) return;
+    setCurrentMatchIndex((i) => (i + 1) % matches.length);
+  }, [matches.length]);
+
+  const prevMatch = useCallback(() => {
+    if (matches.length === 0) return;
+    setCurrentMatchIndex((i) => (i - 1 + matches.length) % matches.length);
+  }, [matches.length]);
+
+  const handleSetQuery = useCallback((q: string) => {
+    setQuery(q);
+    setCurrentMatchIndex(0);
+  }, []);
+
   return {
     query,
-    setQuery,
+    setQuery: handleSetQuery,
     matches,
     matchCount: matches.length,
     matchPaths,
+    currentMatchIndex: safeIndex,
+    currentMatch,
+    nextMatch,
+    prevMatch,
   };
 }
