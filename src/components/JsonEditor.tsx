@@ -27,16 +27,29 @@ export default function JsonEditor({ value, onChange, error, dark, editorSetting
   const onSearchOpenRef = useRef(onSearchOpen);
   useEffect(() => { onSearchOpenRef.current = onSearchOpen; }, [onSearchOpen]);
 
-  const handleMount = useCallback((editor: any, monaco: any) => {
+  const handleMount = useCallback((editor: any, _monaco: any) => {
     editorRef.current = editor;
     editor.focus();
-    // Redirect Monaco's built-in Ctrl+F / Ctrl+H to our custom search panel
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, () => {
-      onSearchOpenRef.current?.();
-    });
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyH, () => {
-      onSearchOpenRef.current?.();
-    });
+
+    // Intercept Ctrl+F / Cmd+F in the capture phase on the editor DOM node.
+    // This fires before Monaco's internal keyboard handler, so Monaco's native
+    // find widget never opens. addCommand runs inside Monaco's system which
+    // fires *alongside* the built-in action (causing the widget flash), so the
+    // capture-phase approach is the reliable fix.
+    const dom = editor.getDomNode() as HTMLElement | null;
+    if (dom) {
+      dom.addEventListener(
+        "keydown",
+        (e: KeyboardEvent) => {
+          if ((e.metaKey || e.ctrlKey) && !e.shiftKey && (e.key === "f" || e.key === "F")) {
+            e.stopPropagation();
+            e.preventDefault();
+            onSearchOpenRef.current?.();
+          }
+        },
+        { capture: true },
+      );
+    }
   }, []);
 
   useEffect(() => {
