@@ -531,11 +531,8 @@ export default function JsonViewerClient() {
       {!isMobile && <AppHeader {...headerProps} />}
 
       <div className="flex flex-1 min-h-0 bg-grad-hero bg-bg">
-        {!isMobile && (
-          <LeftRail
-            {...railProps}
-            collapsed={railCollapsed}
-          />
+        {!isMobile && !railCollapsed && (
+          <LeftRail {...railProps} collapsed={false} />
         )}
 
         {isMobile && (

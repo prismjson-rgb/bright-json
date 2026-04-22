@@ -1,5 +1,5 @@
 "use client";
-import { Braces } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -8,16 +8,19 @@ interface LogoProps {
 }
 
 export default function Logo({ size = "md", className }: LogoProps) {
-  const box = size === "md" ? "w-7 h-7" : "w-7 h-7";
-  const icon = "w-4 h-4";
+  const h = size === "sm" ? 28 : 28;
+  // natural size 377×312 → at 28px tall, width ≈ 34px
+  const w = Math.round(h * (377 / 312));
   return (
     <div className={cn("flex items-center gap-2 min-w-0", className)}>
-      <div className={cn(
-        box,
-        "rounded-lg bg-primary/10 dark:bg-grad-teal flex items-center justify-center shrink-0 dark:text-white",
-      )}>
-        <Braces className={cn(icon, "text-primary dark:text-white")} />
-      </div>
+      <Image
+        src="/logo-transparent.png"
+        alt="JSON Prism logo"
+        width={w}
+        height={h}
+        className="shrink-0"
+        priority
+      />
       <div className="flex flex-col min-w-0">
         <span className="font-semibold text-sm tracking-tight text-foreground leading-none truncate">
           JSON Prism

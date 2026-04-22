@@ -39,9 +39,9 @@ export const metadata: Metadata = {
     url: `${BASE}/`,
     images: [
       {
-        url: `${BASE}/icons/icon-512.png`,
-        width: 512,
-        height: 512,
+        url: `${BASE}/og-image.png`,
+        width: 1200,
+        height: 630,
         alt: "JSON Prism — format, validate, diff, and explore JSON in your browser",
       },
     ],
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [`${BASE}/icons/icon-512.png`],
+    images: [`${BASE}/og-image.png`],
   },
   manifest: "/manifest.json",
   icons: {

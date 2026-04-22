@@ -100,7 +100,7 @@ function redirectHtml(target: string, kind: Kind, siteUrl: string): string {
   const description = kind === "bundle"
     ? "A bundle of JSON documents shared via JSON Prism. Opens locally in your browser — nothing is uploaded."
     : "A JSON document shared via JSON Prism. Opens locally in your browser — nothing is uploaded.";
-  const image = `${siteUrl}/icons/icon-512.png`;
+  const image = `${siteUrl}/og-image.png`;
   const safeTarget = htmlEscape(target);
   const safeSite = htmlEscape(siteUrl);
   const safeImage = htmlEscape(image);
@@ -120,8 +120,8 @@ function redirectHtml(target: string, kind: Kind, siteUrl: string): string {
 <meta property="og:site_name" content="JSON Prism">
 <meta property="og:type" content="website">
 <meta property="og:image" content="${safeImage}">
-<meta property="og:image:width" content="512">
-<meta property="og:image:height" content="512">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="JSON Prism — format, validate, diff, and explore JSON in your browser">
 
 <meta name="twitter:card" content="summary_large_image">

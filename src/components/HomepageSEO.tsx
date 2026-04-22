@@ -152,7 +152,7 @@ const WEBSITE_LD = {
     url: `${BASE}/`,
     logo: {
       "@type": "ImageObject",
-      url: `${BASE}/icons/icon-512.png`,
+      url: `${BASE}/logo.png`,
     },
   },
   potentialAction: {
@@ -210,7 +210,7 @@ const APP_LD = {
     "Bundle multiple JSONs into one link",
     "Import from URL or drag-drop",
   ],
-  screenshot: `${BASE}/icons/icon-512.png`,
+  screenshot: `${BASE}/og-image.png`,
 };
 
 const FAQ_LD = {
