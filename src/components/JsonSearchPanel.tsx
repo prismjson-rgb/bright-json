@@ -28,7 +28,7 @@ export default function JsonSearchPanel({
   }, []);
 
   return (
-    <div className="flex items-center gap-1.5 px-4 py-2 border-b border-border bg-surface shrink-0 animate-slide-up">
+    <div className="flex items-center gap-1.5 px-4 py-2 border-b border-border bg-surface shrink-0">
       <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
       <input
         ref={inputRef}

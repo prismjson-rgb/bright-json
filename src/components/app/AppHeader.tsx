@@ -72,7 +72,7 @@ export default function AppHeader({
         <InfoHelp
           text="View tabs switch the right panel (Tree, Visual, Flow, full-screen Diff). Tree and Visual work with Search (Ctrl/Cmd+K). Icons here: Search, Share (needs JSON), Theme (Ctrl/Cmd+L), Settings. New editor tab: Ctrl/Cmd+T. Other tools are in the left sidebar."
           label="About the header and view modes"
-          side="bottom"
+          side="top"
           className="self-center mr-0.5"
         />
         <AppButton

@@ -19,14 +19,24 @@ interface JsonEditorProps {
   error: string | null;
   dark: boolean;
   editorSettings?: EditorSettings;
+  onSearchOpen?: () => void;
 }
 
-export default function JsonEditor({ value, onChange, error, dark, editorSettings }: JsonEditorProps) {
+export default function JsonEditor({ value, onChange, error, dark, editorSettings, onSearchOpen }: JsonEditorProps) {
   const editorRef = useRef<any>(null);
+  const onSearchOpenRef = useRef(onSearchOpen);
+  useEffect(() => { onSearchOpenRef.current = onSearchOpen; }, [onSearchOpen]);
 
-  const handleMount = useCallback((editor: any) => {
+  const handleMount = useCallback((editor: any, monaco: any) => {
     editorRef.current = editor;
     editor.focus();
+    // Redirect Monaco's built-in Ctrl+F / Ctrl+H to our custom search panel
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, () => {
+      onSearchOpenRef.current?.();
+    });
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyH, () => {
+      onSearchOpenRef.current?.();
+    });
   }, []);
 
   useEffect(() => {

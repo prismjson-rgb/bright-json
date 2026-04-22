@@ -453,6 +453,10 @@ export default function JsonViewerClient() {
         if (settingsOpen) { setSettingsOpen(false); return; }
         if (mode !== "tree" && mode !== "visual") { setMode("tree"); setSearchOpen(false); }
         else if (searchOpen) { setSearchOpen(false); setQuery(""); }
+      } else if (mod && !e.shiftKey && e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        setMode("tree");
+        setSearchOpen(true);
       } else if (mod && e.shiftKey && e.key.toLowerCase() === "f") {
         e.preventDefault(); format({ indent: settings.format.beautifyIndent, sortKeys: settings.format.sortKeysOnBeautify });
       } else if (mod && e.key.toLowerCase() === "m") {
@@ -701,7 +705,7 @@ export default function JsonViewerClient() {
                 <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
               </div>
               <div className="flex-1 min-h-0 relative">
-                <JsonEditor value={json} onChange={setJson} error={error} dark={dark} editorSettings={settings.editor} />
+                <JsonEditor value={json} onChange={setJson} error={error} dark={dark} editorSettings={settings.editor} onSearchOpen={() => { setMode("tree"); setSearchOpen(true); }} />
                 {!hasJson && (
                   <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center p-6 text-center">
                     <div className="max-w-[280px] bg-surface1/60 backdrop-blur-md border border-border/80 rounded-xl p-6 shadow-sm text-sm text-foreground/80 pointer-events-auto cursor-default">
