@@ -9,20 +9,20 @@ export function ToolIndexPage() {
 
   return (
     <SiteLayout activeNav="tools">
-      <main className="mx-auto max-w-7xl px-6 py-20">
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-20">
         {content.heroEyebrow && (
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
             {content.heroEyebrow}
           </p>
         )}
-        <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white">
+        <h1 className="mt-4 text-3xl sm:text-5xl font-semibold tracking-tight text-white">
           {content.heroTitle || content.title}
         </h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
+        <p className="mt-6 max-w-3xl text-base sm:text-lg leading-8 text-slate-300">
           {content.heroDescription}
         </p>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
           {tools.map((tool) => (
             <Link
               key={tool.slug}

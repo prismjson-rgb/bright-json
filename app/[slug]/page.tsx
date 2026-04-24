@@ -69,9 +69,9 @@ export default async function StaticPageRoute({
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
       />
 
-      <main className="mx-auto max-w-4xl px-6 py-16">
+      <main className="mx-auto max-w-4xl px-4 sm:px-6 py-10 sm:py-16">
         <article className="max-w-3xl">
-          <h1 className="text-4xl font-semibold tracking-tight text-white mb-10">
+          <h1 className="text-2xl sm:text-4xl font-semibold tracking-tight text-white mb-8 sm:mb-10">
             {page.title}
           </h1>
           <MarkdownArticleBody content={page.contentMarkdown} />

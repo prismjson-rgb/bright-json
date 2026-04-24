@@ -16,13 +16,13 @@ export function HomePageSEOContent() {
     <div className="bg-[linear-gradient(180deg,_#07111b_0%,_#0b1320_100%)] text-white">
       <h1 className="sr-only">JSON Prism — Free JSON Formatter, Validator &amp; Workspace</h1>
       {/* Tool grid */}
-      <section className="mx-auto max-w-7xl px-6 py-20">
-        <div className="mb-10 flex items-end justify-between gap-6">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-20">
+        <div className="mb-8 sm:mb-10 flex items-end justify-between gap-6">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
               All tools
             </p>
-            <h2 className="mt-3 text-3xl font-semibold text-white">
+            <h2 className="mt-3 text-2xl sm:text-3xl font-semibold text-white">
               {tools.length} JSON tools in one workspace
             </h2>
           </div>
@@ -62,13 +62,13 @@ export function HomePageSEOContent() {
 
       {/* Learn articles */}
       {learnSections.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 py-20">
-          <div className="mb-10 flex items-end justify-between gap-6">
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-20">
+          <div className="mb-8 sm:mb-10 flex items-end justify-between gap-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
                 JSON tutorials
               </p>
-              <h2 className="mt-3 text-3xl font-semibold text-white">
+              <h2 className="mt-3 text-2xl sm:text-3xl font-semibold text-white">
                 Learn JSON from basics to advanced
               </h2>
             </div>
@@ -97,8 +97,8 @@ export function HomePageSEOContent() {
 
       {/* FAQ */}
       {home.faqs.length > 0 && (
-        <section className="mx-auto max-w-3xl px-6 pb-24">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 sm:p-10">
+        <section className="mx-auto max-w-3xl px-4 sm:px-6 pb-16 sm:pb-24">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-10">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
               Frequently asked questions
             </p>

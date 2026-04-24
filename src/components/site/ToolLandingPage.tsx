@@ -14,7 +14,7 @@ function ToolPreview({ title, appHref }: { title: string; appHref?: string }) {
           <span className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
             Deep link
           </span>
-          <span className="text-xs text-slate-400">{appHref}</span>
+          <span className="text-xs text-slate-400 truncate max-w-[12rem]">{appHref}</span>
         </div>
         <div className="rounded-2xl border border-white/10 bg-slate-950 px-4 py-5">
           <p className="text-sm font-semibold text-white">{title}</p>
@@ -32,16 +32,16 @@ function ToolPreview({ title, appHref }: { title: string; appHref?: string }) {
 export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolFaq[] }) {
   return (
     <SiteLayout activeNav="tools">
-      <div className="mx-auto max-w-6xl px-6 py-20">
-        <div className="grid gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-20">
+        <div className="grid gap-10 lg:gap-14 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
               {tool.badge || tool.category || "Tool page"}
             </p>
-            <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white">
+            <h1 className="mt-4 text-3xl sm:text-5xl font-semibold tracking-tight text-white">
               {tool.title}
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+            <p className="mt-6 max-w-2xl text-base sm:text-lg leading-8 text-slate-300">
               {tool.summary || tool.metaDescription}
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
@@ -75,8 +75,8 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
           <ToolPreview title={tool.title} appHref={tool.appHref} />
         </div>
 
-        <section className="mt-16 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
+        <section className="mt-12 sm:mt-16 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-8">
             <MarkdownArticleBody content={tool.contentMarkdown} />
           </div>
           <aside className="space-y-6">
@@ -110,11 +110,11 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
           </aside>
         </section>
 
-        <section className="mt-16 rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
+        <section className="mt-12 sm:mt-16 rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
             Tool Q&A
           </p>
-          <h2 className="mt-4 text-3xl font-semibold text-white">
+          <h2 className="mt-4 text-2xl sm:text-3xl font-semibold text-white">
             Questions people ask before opening {tool.title}
           </h2>
           <div className="mt-8">

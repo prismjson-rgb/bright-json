@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteHeader } from "@/components/site/SiteHeader";
 
 interface SiteLayoutProps {
   children: React.ReactNode;
@@ -14,46 +15,15 @@ export function SiteLayout({ children, activeNav }: SiteLayoutProps) {
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#07111b]/90 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-white hover:text-cyan-200 transition-colors focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:outline-none rounded">
-            JSON Prism
-          </Link>
-          <nav className="flex items-center gap-6 text-sm text-slate-300">
-            <Link
-              href="/tools/"
-              className={`transition-colors hover:text-cyan-200 focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:outline-none rounded ${activeNav === "tools" ? "text-cyan-200 font-medium" : ""}`}
-            >
-              Tools
-            </Link>
-            <Link
-              href="/learn/"
-              className={`transition-colors hover:text-cyan-200 focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:outline-none rounded ${activeNav === "learn" ? "text-cyan-200 font-medium" : ""}`}
-            >
-              Learn
-            </Link>
-            <Link
-              href="/about/"
-              className={`transition-colors hover:text-cyan-200 focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:outline-none rounded ${activeNav === "about" ? "text-cyan-200 font-medium" : ""}`}
-            >
-              About
-            </Link>
-            <Link
-              href="/"
-              className="rounded-full bg-cyan-300 px-4 py-2 font-medium text-slate-950 transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:outline-none"
-            >
-              Open App
-            </Link>
-          </nav>
-        </div>
-      </header>
+
+      <SiteHeader activeNav={activeNav} />
 
       <main id="main-content">
         {children}
       </main>
 
       <footer className="border-t border-white/10 py-10 text-center text-sm text-slate-400">
-        <p className="flex items-center justify-center gap-4 flex-wrap">
+        <p className="flex items-center justify-center gap-3 flex-wrap px-4">
           <Link href="/" className="hover:text-cyan-200 transition-colors font-medium text-white">JSON Prism</Link>
           <span className="text-white/20">·</span>
           <Link href="/tools/" className="hover:text-cyan-200 transition-colors">Tools</Link>

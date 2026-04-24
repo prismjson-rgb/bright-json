@@ -109,7 +109,7 @@ export default async function LearnArticleRoute({
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
       />
 
-      <main className="mx-auto max-w-4xl px-6 py-12">
+      <main className="mx-auto max-w-4xl px-4 sm:px-6 py-8 sm:py-12">
         {levelInfo && (
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200 mb-6">
             {levelInfo.label}
