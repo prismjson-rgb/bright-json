@@ -34,7 +34,7 @@ function CodeBlock({
     }
     if (typeof window !== "undefined") {
       const encoded = encodeJson(code);
-      const url = window.location.origin + "/#json=" + encoded;
+      const url = window.location.origin + "/app/#json=" + encoded;
       if (!isTooLarge(url)) {
         window.location.href = url;
       }
@@ -76,7 +76,10 @@ export function MarkdownArticleBody({
             <p className="text-sm leading-relaxed">{children}</p>
           ),
           ul: ({ children }) => (
-            <ul className="space-y-2 list-disc list-inside">{children}</ul>
+            <ul className="space-y-1 list-disc list-inside">{children}</ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="space-y-1 list-decimal list-inside">{children}</ol>
           ),
           li: ({ children }) => <li className="text-sm">{children}</li>,
           h2: ({ children }) => (
@@ -89,6 +92,39 @@ export function MarkdownArticleBody({
               {children}
             </h3>
           ),
+          a: ({ href, children }) => (
+            <a
+              href={href}
+              className="text-primary underline underline-offset-2 hover:opacity-80"
+            >
+              {children}
+            </a>
+          ),
+          strong: ({ children }) => (
+            <strong className="font-semibold text-foreground">{children}</strong>
+          ),
+          em: ({ children }) => (
+            <em className="italic">{children}</em>
+          ),
+          hr: () => <hr className="border-border my-4" />,
+          table: ({ children }) => (
+            <div className="overflow-x-auto my-4">
+              <table className="w-full text-sm border-collapse">{children}</table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="border-b border-border">{children}</thead>
+          ),
+          tbody: ({ children }) => <tbody>{children}</tbody>,
+          tr: ({ children }) => (
+            <tr className="border-b border-border/50">{children}</tr>
+          ),
+          th: ({ children }) => (
+            <th className="px-3 py-2 text-left font-semibold text-foreground">{children}</th>
+          ),
+          td: ({ children }) => (
+            <td className="px-3 py-2 text-muted-foreground">{children}</td>
+          ),
           pre: ({ children }) => {
             const codeEl = React.Children.only(children) as React.ReactElement;
             const code = String(codeEl?.props?.children ?? "").replace(/\n$/, "");
@@ -98,16 +134,16 @@ export function MarkdownArticleBody({
             );
           },
           code: (props) => {
-            const { children, className } = props;
-            const inline = "inline" in props && (props as { inline?: boolean }).inline;
-            if (inline) {
+            const { children } = props;
+            const isInline = !("className" in props) || !String(props.className ?? "").startsWith("language-");
+            if (isInline) {
               return (
                 <code className="rounded bg-surface2 px-1 py-0.5 text-xs font-mono">
                   {children}
                 </code>
               );
             }
-            return <code className={className}>{children}</code>;
+            return <code className={String(props.className ?? "")}>{children}</code>;
           },
         }}
       >

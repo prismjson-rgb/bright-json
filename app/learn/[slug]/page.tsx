@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getTutorialSections,
@@ -7,6 +6,8 @@ import {
   LEARN_LEVELS,
 } from "@/lib/learn-content";
 import { LearnArticlePage } from "@/components/LearnArticlePage";
+import { SiteLayout } from "@/components/site/SiteLayout";
+import { safeJsonLd } from "@/lib/json-ld";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
@@ -38,13 +39,13 @@ export async function generateMetadata({
       type: "article",
       siteName: "JSON Prism",
       url: `${BASE}/learn/${slug}/`,
-      images: [{ url: `${BASE}/icons/icon-512.png`, width: 512, height: 512, alt: title }],
+      images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [`${BASE}/icons/icon-512.png`],
+      images: [`${BASE}/og-image.png`],
     },
     alternates: {
       canonical: `${BASE}/learn/${slug}/`,
@@ -74,9 +75,15 @@ export default async function LearnArticleRoute({
     headline: section.title,
     description: section.metaDescription || section.contentMarkdown.slice(0, 160),
     author: { "@type": "Organization", name: "JSON Prism" },
-    publisher: { "@type": "Organization", name: "JSON Prism" },
+    publisher: {
+      "@type": "Organization",
+      name: "JSON Prism",
+      url: `${BASE}/`,
+      logo: { "@type": "ImageObject", url: `${BASE}/icons/icon-512.png`, width: 512, height: 512 },
+    },
+    image: { "@type": "ImageObject", url: `${BASE}/og-image.png`, width: 1200, height: 630 },
     url: `${BASE}/learn/${slug}/`,
-    datePublished: "2025-12-01",
+    datePublished: section.publishedAt || "2025-12-01",
     dateModified: new Date().toISOString().split("T")[0],
     mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/learn/${slug}/` },
   };
@@ -92,35 +99,20 @@ export default async function LearnArticleRoute({
   };
 
   return (
-    <div className="min-h-screen bg-bg">
+    <SiteLayout activeNav="learn">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
       />
 
-      <header className="border-b border-border bg-surface1 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-foreground hover:opacity-80 transition-opacity"
-          >
-            <span className="font-semibold">JSON Prism</span>
-            <span className="text-muted-foreground text-sm">/ Learn</span>
-          </Link>
-          <Link href="/learn/" className="text-sm text-primary hover:underline">
-            ← All tutorials
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+      <main className="mx-auto max-w-4xl px-6 py-12">
         {levelInfo && (
-          <p className="text-sm text-muted-foreground mb-4">
-            {levelInfo.label} · {section.title}
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200 mb-6">
+            {levelInfo.label}
           </p>
         )}
         <LearnArticlePage
@@ -129,21 +121,6 @@ export default async function LearnArticleRoute({
           next={next ? { id: next.id, title: next.title } : undefined}
         />
       </main>
-
-      <footer className="border-t border-border mt-16 py-8 text-center text-sm text-muted-foreground">
-        <p>
-          Part of{" "}
-          <Link href="/" className="text-primary hover:underline">
-            JSON Prism
-          </Link>
-          — Format, validate, diff, and explore JSON. No data stored. Works offline.
-        </p>
-        <p className="mt-2">
-          <Link href="/learn/" className="text-primary hover:underline">
-            Browse all JSON tutorials →
-          </Link>
-        </p>
-      </footer>
-    </div>
+    </SiteLayout>
   );
 }

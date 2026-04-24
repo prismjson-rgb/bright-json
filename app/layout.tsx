@@ -18,45 +18,13 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "600"],
 });
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
-
-const SITE_TITLE = "JSON Prism — Free Online JSON Formatter, Viewer & Diff Tool";
-const SITE_DESCRIPTION =
-  "Free browser-based JSON formatter, validator, tree viewer, graph view, diff, debugger, and YAML/XML/CSV converter. Nothing is uploaded by default.";
-
 export const metadata: Metadata = {
-  title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
-  authors: [{ name: "JSON Prism" }],
-  alternates: {
-    canonical: `${BASE}/`,
-  },
-  openGraph: {
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    type: "website",
-    siteName: "JSON Prism",
-    url: `${BASE}/`,
-    images: [
-      {
-        url: `${BASE}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: "JSON Prism — format, validate, diff, and explore JSON in your browser",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: [`${BASE}/og-image.png`],
-  },
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.ico",
     apple: "/icons/icon-192.png",
   },
+  authors: [{ name: "JSON Prism" }],
 };
 
 export default function RootLayout({
@@ -67,7 +35,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Prevent flash of unstyled content: apply dark class before first paint */}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('json-viewer-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}})()`,
@@ -81,7 +48,6 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-WMZSRR3M"
@@ -95,10 +61,9 @@ export default function RootLayout({
           {children}
           <Toaster />
         </Providers>
-        {/* GTM loads after page is interactive to avoid blocking TBT/TTI */}
         <Script
           id="gtm"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

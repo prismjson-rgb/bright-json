@@ -50,6 +50,7 @@ import { repairJson } from "@/lib/json-debug";
 import { safeDecodeJsonAsync } from "@/lib/share";
 import { fetchTextViaGet } from "@/lib/fetch-json-url";
 import { saveJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
+import { getToolLaunchConfig, type ToolLaunchConfig } from "@/lib/tool-links";
 import {
   loadTabs,
   saveTabs,
@@ -119,6 +120,7 @@ export default function JsonViewerClient() {
   const [saved, setSaved] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
+  const [launchConfig, setLaunchConfig] = useState<ToolLaunchConfig | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileDragOver, setFileDragOver] = useState(false);
 
@@ -168,6 +170,20 @@ export default function JsonViewerClient() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const tool = params.get("tool");
+    if (!tool) return;
+
+    const config = getToolLaunchConfig(tool);
+    if (!config) return;
+
+    setLaunchConfig(config);
+    if (config.mode) setMode(config.mode);
+    if (config.opensShare) setShareOpen(true);
   }, []);
 
   // Debounced persist — avoids blocking the main thread on every keystroke
@@ -705,9 +721,19 @@ export default function JsonViewerClient() {
                 <JsonEditor value={json} onChange={setJson} error={error} dark={dark} editorSettings={settings.editor} onSearchOpen={() => { setMode("tree"); setSearchOpen(true); }} />
                 {!hasJson && (
                   <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center p-6 text-center">
-                    <div className="max-w-[280px] bg-surface1/60 backdrop-blur-md border border-border/80 rounded-xl p-6 shadow-sm text-sm text-foreground/80 pointer-events-auto cursor-default">
-                      <p className="font-medium mb-4 text-[13px]">Editor is empty</p>
-                      <div className="text-xs text-muted-foreground flex flex-col gap-2">
+                      <div className="max-w-[280px] bg-surface1/60 backdrop-blur-md border border-border/80 rounded-xl p-6 shadow-sm text-sm text-foreground/80 pointer-events-auto cursor-default">
+                        <p className="font-medium mb-4 text-[13px]">Editor is empty</p>
+                        {launchConfig && (
+                          <div className="mb-4 rounded-lg border border-primary/25 bg-primary/10 px-3 py-2 text-left">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
+                              {launchConfig.title} ready
+                            </p>
+                            <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
+                              {launchConfig.hint}
+                            </p>
+                          </div>
+                        )}
+                        <div className="text-xs text-muted-foreground flex flex-col gap-2">
                         <AppButton
                           variant="ghost"
                           onClick={() => fileRef.current?.click()}

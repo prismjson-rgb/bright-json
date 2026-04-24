@@ -3,25 +3,104 @@ title: JSON vs XML vs CSV
 level: beginner
 order: 2
 keyTerms: []
+publishedAt: "2025-12-08"
 ---
 
-JSON is often compared to XML and CSV. XML uses tags and is verbose; JSON is more compact. CSV is flat and great for spreadsheets but poor for nested data. JSON sits in the middle: readable, hierarchical, and widely supported in every programming language.
+JSON, XML, and CSV are the three most common data interchange formats in software. Each has clear strengths and weaknesses. Choosing the right one for your use case saves integration headaches later.
 
-```text
-// XML (verbose)
-<user>
-  <name>Alice</name>
-  <age>30</age>
-</user>
+## The same data in all three formats
 
-// JSON (compact)
-{"name": "Alice", "age": 30}
+Here is a list of two users represented in each format:
 
-// CSV (flat only)
-name,age
-Alice,30
+XML:
+
+```xml
+<users>
+  <user>
+    <name>Alice</name>
+    <age>30</age>
+    <email>alice@example.com</email>
+  </user>
+  <user>
+    <name>Bob</name>
+    <age>25</age>
+    <email>bob@example.com</email>
+  </user>
+</users>
 ```
 
-- JSON: compact, hierarchical, universal support
-- XML: verbose, schema-rich, legacy systems
-- CSV: flat, spreadsheet-friendly, no nesting
+JSON:
+
+```json
+[
+  {"name": "Alice", "age": 30, "email": "alice@example.com"},
+  {"name": "Bob", "age": 25, "email": "bob@example.com"}
+]
+```
+
+CSV:
+
+```
+name,age,email
+Alice,30,alice@example.com
+Bob,25,bob@example.com
+```
+
+JSON is typically 40–60% smaller than XML for the same data.
+
+## When to use JSON
+
+- REST APIs and web services — JSON is the universal default
+- Configuration files — readable and writable by humans and machines
+- Browser-side data storage — `localStorage`, `IndexedDB`
+- Nested or hierarchical data — JSON handles this naturally
+- Any modern language ecosystem — every language has a JSON library
+
+```json
+{
+  "order": {
+    "id": "ORD-001",
+    "items": [
+      {"sku": "A1", "qty": 2},
+      {"sku": "B3", "qty": 1}
+    ],
+    "total": 59.97
+  }
+}
+```
+
+## When to use XML
+
+- SOAP web services and enterprise integrations
+- Documents with mixed content (text + markup), like XHTML
+- Systems requiring namespaces, DTD, or XSD schema validation
+- Legacy systems that predate JSON's rise (pre-2005)
+- SVG and other XML-based file formats
+
+XML has richer tooling for schema validation (XSD) and transformation (XSLT), which matters in formal enterprise contexts.
+
+## When to use CSV
+
+- Exporting tabular data to spreadsheets (Excel, Google Sheets)
+- Simple flat data with no nesting
+- Data science and analytics pipelines where each row is an observation
+- Bulk imports/exports from databases
+- Files that non-developers need to edit in a spreadsheet tool
+
+CSV cannot represent nested structures at all. A product with multiple categories has no natural CSV representation without denormalizing.
+
+## Quick comparison table
+
+| Feature | JSON | XML | CSV |
+|---------|------|-----|-----|
+| Human-readable | Good | Verbose | Good |
+| Supports nesting | Yes | Yes | No |
+| Comments | No | Yes | No |
+| Schema support | JSON Schema | XSD / DTD | None |
+| File size | Small | Large | Smallest |
+| Browser native | Yes | Yes (DOM) | No |
+| Spreadsheet-friendly | No | No | Yes |
+
+## Try it in JSON Prism
+
+Need to convert between these formats? The [JSON Converter](/tools/json-converter/) handles JSON-to-CSV, JSON-to-XML, and the reverse — no manual reformatting required. For a look at other alternatives beyond these three, see [JSON Alternatives](/learn/json-alternatives/).

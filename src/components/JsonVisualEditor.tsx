@@ -54,17 +54,17 @@ function setAtPath(data: unknown, path: string[], value: unknown): unknown {
   const [head, ...rest] = path;
   const current = data as Record<string, unknown> | unknown[];
   const isArray = Array.isArray(current);
-  const key = isArray ? parseInt(head, 10) : head;
+  const numKey = parseInt(head, 10);
   const next = isArray ? [...(current as unknown[])] : { ...(current as Record<string, unknown>) };
   if (rest.length === 0) {
-    if (isArray) (next as unknown[])[key] = value;
-    else (next as Record<string, unknown>)[key] = value;
+    if (isArray) (next as unknown[])[numKey] = value;
+    else (next as Record<string, unknown>)[head] = value;
     return next;
   }
-  const child = isArray ? (current as unknown[])[key] : (current as Record<string, unknown>)[key];
+  const child = isArray ? (current as unknown[])[numKey] : (current as Record<string, unknown>)[head];
   const updated = setAtPath(child, rest, value);
-  if (isArray) (next as unknown[])[key] = updated;
-  else (next as Record<string, unknown>)[key] = updated;
+  if (isArray) (next as unknown[])[numKey] = updated;
+  else (next as Record<string, unknown>)[head] = updated;
   return next;
 }
 
@@ -83,12 +83,12 @@ function deleteAtPath(data: unknown, path: string[]): unknown {
   const [head, ...rest] = path;
   const current = data as Record<string, unknown> | unknown[];
   const isArray = Array.isArray(current);
-  const key = isArray ? parseInt(head, 10) : head;
+  const numKey = parseInt(head, 10);
   const next = isArray ? [...(current as unknown[])] : { ...(current as Record<string, unknown>) };
-  const child = isArray ? (current as unknown[])[key] : (current as Record<string, unknown>)[key];
+  const child = isArray ? (current as unknown[])[numKey] : (current as Record<string, unknown>)[head];
   const updated = deleteAtPath(child, rest);
-  if (isArray) (next as unknown[])[key] = updated;
-  else (next as Record<string, unknown>)[key] = updated;
+  if (isArray) (next as unknown[])[numKey] = updated;
+  else (next as Record<string, unknown>)[head] = updated;
   return next;
 }
 

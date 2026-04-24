@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import BundleViewerWrapper from "@/components/BundleViewerWrapper";
+import { safeJsonLd } from "@/lib/json-ld";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
@@ -15,12 +16,14 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "JSON Prism",
     url: `${BASE}/bundle/`,
+    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: "JSON Bundle Viewer" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "JSON Bundle Viewer — JSON Prism",
     description:
       "View and explore a shared JSON bundle. Runs entirely in your browser.",
+    images: [`${BASE}/og-image.png`],
   },
 };
 
@@ -38,7 +41,7 @@ export default function BundlePage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(BREADCRUMB_LD) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(BREADCRUMB_LD) }}
       />
       <BundleViewerWrapper />
     </>

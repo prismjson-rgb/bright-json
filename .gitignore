@@ -31,3 +31,6 @@ coverage/
 
 # TypeScript incremental build info
 tsconfig.tsbuildinfo
+
+# Generated content — do not commit, run npm run generate:content
+src/lib/*.generated.ts

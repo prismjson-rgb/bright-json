@@ -1,54 +1,44 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  LEARN_LEVELS,
-  getSectionsByLevel,
-  getTutorialSections,
-} from "@/lib/learn-content";
+import { LEARN_LEVELS, getSectionsByLevel, getTutorialSections } from "@/lib/learn-content";
+import { getLearnIndexContent } from "@/lib/site-content";
+import { SiteLayout } from "@/components/site/SiteLayout";
+import { safeJsonLd } from "@/lib/json-ld";
 
-const TITLE = "JSON Tutorial — Complete Guide from Beginner to Expert | JSON Prism";
-const DESCRIPTION =
-  "Master JSON free. 18 articles: basics, data types, REST APIs, JSON Schema, JSONPath, security, and more. Each topic has its own page for focused learning.";
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
+const content = getLearnIndexContent();
+
+const TITLE = `${content.heroTitle || content.title} | JSON Prism`;
+const DESCRIPTION = content.heroDescription || "Master JSON with focused tutorials covering basics, APIs, JSON Schema, JSONPath, and more.";
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  keywords: [
-    "JSON tutorial",
-    "learn JSON",
-    "JSON for beginners",
-    "JSON syntax",
-    "JSON data types",
-    "JSON Schema",
-    "JSONPath",
-    "REST API JSON",
-  ],
+  keywords: ["JSON tutorial", "learn JSON", "JSON for beginners", "JSON syntax", "JSON data types", "JSON Schema", "JSONPath", "REST API JSON"],
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
     type: "website",
     siteName: "JSON Prism",
-    url: `${process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com"}/learn/`,
+    url: `${BASE}/learn/`,
+    images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: TITLE }],
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
+    images: [`${BASE}/og-image.png`],
   },
-  alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com"}/learn/`,
-  },
+  alternates: { canonical: `${BASE}/learn/` },
 };
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
-
-const JSON_LD_COURSE = {
+const courseLd = {
   "@context": "https://schema.org",
   "@type": "Course",
-  name: "Complete JSON Tutorial — From Beginner to Expert",
+  name: content.heroTitle || "Complete JSON Tutorial — From Beginner to Expert",
   description: DESCRIPTION,
   provider: { "@type": "Organization", name: "JSON Prism", url: `${BASE}/` },
-  hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: "PT1H" },
+  hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: "PT5H" },
   hasPart: getTutorialSections().map((s) => ({
     "@type": "LearningResource",
     name: s.title,
@@ -56,72 +46,74 @@ const JSON_LD_COURSE = {
   })),
 };
 
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
+    { "@type": "ListItem", position: 2, name: "Learn JSON", item: `${BASE}/learn/` },
+  ],
+};
+
 export default function LearnIndexPage() {
   return (
-    <div className="min-h-screen bg-bg">
+    <SiteLayout activeNav="learn">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD_COURSE) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(courseLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
       />
 
-      <header className="border-b border-border bg-surface1 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-foreground hover:opacity-80 transition-opacity"
-          >
-            <span className="font-semibold">JSON Prism</span>
-            <span className="text-muted-foreground text-sm">/ Learn</span>
-          </Link>
-          <Link href="/" className="text-sm text-primary hover:underline">
-            ← Back to JSON Tools
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        <header className="mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight mb-4">
-            Complete JSON Tutorial — From Beginner to Expert
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            Master JSON (JavaScript Object Notation) from the ground up. Each topic has its own
-            page — pick one below or follow the learning path in order.
+      <main className="mx-auto max-w-4xl px-6 py-20">
+        {content.heroEyebrow && (
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
+            {content.heroEyebrow}
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {["JSON basics", "REST APIs", "JSON Schema", "JSONPath", "Security"].map((tag) => (
+        )}
+        <h1 className="mt-4 text-5xl font-semibold tracking-tight text-white">
+          {content.heroTitle || content.title}
+        </h1>
+        <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+          {content.heroDescription}
+        </p>
+        {content.tags.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {content.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary"
+                className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-medium text-cyan-100"
               >
                 {tag}
               </span>
             ))}
           </div>
-        </header>
+        )}
 
-        <nav aria-label="Tutorial index" className="space-y-10">
+        <nav aria-label="Tutorial index" className="mt-14 space-y-12">
           {LEARN_LEVELS.map((level, levelIdx) => {
             const sections = getSectionsByLevel(level.id);
             if (sections.length === 0) return null;
             return (
               <section key={level.id}>
-                <h2 className="text-xl font-semibold text-foreground mb-2 border-b border-border pb-2">
+                <h2 className="text-xl font-semibold text-white pb-3 border-b border-white/10">
                   {levelIdx + 1}. {level.label}
                 </h2>
-                <p className="text-sm text-muted-foreground mb-4">{level.description}</p>
-                <ul className="space-y-2">
+                <p className="mt-2 mb-5 text-sm text-slate-400">{level.description}</p>
+                <ul className="space-y-3">
                   {sections.map((s) => (
                     <li key={s.id}>
                       <Link
                         href={`/learn/${s.id}/`}
-                        className="block p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-primary/5 transition-colors group"
+                        className="block rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-cyan-300/40 hover:bg-cyan-300/[0.05] group"
                       >
-                        <span className="font-medium text-foreground group-hover:text-primary">
+                        <span className="font-semibold text-white group-hover:text-cyan-200 transition-colors">
                           {s.title}
                         </span>
                         {s.metaDescription && (
-                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                          <p className="text-sm text-slate-400 mt-1 line-clamp-2">
                             {s.metaDescription}
                           </p>
                         )}
@@ -134,28 +126,17 @@ export default function LearnIndexPage() {
           })}
         </nav>
 
-        <div className="mt-12 p-4 rounded-xl bg-surface2 border border-border">
-          <h3 className="text-sm font-semibold text-foreground mb-2">Why separate pages?</h3>
-          <p className="text-sm text-muted-foreground">
-            Each tutorial topic has its own URL for better SEO and focused learning. You can share
-            a specific article, bookmark it, or let search engines index it. Start with{" "}
-            <Link href="/learn/what-is-json/" className="text-primary hover:underline">
-              What is JSON?
-            </Link>{" "}
-            or jump to any topic above.
-          </p>
-        </div>
+        {(content.whyTitle || content.whyBody) && (
+          <div className="mt-14 rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
+            {content.whyTitle && (
+              <h3 className="text-sm font-semibold text-white mb-2">{content.whyTitle}</h3>
+            )}
+            {content.whyBody && (
+              <p className="text-sm text-slate-400">{content.whyBody}</p>
+            )}
+          </div>
+        )}
       </main>
-
-      <footer className="border-t border-border mt-16 py-8 text-center text-sm text-muted-foreground">
-        <p>
-          Part of{" "}
-          <Link href="/" className="text-primary hover:underline">
-            JSON Prism
-          </Link>
-          — Format, validate, diff, and explore JSON. No data stored. Works offline.
-        </p>
-      </footer>
-    </div>
+    </SiteLayout>
   );
 }

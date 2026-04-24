@@ -49,7 +49,7 @@ export function jsonToCsv(parsed: unknown): string {
   const csvRows = [
     headers.map(escapeCell).join(","),
     ...flatRows.map((row) =>
-      headers.map((h) => escapeCell(row[h])).join(",")
+      headers.map((h) => escapeCell((row as Record<string, unknown>)[h])).join(",")
     ),
   ];
 

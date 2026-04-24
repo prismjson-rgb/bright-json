@@ -18,9 +18,8 @@ import {
   Edit3,
   Check,
 } from "lucide-react";
-import { remark } from "remark";
 import remarkGfm from "remark-gfm";
-import remarkHtml from "remark-html";
+import ReactMarkdown from "react-markdown";
 import { InfoHelp } from "@/components/app/InfoHelp";
 import { MODES } from "@/lib/modes";
 
@@ -53,9 +52,8 @@ function ToolBtn({
 
 export default function JsonNoteEditorInner() {
   const [previewMode, setPreviewMode] = useState(false);
-  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewText, setPreviewText] = useState("");
   const [copied, setCopied] = useState(false);
-  const [markdownInput, setMarkdownInput] = useState("");
 
   const editor = useEditor({
     extensions: [
@@ -95,20 +93,10 @@ export default function JsonNoteEditorInner() {
     URL.revokeObjectURL(url);
   };
 
-  const handlePreview = async () => {
+  const handlePreview = () => {
     if (!editor) return;
     if (!previewMode) {
-      // Convert Tiptap text to HTML via remark for preview
-      const text = editor.getText();
-      try {
-        const result = await remark()
-          .use(remarkGfm)
-          .use(remarkHtml)
-          .process(text);
-        setPreviewHtml(String(result));
-      } catch {
-        setPreviewHtml(`<pre>${text}</pre>`);
-      }
+      setPreviewText(editor.getText());
     }
     setPreviewMode((p) => !p);
   };
@@ -205,10 +193,11 @@ export default function JsonNoteEditorInner() {
       {/* Editor content */}
       <div className="flex-1 min-h-0 overflow-auto">
         {previewMode ? (
-          <div
-            className="prose prose-sm dark:prose-invert max-w-none p-4 h-full"
-            dangerouslySetInnerHTML={{ __html: previewHtml }}
-          />
+          <div className="prose prose-sm dark:prose-invert max-w-none p-4 h-full">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {previewText}
+            </ReactMarkdown>
+          </div>
         ) : (
           <div className="tiptap-editor h-full">
             <EditorContent editor={editor} className="h-full" />

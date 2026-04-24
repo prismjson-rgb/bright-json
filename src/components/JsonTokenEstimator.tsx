@@ -76,7 +76,7 @@ export default function JsonTokenEstimator({ json, parsed }: { json: string; par
           </div>
 
           {/* Format comparison */}
-          {parsed && (
+          {!!parsed && (
             <div>
               <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 block">Format Comparison</label>
               <div className="space-y-2">
