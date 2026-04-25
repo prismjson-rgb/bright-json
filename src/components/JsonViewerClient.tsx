@@ -544,25 +544,25 @@ export default function JsonViewerClient() {
 
   return (
     <div className="flex flex-col h-screen bg-bg">
-      {!isMobile && <AppHeader {...headerProps} />}
+      <div className="hidden md:contents">
+        <AppHeader {...headerProps} />
+      </div>
 
       <div className="flex flex-1 min-h-0 bg-grad-hero bg-bg">
-        {!isMobile && !railCollapsed && (
-          <LeftRail {...railProps} collapsed={false} />
-        )}
+        <div className="hidden md:contents">
+          {!railCollapsed && <LeftRail {...railProps} collapsed={false} />}
+        </div>
 
-        {isMobile && (
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetContent side="left" className="w-[min(100vw-2rem,16rem)] min-w-[11rem] p-0 gap-0 border-r border-border bg-surface1 overflow-hidden [&>button]:hidden">
-              <SheetTitle className="sr-only">Navigation menu</SheetTitle>
-              <LeftRail {...railProps} onClose={() => setMobileMenuOpen(false)} />
-            </SheetContent>
-          </Sheet>
-        )}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetContent side="left" className="w-[min(100vw-2rem,16rem)] min-w-[11rem] p-0 gap-0 border-r border-border bg-surface1 overflow-hidden [&>button]:hidden">
+            <SheetTitle className="sr-only">Navigation menu</SheetTitle>
+            <LeftRail {...railProps} onClose={() => setMobileMenuOpen(false)} />
+          </SheetContent>
+        </Sheet>
 
         {layout === "focused" && mode === "diff" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            {isMobile && (
+            <div className="md:hidden">
               <MobileHeader
                 mode={mode}
                 onOpenMenu={() => setMobileMenuOpen(true)}
@@ -574,7 +574,7 @@ export default function JsonViewerClient() {
                 settingsActive={settingsOpen}
                 hasJson={hasJson}
               />
-            )}
+            </div>
             <div className="pane-header">
               <span className="inline-flex items-center gap-1">
                 Diff Viewer
@@ -589,7 +589,7 @@ export default function JsonViewerClient() {
 
         {layout === "focused" && mode === "clean" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            {isMobile && (
+            <div className="md:hidden">
               <MobileHeader
                 mode={mode}
                 onOpenMenu={() => setMobileMenuOpen(true)}
@@ -601,14 +601,14 @@ export default function JsonViewerClient() {
                 settingsActive={settingsOpen}
                 hasJson={hasJson}
               />
-            )}
+            </div>
             <JsonAiCleaner onUseJson={handleUseJson} dark={dark} />
           </main>
         )}
 
         {layout === "split" && (
           <main className="flex flex-1 min-h-0 flex-col md:flex-row min-w-0 overflow-y-auto md:overflow-visible">
-            {isMobile && (
+            <div className="md:hidden">
               <MobileHeader
                 mode={mode}
                 onOpenMenu={() => setMobileMenuOpen(true)}
@@ -620,7 +620,7 @@ export default function JsonViewerClient() {
                 settingsActive={settingsOpen}
                 hasJson={hasJson}
               />
-            )}
+            </div>
             <section
               className="flex flex-col min-w-0 border-r border-border bg-surface1 min-h-[70vh] md:flex-1 md:min-h-0 shrink-0 relative"
               onDragEnter={onEditorDragEnter}
