@@ -1,5 +1,6 @@
 ---
 title: JSON vs XML vs CSV
+metaDescription: "Compare JSON, XML, and CSV with examples, strengths, limitations, and guidance on when to use each data format."
 level: beginner
 order: 2
 keyTerms: []

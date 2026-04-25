@@ -1,5 +1,6 @@
 ---
 title: "Performance: Large JSON Files"
+metaDescription: "Learn how to handle large JSON files with streaming parsers, Web Workers, pagination, compression, and payload reduction."
 level: advanced
 order: 16
 keyTerms: []

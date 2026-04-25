@@ -1,5 +1,6 @@
 ---
 title: Pretty Print vs Minified
+metaDescription: "Learn the difference between pretty-printed and minified JSON, when to use each format, and how formatting affects file size."
 level: practical
 order: 11
 keyTerms: []

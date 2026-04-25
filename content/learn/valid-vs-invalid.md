@@ -1,5 +1,6 @@
 ---
 title: Valid vs Invalid JSON
+metaDescription: "Learn what makes JSON valid or invalid, with examples of trailing commas, single quotes, comments, and unsupported values."
 level: comfortable
 order: 8
 keyTerms: []

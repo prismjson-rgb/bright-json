@@ -1,5 +1,6 @@
 ---
 title: Escaping and Special Characters
+metaDescription: "Learn how JSON escaping works for quotes, backslashes, newlines, tabs, Unicode characters, and other special string values."
 level: intermediate
 order: 13
 keyTerms: []

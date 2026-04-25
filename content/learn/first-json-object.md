@@ -1,5 +1,6 @@
 ---
 title: Your First JSON Object
+metaDescription: "Write your first JSON object with clear examples of keys, values, commas, data types, and common beginner mistakes."
 level: beginner
 order: 5
 tryExample: '{"name": "Your Name", "favoriteColor": "blue", "luckyNumber": 7}'

@@ -1,5 +1,6 @@
 ---
 title: "JSON Alternatives: When to Use What"
+metaDescription: "Compare JSON with JSON5, JSONC, YAML, TOML, MessagePack, Protobuf, and CBOR so you can choose the right data format."
 level: expert
 order: 18
 keyTerms: []

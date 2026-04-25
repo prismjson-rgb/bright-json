@@ -1,5 +1,6 @@
 ---
 title: Objects and Arrays in Depth
+metaDescription: "Understand JSON objects, arrays, nesting, ordered lists, key-value pairs, and practical patterns for structured data."
 level: comfortable
 order: 6
 keyTerms: []

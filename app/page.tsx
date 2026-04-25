@@ -8,14 +8,14 @@ import { safeJsonLd } from "@/lib/json-ld";
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
 export const metadata: Metadata = {
-  title: "JSON Prism — Free JSON Formatter, Validator, Diff & Workspace",
+  title: "JSON Prism - Free JSON Formatter, Validator, Diff & Workspace",
   description:
     "Free browser-based JSON workspace. Format, validate, diff, convert, and debug JSON instantly. No sign-up, no data upload, no install required.",
   alternates: {
     canonical: `${BASE}/`,
   },
   openGraph: {
-    title: "JSON Prism — Free JSON Formatter, Validator, Diff & Workspace",
+    title: "JSON Prism - Free JSON Formatter, Validator, Diff & Workspace",
     description:
       "Free browser-based JSON workspace. Format, validate, diff, convert, and debug JSON instantly.",
     type: "website",
@@ -26,13 +26,13 @@ export const metadata: Metadata = {
         url: `${BASE}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "JSON Prism — JSON workspace in your browser",
+        alt: "JSON Prism - JSON workspace in your browser",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "JSON Prism — Free JSON Formatter, Validator, Diff & Workspace",
+    title: "JSON Prism - Free JSON Formatter, Validator, Diff & Workspace",
     description:
       "Free browser-based JSON workspace. Format, validate, diff, convert, and debug JSON instantly.",
     images: [`${BASE}/og-image.png`],
@@ -96,10 +96,10 @@ export default function HomePage() {
         />
       )}
 
-      {/* App workspace — fills the viewport (h-screen) */}
+      {/* App workspace - fills the viewport (h-screen) */}
       <AppShell />
 
-      {/* SEO/AEO content — below the fold, visible on scroll */}
+      {/* SEO/AEO content - below the fold, visible on scroll */}
       <HomePageSEOContent />
     </>
   );

@@ -14,7 +14,7 @@ export function HomePageSEOContent() {
 
   return (
     <div className="bg-[linear-gradient(180deg,_#07111b_0%,_#0b1320_100%)] text-white">
-      <h1 className="sr-only">JSON Prism — Free JSON Formatter, Validator &amp; Workspace</h1>
+      <h1 className="sr-only">JSON Prism - Free JSON Formatter, Validator &amp; Workspace</h1>
       {/* Tool grid */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-12 sm:py-20">
         <div className="mb-8 sm:mb-10 flex items-end justify-between gap-6">
@@ -124,13 +124,13 @@ export function HomePageSEOContent() {
       <footer className="border-t border-white/10 py-10 text-center text-sm text-slate-400">
         <p className="flex items-center justify-center gap-4 flex-wrap">
           <Link href="/tools/" className="hover:text-cyan-200 transition-colors">Tools</Link>
-          <span className="text-white/20">·</span>
+          <span className="text-white/20">/</span>
           <Link href="/learn/" className="hover:text-cyan-200 transition-colors">Learn</Link>
-          <span className="text-white/20">·</span>
+          <span className="text-white/20">/</span>
           <Link href="/about/" className="hover:text-cyan-200 transition-colors">About</Link>
-          <span className="text-white/20">·</span>
+          <span className="text-white/20">/</span>
           <Link href="/privacy/" className="hover:text-cyan-200 transition-colors">Privacy</Link>
-          <span className="text-white/20">·</span>
+          <span className="text-white/20">/</span>
           <Link href="/terms/" className="hover:text-cyan-200 transition-colors">Terms</Link>
         </p>
         <p className="mt-3 text-xs text-slate-400">No data stored. Runs entirely in your browser.</p>
