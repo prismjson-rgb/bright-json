@@ -72,31 +72,34 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
             </div>
           </div>
 
-          <ToolPreview title={tool.title} appHref={tool.appHref} />
+          <div className="hidden lg:block">
+            <ToolPreview title={tool.title} appHref={tool.appHref} />
+          </div>
         </div>
 
-        <section className="mt-12 sm:mt-16 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-8">
+        <section className="mt-12 sm:mt-16 grid gap-10 lg:gap-14 lg:grid-cols-[1.15fr_0.85fr]">
+          <div>
             <MarkdownArticleBody content={tool.contentMarkdown} />
           </div>
-          <aside className="space-y-6">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
+          <aside className="space-y-8">
+            <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
                 Best for
               </p>
-              <ul className="mt-5 space-y-3 text-sm text-slate-300">
+              <ul className="mt-4 space-y-2 text-sm text-slate-300">
                 {tool.useCases.map((useCase) => (
-                  <li key={useCase} className="rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3">
+                  <li key={useCase} className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-cyan-300/60" />
                     {useCase}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
+            <div>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
                 Search targets
               </p>
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {tool.keywords.map((keyword) => (
                   <span
                     key={keyword}
@@ -110,7 +113,7 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
           </aside>
         </section>
 
-        <section className="mt-12 sm:mt-16 rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-8">
+        <section className="mt-12 sm:mt-16">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
             Tool Q&A
           </p>

@@ -8,7 +8,7 @@ interface SiteLayoutProps {
 
 export function SiteLayout({ children, activeNav }: SiteLayoutProps) {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.08),_transparent_30%),linear-gradient(180deg,_#07111b_0%,_#0b1320_100%)] text-white">
+    <div className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.08),_transparent_30%),linear-gradient(180deg,_#07111b_0%,_#0b1320_100%)] text-white">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cyan-300 focus:text-slate-950 focus:rounded-md focus:font-medium"

@@ -68,7 +68,7 @@ export function MarkdownArticleBody({
   onTryInEditor,
 }: MarkdownArticleBodyProps) {
   return (
-    <section className="prose prose-sm max-w-none text-muted-foreground space-y-4">
+    <section className="prose prose-sm max-w-none text-muted-foreground space-y-4 [overflow-wrap:break-word] [word-break:break-word]">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
