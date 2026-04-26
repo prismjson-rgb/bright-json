@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { X, Loader2, Play, TerminalSquare, Share2, Check } from "lucide-react";
 import { AppButton } from "@/components/app/AppButton";
 import { encodeCurlCmd } from "@/lib/share";
+import { createShortLink, isShortLinkConfigured, extractSharePayload } from "@/lib/short-link";
 
 interface CurlPanelProps {
   open: boolean;
@@ -37,8 +38,16 @@ export default function CurlPanel({ open, onClose, initialCommand, onRun }: Curl
     setShareState("sharing");
     try {
       const encoded = await encodeCurlCmd(command.trim());
-      const url = `${window.location.origin}/#curlcmd=${encoded}`;
-      await navigator.clipboard.writeText(url);
+      const fullUrl = `${window.location.origin}/#curlcmd=${encoded}`;
+      let urlToCopy = fullUrl;
+      if (isShortLinkConfigured()) {
+        const extracted = extractSharePayload(fullUrl);
+        if (extracted) {
+          const result = await createShortLink(extracted.kind, extracted.payload);
+          if (result.ok) urlToCopy = result.url;
+        }
+      }
+      await navigator.clipboard.writeText(urlToCopy);
       setShareState("copied");
       setTimeout(() => setShareState("idle"), 2000);
     } catch {
