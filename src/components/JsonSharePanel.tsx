@@ -5,9 +5,10 @@ import {
   FileCode, Package, Lock, ChevronDown, Sparkles, X, AlertTriangle,
   Loader2, Zap,
 } from "lucide-react";
-import { encodeJsonAsync, encodeBundleAsync, type BundleEntry } from "@/lib/share";
+import { encodeJsonAsync, encodeBundleAsync, encodeCurlShare, type BundleEntry } from "@/lib/share";
 import { generateHtml } from "@/lib/html-export";
-import type { TabData } from "@/lib/tabs-storage";
+import type { TabData, CurlMeta } from "@/lib/tabs-storage";
+import { TerminalSquare } from "lucide-react";
 import { AppButton } from "@/components/app/AppButton";
 import { InfoHelp } from "@/components/app/InfoHelp";
 import { MODES } from "@/lib/modes";
@@ -24,6 +25,7 @@ interface JsonSharePanelProps {
   onClose?: () => void;
   tabs?: TabData[];
   activeTabId?: string;
+  curlMeta?: CurlMeta;
 }
 
 type Section = "link" | "bundle" | "export";
@@ -57,7 +59,7 @@ function shortErrorMessage(r: Exclude<ShortLinkResult, { ok: true }>): string {
   }
 }
 
-export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [], activeTabId }: JsonSharePanelProps) {
+export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [], activeTabId, curlMeta }: JsonSharePanelProps) {
   const [open, setOpen] = useState<Section>("link");
   const [shareScope, setShareScope] = useState<"current" | "selected" | "all">("current");
   const [exportScope, setExportScope] = useState<"current" | "selected" | "all">("current");
@@ -117,9 +119,27 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
 
     (async () => {
       try {
-        const url = shareInput.kind === "bundle"
-          ? window.location.origin + "/bundle/#bundle=" + await encodeBundleAsync(shareInput.data)
-          : window.location.origin + "/#json=" + await encodeJsonAsync(shareInput.data);
+        let url: string;
+        if (shareInput.kind === "bundle") {
+          url = window.location.origin + "/bundle/#bundle=" + await encodeBundleAsync(shareInput.data);
+        } else if (curlMeta && shareScope !== "all" && shareScope !== "selected") {
+          // Encode as curl share when active tab is a curl tab and sharing current only
+          const encoded = await encodeCurlShare({
+            curl: curlMeta.command,
+            json: shareInput.data,
+            meta: {
+              method: curlMeta.method,
+              url: curlMeta.url,
+              status: curlMeta.status,
+              statusText: curlMeta.statusText,
+              responseHeaders: curlMeta.responseHeaders,
+              timing: curlMeta.timing,
+            },
+          });
+          url = window.location.origin + "/#curl=" + encoded;
+        } else {
+          url = window.location.origin + "/#json=" + await encodeJsonAsync(shareInput.data);
+        }
         if (cancelled) return;
         setShareUrl(url);
         setLinkStatus(url.length > URL_LENGTH_WARN ? "too-large" : "ok");
@@ -129,7 +149,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
     })();
 
     return () => { cancelled = true; };
-  }, [shareInput]);
+  }, [shareInput, curlMeta, shareScope]);
 
   useEffect(() => () => shortLinkAbortRef.current?.abort(), []);
 
@@ -347,6 +367,11 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
       </div>
 
       <div className="flex flex-col">
+
+        {/* ── cURL Command (shown when active tab came from a curl) ── */}
+        {curlMeta && (
+          <CurlCommandSection meta={curlMeta} />
+        )}
 
         {/* ── Section 1: Share via Link ── */}
         <SectionHeader
@@ -739,4 +764,48 @@ function LinkStatusLine({ status, charCount }: { status: LinkStatus; charCount: 
     );
   }
   return null;
+}
+
+function CurlCommandSection({ meta }: { meta: CurlMeta }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(meta.command);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1600);
+  };
+
+  const statusColor =
+    meta.status >= 500 ? "text-red-600 dark:text-red-400" :
+    meta.status >= 400 ? "text-orange-600 dark:text-orange-400" :
+    "text-emerald-600 dark:text-emerald-400";
+
+  return (
+    <div className="px-4 py-3 border-b border-border bg-secondary/20">
+      <div className="flex items-center gap-2 mb-2">
+        <TerminalSquare className="w-3.5 h-3.5 text-primary shrink-0" />
+        <span className="text-[11px] font-semibold text-foreground">cURL Request</span>
+        <span className={`ml-auto text-[10px] font-medium ${statusColor}`}>
+          {meta.status} {meta.statusText} · {meta.timing}ms
+        </span>
+      </div>
+      <div className="relative">
+        <pre className="text-[10px] font-mono bg-surface2 border border-border rounded-lg p-2.5 overflow-x-auto text-foreground/80 whitespace-pre-wrap break-all max-h-28">
+          {meta.command}
+        </pre>
+        <div className="absolute top-1.5 right-1.5">
+          <AppButton
+            size="sm"
+            onClick={handleCopy}
+            className="px-2 py-0.5 text-[10px] bg-surface1/90 border border-border"
+            leftIcon={copied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
+            label={copied ? "Copied!" : "Copy"}
+          />
+        </div>
+      </div>
+      <p className="mt-1.5 text-[10px] text-muted-foreground/60">
+        The share link encodes both this curl command and the response — recipients see the full request + JSON.
+      </p>
+    </div>
+  );
 }

@@ -92,6 +92,41 @@ export async function safeDecodeJsonAsync(encoded: string): Promise<string | nul
   return decodeAnyAsync(encoded);
 }
 
+/* ── cURL share ──────────────────────────────────────────────────────────── */
+
+export interface CurlSharePayload {
+  curl: string;
+  json: string;
+  meta: {
+    method: string;
+    url: string;
+    status: number;
+    statusText: string;
+    responseHeaders: Record<string, string>;
+    timing: number;
+  };
+}
+
+export async function encodeCurlShare(payload: CurlSharePayload): Promise<string> {
+  const serialized = JSON.stringify(payload);
+  try {
+    return V2_MARKER + (await compressToBase64Url(serialized));
+  } catch {
+    const viaWorker = await lzEncodeAsync(serialized).catch(() => null);
+    return viaWorker ?? LZString.compressToEncodedURIComponent(serialized);
+  }
+}
+
+export async function decodeCurlShare(encoded: string): Promise<CurlSharePayload | null> {
+  try {
+    const raw = await decodeAnyAsync(encoded);
+    if (!raw) return null;
+    return JSON.parse(raw) as CurlSharePayload;
+  } catch {
+    return null;
+  }
+}
+
 async function decodeAnyAsync(encoded: string): Promise<string | null> {
   if (encoded.startsWith(V2_MARKER)) {
     try {

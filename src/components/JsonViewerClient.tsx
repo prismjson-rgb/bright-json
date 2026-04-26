@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check,
-  Minimize2, ArrowUpDown, Sparkles, Save, Trash2, Wrench, Upload, Link2, MousePointerClick,
+  Minimize2, ArrowUpDown, Sparkles, Save, Trash2, Wrench, Upload, MousePointerClick,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
@@ -47,9 +47,9 @@ const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), { ssr:
 const JsonFlowView = dynamic(() => import("@/components/JsonFlowView"), { ssr: false, loading: panelLoading });
 import { useSettings } from "@/contexts/SettingsContext";
 import { repairJson } from "@/lib/json-debug";
-import { safeDecodeJsonAsync } from "@/lib/share";
-import { fetchTextViaGet } from "@/lib/fetch-json-url";
+import { safeDecodeJsonAsync, decodeCurlShare } from "@/lib/share";
 import { saveJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
+import { parseCurl, executeCurl, labelFromCurlRequest } from "@/lib/curl-executor";
 import { getToolLaunchConfig, type ToolLaunchConfig } from "@/lib/tool-links";
 import {
   loadTabs,
@@ -58,7 +58,10 @@ import {
   getNextTabName,
   defaultTabs,
   type TabsState,
+  type CurlMeta,
 } from "@/lib/tabs-storage";
+import CurlPanel from "@/components/CurlPanel";
+import CurlMetaBar from "@/components/CurlMetaBar";
 
 // Re-exported so older imports continue to resolve; canonical source is @/lib/modes.
 export type { PanelMode } from "@/lib/modes";
@@ -123,6 +126,8 @@ export default function JsonViewerClient() {
   const [launchConfig, setLaunchConfig] = useState<ToolLaunchConfig | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileDragOver, setFileDragOver] = useState(false);
+  const [curlOpen, setCurlOpen] = useState(false);
+  const [curlCommand, setCurlCommand] = useState<string | undefined>(undefined);
 
   const { query, setQuery, matchCount, currentMatchIndex, currentMatch, nextMatch, prevMatch } = useJsonSearch(parsed);
 
@@ -215,13 +220,38 @@ export default function JsonViewerClient() {
   // Load from URL hash after storage hydrate so hash wins over restored tabs
   useEffect(() => {
     if (!tabsHydrated) return;
-    const m = window.location.hash.match(/^#json=(.+)/);
-    if (!m) return;
-    let cancelled = false;
-    void safeDecodeJsonAsync(m[1]).then((decoded) => {
-      if (!cancelled && decoded) setJson(decoded);
-    });
-    return () => { cancelled = true; };
+    const hash = window.location.hash;
+
+    const jsonMatch = hash.match(/^#json=(.+)/);
+    if (jsonMatch) {
+      let cancelled = false;
+      void safeDecodeJsonAsync(jsonMatch[1]).then((decoded) => {
+        if (!cancelled && decoded) setJson(decoded);
+      });
+      return () => { cancelled = true; };
+    }
+
+    const curlMatch = hash.match(/^#curl=(.+)/);
+    if (curlMatch) {
+      let cancelled = false;
+      void decodeCurlShare(curlMatch[1]).then((payload) => {
+        if (cancelled || !payload) return;
+        const meta: CurlMeta = {
+          command: payload.curl,
+          method: payload.meta.method,
+          url: payload.meta.url,
+          status: payload.meta.status,
+          statusText: payload.meta.statusText,
+          responseHeaders: payload.meta.responseHeaders,
+          timing: payload.meta.timing,
+        };
+        const label = labelFromCurlRequest({ url: meta.url, method: meta.method });
+        const tab = { id: crypto.randomUUID(), name: label, json: payload.json, curlMeta: meta };
+        setTabsState((prev) => ({ tabs: [...prev.tabs, tab], activeId: tab.id }));
+        setParserJson(payload.json);
+      });
+      return () => { cancelled = true; };
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabsHydrated]);
 
@@ -389,14 +419,26 @@ export default function JsonViewerClient() {
     [importJsonTextItems]
   );
 
-  /** LeftRail's From-URL popover calls this. Resolves true on success so the
-   *  rail can close/reset its popover. */
-  const fetchAndImportFromUrl = useCallback(
-    async (url: string, signal: AbortSignal): Promise<boolean> => {
+  /** CurlPanel calls this. Parses the command, runs it, creates a new tab with curlMeta. */
+  const executeCurlCommand = useCallback(
+    async (command: string, signal: AbortSignal): Promise<boolean> => {
       try {
-        const { text, label } = await fetchTextViaGet(url, signal);
-        importJsonTextItems([{ content: text, filename: label }]);
-        toast.success("Loaded from URL");
+        const req = parseCurl(command);
+        const res = await executeCurl(req, signal);
+        const meta: CurlMeta = {
+          command,
+          method: req.method,
+          url: req.url,
+          status: res.status,
+          statusText: res.statusText,
+          responseHeaders: res.headers,
+          timing: res.timing,
+        };
+        const label = labelFromCurlRequest(req);
+        const tab = { id: crypto.randomUUID(), name: label, json: res.body, curlMeta: meta };
+        setTabsState((prev) => ({ tabs: [...prev.tabs, tab], activeId: tab.id }));
+        setParserJson(res.body);
+        toast.success(`${res.status} ${res.statusText} · ${res.timing}ms`);
         return true;
       } catch (e) {
         if (e instanceof DOMException && e.name === "AbortError") return false;
@@ -414,7 +456,7 @@ export default function JsonViewerClient() {
         return false;
       }
     },
-    [importJsonTextItems],
+    [setParserJson],
   );
 
   const handleSave = useCallback(() => {
@@ -523,7 +565,7 @@ export default function JsonViewerClient() {
     hasJson,
     onImport: () => fileRef.current?.click(),
     onExport: () => handleDownload(),
-    onImportFromUrl: fetchAndImportFromUrl,
+    onOpenCurl: () => { setCurlCommand(undefined); setCurlOpen(true); },
   };
 
   const headerProps = {
@@ -717,6 +759,15 @@ export default function JsonViewerClient() {
                 )}
                 <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
               </div>
+              {activeTab?.curlMeta && (
+                <CurlMetaBar
+                  meta={activeTab.curlMeta}
+                  onRerun={() => {
+                    setCurlCommand(activeTab.curlMeta?.command);
+                    setCurlOpen(true);
+                  }}
+                />
+              )}
               <div className="flex-1 min-h-0 relative">
                 <JsonEditor value={json} onChange={setJson} error={error} dark={dark} editorSettings={settings.editor} onSearchOpen={() => { setMode("tree"); setSearchOpen(true); }} />
                 {!hasJson && (
@@ -858,6 +909,7 @@ export default function JsonViewerClient() {
           onClose={() => setShareOpen(false)}
           tabs={tabsState.tabs}
           activeTabId={tabsState.activeId}
+          curlMeta={activeTab?.curlMeta}
         />
       </OverlaySidebar>
 
@@ -868,6 +920,13 @@ export default function JsonViewerClient() {
       >
         <SettingsPanel onClose={() => setSettingsOpen(false)} />
       </OverlaySidebar>
+
+      <CurlPanel
+        open={curlOpen}
+        onClose={() => setCurlOpen(false)}
+        initialCommand={curlCommand}
+        onRun={executeCurlCommand}
+      />
 
       <footer className="status-bar flex-wrap gap-y-1.5 px-3 sm:px-4">
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">

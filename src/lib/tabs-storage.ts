@@ -7,10 +7,21 @@ import { idbGet, idbSet } from "@/lib/json-prism-idb";
 const IDB_KEY = "json-prism-tabs-v1";
 const LEGACY_LS_KEY = "json-prism-tabs";
 
+export interface CurlMeta {
+  command: string;
+  method: string;
+  url: string;
+  status: number;
+  statusText: string;
+  responseHeaders: Record<string, string>;
+  timing: number;
+}
+
 export interface TabData {
   id: string;
   name: string;
   json: string;
+  curlMeta?: CurlMeta;
 }
 
 export interface TabsState {

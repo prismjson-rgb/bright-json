@@ -1,12 +1,9 @@
 "use client";
-import { useRef, useState } from "react";
-import { Download, Link2, Loader2, Upload, X } from "lucide-react";
+import { Download, TerminalSquare, Upload, X } from "lucide-react";
 import Link from "next/link";
 import Logo from "./Logo";
 import { AppButton } from "./AppButton";
 import { InfoHelp } from "./InfoHelp";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
 import { RAIL_GROUPS, railModesForGroup, type PanelMode } from "@/lib/modes";
 
 interface LeftRailProps {
@@ -16,49 +13,24 @@ interface LeftRailProps {
   collapsed?: boolean;
   /** Present only in mobile sheet; shows close button + hides collapse control. */
   onClose?: () => void;
-  /** Input actions shown at the top of the rail (Import / From URL / Export). */
+  /** Input actions shown at the top of the rail (Import / From cURL / Export). */
   hasJson?: boolean;
   onImport?: () => void;
   onExport?: () => void;
-  /** Resolves true on success so the rail can close its popover. */
-  onImportFromUrl?: (url: string, signal: AbortSignal) => Promise<boolean>;
+  /** Opens the cURL panel overlay. */
+  onOpenCurl?: () => void;
 }
 
 export default function LeftRail({
   mode, onModeChange,
   collapsed = false,
   onClose,
-  hasJson, onImport, onExport, onImportFromUrl,
+  hasJson, onImport, onExport, onOpenCurl,
 }: LeftRailProps) {
   const isMobile = !!onClose;
   const iconOnly = !isMobile && collapsed;
 
-  const [fetchOpen, setFetchOpen] = useState(false);
-  const [fetchValue, setFetchValue] = useState("");
-  const [fetchLoading, setFetchLoading] = useState(false);
-  const abortRef = useRef<AbortController | null>(null);
-
-  const runFetch = async () => {
-    if (!onImportFromUrl || fetchLoading) return;
-    abortRef.current?.abort();
-    const ac = new AbortController();
-    abortRef.current = ac;
-    setFetchLoading(true);
-    try {
-      const ok = await onImportFromUrl(fetchValue, ac.signal);
-      if (ok) {
-        setFetchOpen(false);
-        setFetchValue("");
-      }
-    } finally {
-      if (abortRef.current === ac) {
-        abortRef.current = null;
-        setFetchLoading(false);
-      }
-    }
-  };
-
-  const hasInputActions = !!(onImport || onExport || onImportFromUrl);
+  const hasInputActions = !!(onImport || onExport || onOpenCurl);
 
   return (
     <aside
@@ -93,7 +65,7 @@ export default function LeftRail({
                 Get started
               </span>
               <InfoHelp
-                text="Load JSON into a new tab (pick files, fetch a URL, or drag files onto the editor) and export the current tab as a .json file."
+                text="Load JSON into a new tab (pick files, run a curl command, or drag files onto the editor) and export the current tab as a .json file."
                 label="About Get started"
                 side="right"
                 className="opacity-80"
@@ -124,80 +96,28 @@ export default function LeftRail({
                 className={iconOnly ? "justify-center w-9" : "px-3 py-2"}
               />
             )}
-            {onImportFromUrl && (
-              <Popover
-                open={fetchOpen}
-                onOpenChange={(open) => {
-                  setFetchOpen(open);
-                  if (!open) abortRef.current?.abort();
-                }}
-              >
-                <PopoverTrigger asChild>
-                  <AppButton
-                    variant="rail"
-                    size={iconOnly ? "icon" : "sm"}
-                    active={fetchOpen}
-                    title="Fetch JSON with GET from a URL"
-                    aria-label="Import from URL"
-                    leftIcon={<Link2 className="w-[15px] h-[15px]" />}
-                    label={
-                      <span className="inline-flex items-center gap-1 min-w-0 text-xs">
-                        <span className="truncate">From URL</span>
-                        <InfoHelp
-                          text="Runs a GET request from your browser and opens the response as a new tab. Only http(s) URLs; the target server must allow CORS."
-                          label="About From URL"
-                          side="right"
-                          className="shrink-0"
-                        />
-                      </span>
-                    }
-                    iconOnly={iconOnly}
-                    className={iconOnly ? "justify-center w-9" : "px-3 py-2"}
-                  />
-                </PopoverTrigger>
-                <PopoverContent
-                  align="start"
-                  side="right"
-                  sideOffset={8}
-                  className="w-[min(100vw-2rem,22rem)] space-y-3"
-                >
-                  <div className="space-y-1.5">
-                    <p className="text-xs font-medium text-foreground">GET from URL</p>
-                    <p className="text-[10px] text-muted-foreground leading-snug">
-                      Opens the response as a new tab. Cross-origin APIs must send CORS headers.
-                    </p>
-                  </div>
-                  <Input
-                    value={fetchValue}
-                    onChange={(e) => setFetchValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !fetchLoading) {
-                        e.preventDefault();
-                        void runFetch();
-                      }
-                    }}
-                    placeholder="https://api.example.com/data.json"
-                    className="h-9 text-xs font-mono"
-                    disabled={fetchLoading}
-                    autoComplete="url"
-                    spellCheck={false}
-                  />
-                  <AppButton
-                    variant="accent"
-                    className="w-full justify-center"
-                    onClick={() => void runFetch()}
-                    disabled={fetchLoading || !fetchValue.trim()}
-                    leftIcon={
-                      fetchLoading ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <Link2 className="w-3.5 h-3.5" />
-                      )
-                    }
-                    label={fetchLoading ? "Loading…" : "Fetch"}
-                  />
-                </PopoverContent>
-              </Popover>
+            {onOpenCurl && (
+              <AppButton
+                variant="rail"
+                size={iconOnly ? "icon" : "sm"}
+                onClick={onOpenCurl}
+                title="Run a curl command and load the response as a new tab"
+                aria-label="From cURL"
+                leftIcon={<TerminalSquare className="w-[15px] h-[15px]" />}
+                label={
+                  <span className="inline-flex items-center gap-1 min-w-0 text-xs">
+                    <span className="truncate">From cURL</span>
+                    <InfoHelp
+                      text="Paste any curl command — supports -X, -H, -d, --json, -u. Runs the request from your browser and opens the JSON response as a new tab. Share the result as a full curl + response link."
+                      label="About From cURL"
+                      side="right"
+                      className="shrink-0"
+                    />
+                  </span>
+                }
+                iconOnly={iconOnly}
+                className={iconOnly ? "justify-center w-9" : "px-3 py-2"}
+              />
             )}
             {onExport && (
               <AppButton
