@@ -72,11 +72,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
 
   const useBundleForShare = hasMultipleTabs && shareScope !== "current";
 
-  // True when the current share encodes a curl request — the short-link worker
-  // only supports "json" and "bundle" kinds, so we skip it and show the full
-  // #curl= URL directly (it carries the complete curl + response experience).
-  const isCurlShare = !!(curlMeta && shareScope === "current" && !useBundleForShare);
-
   // Cheap, memoized: builds the string/entries to encode. Encoding itself happens
   // off the main thread in the effect below so typing large JSON stays smooth.
   const shareInput = useMemo<
@@ -185,16 +180,15 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
 
   // Auto-create the short link once a share URL is ready, debounced so
   // typing in the editor doesn't hammer the Worker on every keystroke.
-  // Skipped for curl shares — the worker only supports "json"/"bundle" kinds.
   useEffect(() => {
     shortLinkAbortRef.current?.abort();
-    if (!shortEnabled || !shareUrl || isCurlShare) {
+    if (!shortEnabled || !shareUrl) {
       setShortLinkState({ kind: "idle" });
       return;
     }
     const timer = setTimeout(() => { void handleCreateShortLink(); }, 500);
     return () => clearTimeout(timer);
-  }, [shareUrl, handleCreateShortLink, isCurlShare]);
+  }, [shareUrl, handleCreateShortLink]);
 
   const handleCopyLink = () => {
     if (!shareUrl) return;
@@ -422,21 +416,6 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
             )}
             {!shareHasJson ? (
               <p className="text-xs text-muted-foreground">Paste JSON in the editor first.</p>
-            ) : isCurlShare ? (
-              /* Curl shares: always show the full #curl= URL — the short-link
-               * worker doesn't support the curl kind, and the full URL carries
-               * the complete curl + response experience for recipients. */
-              <>
-                <div className="flex items-center gap-2">
-                  <input
-                    readOnly value={shareUrl}
-                    className="flex-1 min-w-0 text-[11px] font-mono bg-secondary/50 border border-border rounded-lg px-3 py-2 text-muted-foreground truncate outline-none"
-                    onClick={e => (e.target as HTMLInputElement).select()}
-                  />
-                  <CopyBtn copied={copiedLink} onClick={handleCopyLink} />
-                </div>
-                <LinkStatusLine status={linkStatus} charCount={shareUrl.length} />
-              </>
             ) : (
               <>
                 {shortEnabled && shareUrl && (

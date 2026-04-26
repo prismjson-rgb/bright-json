@@ -31,7 +31,7 @@ const SLUG_ALPHABET =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const SLUG_RETRIES = 5;
 
-type Kind = "json" | "bundle";
+type Kind = "json" | "bundle" | "curl";
 
 interface StoredLink {
   k: Kind;
@@ -96,9 +96,13 @@ function htmlEscape(s: string): string {
 function redirectHtml(target: string, kind: Kind, siteUrl: string): string {
   const title = kind === "bundle"
     ? "JSON Prism — Shared JSON Bundle"
+    : kind === "curl"
+    ? "JSON Prism — Shared cURL Response"
     : "JSON Prism — Shared JSON";
   const description = kind === "bundle"
     ? "A bundle of JSON documents shared via JSON Prism. Opens locally in your browser — nothing is uploaded."
+    : kind === "curl"
+    ? "A cURL request and its JSON response shared via JSON Prism. Opens locally in your browser — nothing is uploaded."
     : "A JSON document shared via JSON Prism. Opens locally in your browser — nothing is uploaded.";
   const image = `${siteUrl}/og-image.png`;
   const safeTarget = htmlEscape(target);
@@ -194,7 +198,7 @@ async function handlePost(req: Request, env: Env): Promise<Response> {
     return jsonResponse({ error: "invalid_json" }, 400, origin);
   }
 
-  if (body.kind !== "json" && body.kind !== "bundle") {
+  if (body.kind !== "json" && body.kind !== "bundle" && body.kind !== "curl") {
     return jsonResponse({ error: "invalid_kind" }, 400, origin);
   }
   if (typeof body.payload !== "string" || body.payload.length === 0) {
@@ -257,6 +261,8 @@ async function handleGet(url: URL, env: Env): Promise<Response> {
   const target =
     record.k === "bundle"
       ? `${env.SITE_URL}/bundle/#bundle=${record.p}`
+      : record.k === "curl"
+      ? `${env.SITE_URL}/#curl=${record.p}`
       : `${env.SITE_URL}/#json=${record.p}`;
 
   return new Response(redirectHtml(target, record.k, env.SITE_URL), {

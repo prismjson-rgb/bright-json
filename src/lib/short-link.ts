@@ -8,7 +8,7 @@
 
 const SHORTENER_URL = process.env.NEXT_PUBLIC_SHORTENER_URL;
 
-export type ShortKind = "json" | "bundle";
+export type ShortKind = "json" | "bundle" | "curl";
 
 export interface ShortLinkSuccess {
   ok: true;
@@ -30,9 +30,8 @@ export function isShortLinkConfigured(): boolean {
   return typeof SHORTENER_URL === "string" && SHORTENER_URL.length > 0;
 }
 
-/** Strips the `#json=` or `#bundle=` hash off a full share URL and returns the
- *  kind + raw payload (including the `~` marker from share.ts). Returns null
- *  if the URL doesn't look like a share URL we can shorten. */
+/** Strips the `#json=`, `#bundle=`, or `#curl=` hash off a full share URL and
+ *  returns the kind + raw payload. Returns null for unrecognised formats. */
 export function extractSharePayload(
   shareUrl: string,
 ): { kind: ShortKind; payload: string } | null {
@@ -43,6 +42,9 @@ export function extractSharePayload(
     }
     if (u.hash.startsWith("#bundle=")) {
       return { kind: "bundle", payload: u.hash.slice("#bundle=".length) };
+    }
+    if (u.hash.startsWith("#curl=")) {
+      return { kind: "curl", payload: u.hash.slice("#curl=".length) };
     }
   } catch {
     // fall through
