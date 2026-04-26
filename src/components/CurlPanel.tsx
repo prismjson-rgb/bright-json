@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { X, Loader2, Play, TerminalSquare, Share2, Check } from "lucide-react";
+import { X, Loader2, Play, TerminalSquare, Share2, Check, Copy } from "lucide-react";
 import { AppButton } from "@/components/app/AppButton";
 import { encodeCurlCmd } from "@/lib/share";
 import { createShortLink, isShortLinkConfigured, extractSharePayload } from "@/lib/short-link";
@@ -21,6 +21,7 @@ export default function CurlPanel({ open, onClose, initialCommand, onRun }: Curl
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "copied">("idle");
+  const [cmdCopied, setCmdCopied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -29,9 +30,18 @@ export default function CurlPanel({ open, onClose, initialCommand, onRun }: Curl
     if (!open) return;
     setError(null);
     setShareState("idle");
+    setCmdCopied(false);
     if (initialCommand !== undefined) setCommand(initialCommand);
     setTimeout(() => textareaRef.current?.focus(), 50);
   }, [open, initialCommand]);
+
+  const handleCopyCmd = () => {
+    if (!command.trim()) return;
+    void navigator.clipboard.writeText(command.trim()).then(() => {
+      setCmdCopied(true);
+      setTimeout(() => setCmdCopied(false), 1600);
+    });
+  };
 
   const handleShare = async () => {
     if (shareState === "sharing" || !command.trim()) return;
@@ -129,25 +139,38 @@ export default function CurlPanel({ open, onClose, initialCommand, onRun }: Curl
             </p>
           </div>
 
-          <textarea
-            id="curl-input"
-            ref={textareaRef}
-            value={command}
-            onChange={(e) => { setCommand(e.target.value); setError(null); }}
-            onKeyDown={(e) => {
-              if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
-                e.preventDefault();
-                void handleRun();
-              }
-            }}
-            placeholder={SAMPLE}
-            rows={10}
-            spellCheck={false}
-            autoCorrect="off"
-            autoCapitalize="off"
-            disabled={loading}
-            className="w-full font-mono text-xs bg-surface2 border border-border rounded-lg p-3 text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 leading-relaxed"
-          />
+          <div className="relative">
+            <textarea
+              id="curl-input"
+              ref={textareaRef}
+              value={command}
+              onChange={(e) => { setCommand(e.target.value); setError(null); }}
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                  e.preventDefault();
+                  void handleRun();
+                }
+              }}
+              placeholder={SAMPLE}
+              rows={10}
+              spellCheck={false}
+              autoCorrect="off"
+              autoCapitalize="off"
+              disabled={loading}
+              className="w-full font-mono text-xs bg-surface2 border border-border rounded-lg p-3 pr-8 text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 leading-relaxed"
+            />
+            {command.trim() && (
+              <button
+                type="button"
+                onClick={handleCopyCmd}
+                className="absolute top-2 right-2 p-1 rounded text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+                title="Copy command"
+                aria-label="Copy command"
+              >
+                {cmdCopied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+              </button>
+            )}
+          </div>
 
           {error && (
             <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive leading-snug">
