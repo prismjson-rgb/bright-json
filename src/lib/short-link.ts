@@ -8,7 +8,7 @@
 
 const SHORTENER_URL = process.env.NEXT_PUBLIC_SHORTENER_URL;
 
-export type ShortKind = "json" | "bundle" | "curl";
+export type ShortKind = "json" | "bundle" | "curl" | "curlcmd";
 
 export interface ShortLinkSuccess {
   ok: true;
@@ -45,6 +45,9 @@ export function extractSharePayload(
     }
     if (u.hash.startsWith("#curl=")) {
       return { kind: "curl", payload: u.hash.slice("#curl=".length) };
+    }
+    if (u.hash.startsWith("#curlcmd=")) {
+      return { kind: "curlcmd", payload: u.hash.slice("#curlcmd=".length) };
     }
   } catch {
     // fall through

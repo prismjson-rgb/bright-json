@@ -47,7 +47,7 @@ const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), { ssr:
 const JsonFlowView = dynamic(() => import("@/components/JsonFlowView"), { ssr: false, loading: panelLoading });
 import { useSettings } from "@/contexts/SettingsContext";
 import { repairJson } from "@/lib/json-debug";
-import { safeDecodeJsonAsync, decodeCurlShare } from "@/lib/share";
+import { safeDecodeJsonAsync, decodeCurlShare, decodeCurlCmd } from "@/lib/share";
 import { saveJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
 import { parseCurl, executeCurl, labelFromCurlRequest } from "@/lib/curl-executor";
 import { getToolLaunchConfig, type ToolLaunchConfig } from "@/lib/tool-links";
@@ -249,6 +249,17 @@ export default function JsonViewerClient() {
         const tab = { id: crypto.randomUUID(), name: label, json: payload.json, curlMeta: meta };
         setTabsState((prev) => ({ tabs: [...prev.tabs, tab], activeId: tab.id }));
         setParserJson(payload.json);
+      });
+      return () => { cancelled = true; };
+    }
+
+    const curlCmdMatch = hash.match(/^#curlcmd=(.+)/);
+    if (curlCmdMatch) {
+      let cancelled = false;
+      void decodeCurlCmd(curlCmdMatch[1]).then((cmd) => {
+        if (cancelled || !cmd) return;
+        setCurlCommand(cmd);
+        setCurlOpen(true);
       });
       return () => { cancelled = true; };
     }

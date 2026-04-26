@@ -127,6 +127,21 @@ export async function decodeCurlShare(encoded: string): Promise<CurlSharePayload
   }
 }
 
+/* ── cURL command-only share (no response) ───────────────────────────────── */
+
+export async function encodeCurlCmd(command: string): Promise<string> {
+  try {
+    return V2_MARKER + (await compressToBase64Url(command));
+  } catch {
+    const viaWorker = await lzEncodeAsync(command).catch(() => null);
+    return viaWorker ?? LZString.compressToEncodedURIComponent(command);
+  }
+}
+
+export async function decodeCurlCmd(encoded: string): Promise<string | null> {
+  return decodeAnyAsync(encoded);
+}
+
 async function decodeAnyAsync(encoded: string): Promise<string | null> {
   if (encoded.startsWith(V2_MARKER)) {
     try {

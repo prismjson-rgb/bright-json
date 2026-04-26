@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { X, Loader2, Play, TerminalSquare } from "lucide-react";
+import { X, Loader2, Play, TerminalSquare, Share2, Check } from "lucide-react";
 import { AppButton } from "@/components/app/AppButton";
+import { encodeCurlCmd } from "@/lib/share";
 
 interface CurlPanelProps {
   open: boolean;
@@ -18,17 +19,32 @@ export default function CurlPanel({ open, onClose, initialCommand, onRun }: Curl
   const [command, setCommand] = useState(initialCommand ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shareState, setShareState] = useState<"idle" | "sharing" | "copied">("idle");
   const abortRef = useRef<AbortController | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Sync command and reset error when panel opens
+  // Sync command and reset state when panel opens
   useEffect(() => {
     if (!open) return;
     setError(null);
+    setShareState("idle");
     if (initialCommand !== undefined) setCommand(initialCommand);
-    // Focus the textarea on open
     setTimeout(() => textareaRef.current?.focus(), 50);
   }, [open, initialCommand]);
+
+  const handleShare = async () => {
+    if (shareState === "sharing" || !command.trim()) return;
+    setShareState("sharing");
+    try {
+      const encoded = await encodeCurlCmd(command.trim());
+      const url = `${window.location.origin}/#curlcmd=${encoded}`;
+      await navigator.clipboard.writeText(url);
+      setShareState("copied");
+      setTimeout(() => setShareState("idle"), 2000);
+    } catch {
+      setShareState("idle");
+    }
+  };
 
   const handleRun = async () => {
     if (loading || !command.trim()) return;
@@ -130,20 +146,39 @@ export default function CurlPanel({ open, onClose, initialCommand, onRun }: Curl
             </div>
           )}
 
-          <AppButton
-            variant="accent"
-            className="w-full justify-center py-2.5"
-            onClick={() => void handleRun()}
-            disabled={loading || !command.trim()}
-            leftIcon={
-              loading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Play className="w-4 h-4" />
-              )
-            }
-            label={loading ? "Running…" : "Run  ⌘↵"}
-          />
+          <div className="flex gap-2">
+            <AppButton
+              variant="accent"
+              className="flex-1 justify-center py-2.5"
+              onClick={() => void handleRun()}
+              disabled={loading || !command.trim()}
+              leftIcon={
+                loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Play className="w-4 h-4" />
+                )
+              }
+              label={loading ? "Running…" : "Run  ⌘↵"}
+            />
+            <AppButton
+              variant="ghost"
+              className="px-3 py-2.5 border border-border shrink-0"
+              onClick={() => void handleShare()}
+              disabled={loading || !command.trim() || shareState === "sharing"}
+              leftIcon={
+                shareState === "copied" ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : shareState === "sharing" ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Share2 className="w-4 h-4" />
+                )
+              }
+              label={shareState === "copied" ? "Copied!" : "Share curl"}
+              title="Copy a link to this curl command (without running it)"
+            />
+          </div>
 
           {/* Tips */}
           <div className="mt-auto pt-2 border-t border-border/60 space-y-2">

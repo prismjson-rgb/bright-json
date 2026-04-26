@@ -31,7 +31,7 @@ const SLUG_ALPHABET =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 const SLUG_RETRIES = 5;
 
-type Kind = "json" | "bundle" | "curl";
+type Kind = "json" | "bundle" | "curl" | "curlcmd";
 
 interface StoredLink {
   k: Kind;
@@ -98,11 +98,15 @@ function redirectHtml(target: string, kind: Kind, siteUrl: string): string {
     ? "JSON Prism — Shared JSON Bundle"
     : kind === "curl"
     ? "JSON Prism — Shared cURL Response"
+    : kind === "curlcmd"
+    ? "JSON Prism — Shared cURL Command"
     : "JSON Prism — Shared JSON";
   const description = kind === "bundle"
     ? "A bundle of JSON documents shared via JSON Prism. Opens locally in your browser — nothing is uploaded."
     : kind === "curl"
     ? "A cURL request and its JSON response shared via JSON Prism. Opens locally in your browser — nothing is uploaded."
+    : kind === "curlcmd"
+    ? "A cURL command shared via JSON Prism. Opens ready to run — nothing is uploaded."
     : "A JSON document shared via JSON Prism. Opens locally in your browser — nothing is uploaded.";
   const image = `${siteUrl}/og-image.png`;
   const safeTarget = htmlEscape(target);
@@ -198,7 +202,7 @@ async function handlePost(req: Request, env: Env): Promise<Response> {
     return jsonResponse({ error: "invalid_json" }, 400, origin);
   }
 
-  if (body.kind !== "json" && body.kind !== "bundle" && body.kind !== "curl") {
+  if (body.kind !== "json" && body.kind !== "bundle" && body.kind !== "curl" && body.kind !== "curlcmd") {
     return jsonResponse({ error: "invalid_kind" }, 400, origin);
   }
   if (typeof body.payload !== "string" || body.payload.length === 0) {
@@ -263,6 +267,8 @@ async function handleGet(url: URL, env: Env): Promise<Response> {
       ? `${env.SITE_URL}/bundle/#bundle=${record.p}`
       : record.k === "curl"
       ? `${env.SITE_URL}/#curl=${record.p}`
+      : record.k === "curlcmd"
+      ? `${env.SITE_URL}/#curlcmd=${record.p}`
       : `${env.SITE_URL}/#json=${record.p}`;
 
   return new Response(redirectHtml(target, record.k, env.SITE_URL), {
