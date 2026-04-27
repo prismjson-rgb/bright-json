@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check,
-  Minimize2, ArrowUpDown, Sparkles, Save, Trash2, Wrench, Upload, MousePointerClick,
+  Minimize2, ArrowUpDown, Sparkles, Wrench, Upload, MousePointerClick, Share2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
@@ -48,7 +48,6 @@ const JsonFlowView = dynamic(() => import("@/components/JsonFlowView"), { ssr: f
 import { useSettings } from "@/contexts/SettingsContext";
 import { repairJson } from "@/lib/json-debug";
 import { safeDecodeJsonAsync, decodeCurlShare, decodeCurlCmd } from "@/lib/share";
-import { saveJson, hasSavedJson, clearSavedJson } from "@/lib/saved-json";
 import { parseCurl, executeCurl, labelFromCurlRequest } from "@/lib/curl-executor";
 import { getToolLaunchConfig, type ToolLaunchConfig } from "@/lib/tool-links";
 import {
@@ -120,8 +119,6 @@ export default function JsonViewerClient() {
   const [railCollapsed, setRailCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [hasSaved, setHasSaved] = useState(false);
   const [expandAll, setExpandAll] = useState<boolean | undefined>(undefined);
   const [launchConfig, setLaunchConfig] = useState<ToolLaunchConfig | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -265,10 +262,6 @@ export default function JsonViewerClient() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabsHydrated]);
-
-  useEffect(() => {
-    void hasSavedJson().then(setHasSaved);
-  }, []);
 
   const addTab = useCallback(() => {
     const newTab = createTab(getNextTabName(tabsState.tabs));
@@ -469,20 +462,6 @@ export default function JsonViewerClient() {
     },
     [setParserJson],
   );
-
-  const handleSave = useCallback(() => {
-    void (async () => {
-      if (await saveJson(json)) {
-        setSaved(true);
-        setHasSaved(true);
-        setTimeout(() => setSaved(false), 1500);
-      }
-    })();
-  }, [json]);
-
-  const handleClearSaved = useCallback(() => {
-    void clearSavedJson().then(() => setHasSaved(false));
-  }, []);
 
   // Single mode-selection handler: routes "share" to the overlay, closes mobile
   // sheet, and clears search unless the new mode supports it.
@@ -751,23 +730,14 @@ export default function JsonViewerClient() {
                   className="hidden"
                 />
                 <AppButton
-                  onClick={handleSave}
-                  disabled={!hasJson || !!error}
-                  title="Save to browser (persists across refresh)"
-                  leftIcon={saved ? <Check className="w-3.5 h-3.5 text-primary" /> : <Save className="w-3.5 h-3.5" />}
-                  label={saved ? "Saved!" : "Save"}
+                  onClick={handleShareClick}
+                  disabled={!hasJson}
+                  title="Share & Export (⌘⇧S)"
+                  active={shareOpen}
+                  leftIcon={<Share2 className="w-3.5 h-3.5" />}
+                  label="Share"
                   hideLabelOnMobile
                 />
-                {hasSaved && (
-                  <AppButton
-                    variant="danger"
-                    onClick={handleClearSaved}
-                    title="Delete saved data"
-                    leftIcon={<Trash2 className="w-3.5 h-3.5" />}
-                    label="Clear saved"
-                    hideLabelOnMobile
-                  />
-                )}
                 <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
               </div>
               {activeTab?.curlMeta && (
