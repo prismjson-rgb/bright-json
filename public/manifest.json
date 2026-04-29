@@ -1,7 +1,7 @@
 {
-  "name": "JSON Prism — Format, Validate & Beautify",
+  "name": "JSON Prism - JSON Editor, Formatter & Validator",
   "short_name": "JSON Prism",
-  "description": "A modern, blazing-fast JSON formatter, diff viewer, and converter.",
+  "description": "A free online JSON editor, formatter, validator, diff viewer, and converter.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0c0f1a",

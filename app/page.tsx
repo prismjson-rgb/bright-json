@@ -8,16 +8,16 @@ import { safeJsonLd } from "@/lib/json-ld";
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
 export const metadata: Metadata = {
-  title: "JSON Prism - Free JSON Formatter, Validator, Diff & Workspace",
+  title: "JSON Editor Online - Free JSON Formatter, Validator & Diff Tool",
   description:
-    "Free browser-based JSON workspace. Format, validate, diff, convert, and debug JSON instantly. No sign-up, no data upload, no install required.",
+    "Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser with no sign-up and no data upload.",
   alternates: {
     canonical: `${BASE}/`,
   },
   openGraph: {
-    title: "JSON Prism - Free JSON Formatter, Validator, Diff & Workspace",
+    title: "JSON Editor Online - Free JSON Formatter, Validator & Diff Tool",
     description:
-      "Free browser-based JSON workspace. Format, validate, diff, convert, and debug JSON instantly.",
+      "Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser.",
     type: "website",
     url: `${BASE}/`,
     siteName: "JSON Prism",
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "JSON Prism - Free JSON Formatter, Validator, Diff & Workspace",
+    title: "JSON Editor Online - Free JSON Formatter, Validator & Diff Tool",
     description:
-      "Free browser-based JSON workspace. Format, validate, diff, convert, and debug JSON instantly.",
+      "Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser.",
     images: [`${BASE}/og-image.png`],
   },
 };
@@ -53,6 +53,21 @@ export default function HomePage() {
     description: home.metaDescription,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     featureList: tools.map((t) => t.title),
+    image: `${BASE}/icons/icon-512.png`,
+    publisher: {
+      "@type": "Organization",
+      name: "JSON Prism",
+      logo: `${BASE}/icons/icon-512.png`,
+      url: `${BASE}/`,
+    },
+  };
+
+  const organizationLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "JSON Prism",
+    url: `${BASE}/`,
+    logo: `${BASE}/icons/icon-512.png`,
   };
 
   const itemListLd = {
@@ -84,6 +99,10 @@ export default function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(softwareLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationLd) }}
       />
       <script
         type="application/ld+json"

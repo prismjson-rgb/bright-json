@@ -1,7 +1,7 @@
 ---
 title: JSON Prism
-metaTitle: JSON Prism - Free JSON Formatter, Validator, Diff & Workspace
-metaDescription: Free browser-based JSON workspace. Format, validate, diff, convert, and debug JSON instantly. No sign-up, no data upload, no install required.
+metaTitle: JSON Editor Online - Free JSON Formatter, Validator & Diff Tool
+metaDescription: Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser with no sign-up and no data upload.
 faqs:
   - question: Is JSON Prism free to use?
     answer: Yes. JSON Prism is completely free. There is no sign-up, no subscription, and no usage limit. All core tools - formatter, validator, diff viewer, converter, debugger, and more - are available immediately.
@@ -23,7 +23,7 @@ trustPoints:
 
 ## What is JSON Prism?
 
-JSON Prism is a free, browser-based JSON workspace built for developers. It combines 19 JSON tools in a single interface - format, validate, diff, convert, debug, and analyze JSON without installing anything or sending data to a server.
+JSON Prism is a free online JSON editor and browser-based JSON workspace built for developers. It combines 19 JSON tools in a single interface - format, validate, diff, convert, debug, edit, and analyze JSON without installing anything or sending data to a server.
 
 ## Core tools
 
@@ -45,4 +45,4 @@ JSON Prism is a free, browser-based JSON workspace built for developers. It comb
 
 ## Why use JSON Prism?
 
-Every tool opens from the left sidebar and shares the same JSON editor - you do not need to copy and paste between separate browser tabs. Format, then validate, then diff, then share, all in one place. The workspace also supports deep links: tool landing pages link directly into the right mode so you land in the exact feature for your search query.
+Every tool opens from the left sidebar and shares the same JSON editor - you do not need to copy and paste between separate browser tabs. Format, then validate, then diff, then edit, then share, all in one place. The workspace also supports deep links: tool landing pages link directly into the right mode so you land in the exact feature for your search query.

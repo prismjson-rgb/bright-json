@@ -1,13 +1,13 @@
 ---
 title: JSON Visual Editor
-metaTitle: JSON Visual Editor | Edit JSON Without Touching Raw Syntax
-metaDescription: Modify objects and arrays through form controls while keeping the source JSON synchronized in real time.
-summary: Make structured edits in JSON without hand-editing commas, brackets, or quote marks.
+metaTitle: JSON Editor Online | Visual JSON Editor for Structured Edits
+metaDescription: Edit JSON online through visual form controls while keeping the source JSON synchronized, valid, and ready to copy.
+summary: Edit JSON online without hand-editing commas, brackets, or quote marks.
 category: Edit
 appHref: /app/?tool=json-visual-editor
 badge: No-code editing
 order: 4
-keywords: [json visual editor, edit json online, form json editor]
+keywords: [json editor, json editor online, json visual editor, edit json online, form json editor]
 highlights:
   - Form-style editing
   - Raw JSON stays in sync

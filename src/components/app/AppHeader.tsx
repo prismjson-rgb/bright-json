@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Menu, Moon, Search, Settings, Share2, Sun } from "lucide-react";
 import Logo from "./Logo";
 import ModeTabs from "./ModeTabs";
@@ -41,7 +42,13 @@ export default function AppHeader({
           className="shrink-0"
         />
       )}
-      <Logo className="shrink-0" />
+      <Link
+        href="/"
+        aria-label="JSON Prism home"
+        className="shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      >
+        <Logo />
+      </Link>
       <div className="h-6 w-px bg-border shrink-0" aria-hidden />
       <div className="flex items-center gap-3 flex-1 min-w-0">
 
