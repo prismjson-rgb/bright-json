@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check,
-  Minimize2, ArrowUpDown, Sparkles, Wrench, Upload, MousePointerClick, Share2,
+  Minimize2, Maximize2, ArrowUpDown, Sparkles, Wrench, Upload, MousePointerClick, Share2, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
@@ -125,6 +125,7 @@ export default function JsonViewerClient() {
   const [fileDragOver, setFileDragOver] = useState(false);
   const [curlOpen, setCurlOpen] = useState(false);
   const [curlCommand, setCurlCommand] = useState<string | undefined>(undefined);
+  const [flowFullscreen, setFlowFullscreen] = useState(false);
 
   const { query, setQuery, matchCount, currentMatchIndex, currentMatch, nextMatch, prevMatch } = useJsonSearch(parsed);
 
@@ -497,6 +498,7 @@ export default function JsonViewerClient() {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
       if (e.key === "Escape") {
+        if (flowFullscreen) { setFlowFullscreen(false); return; }
         if (shareOpen) { setShareOpen(false); return; }
         if (settingsOpen) { setSettingsOpen(false); return; }
         if (mode !== "tree" && mode !== "visual") { setMode("tree"); setSearchOpen(false); }
@@ -527,7 +529,7 @@ export default function JsonViewerClient() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [mode, searchOpen, shareOpen, settingsOpen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
+  }, [mode, searchOpen, shareOpen, settingsOpen, flowFullscreen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
 
   const lineCount = json.split("\n").length;
   const modeCfg = MODES[mode];
@@ -830,6 +832,16 @@ export default function JsonViewerClient() {
                           />
                         </>
                       )}
+                      {mode === "flow" && (
+                        <AppButton
+                          onClick={() => setFlowFullscreen(true)}
+                          disabled={!parsed}
+                          title="Open Flow View fullscreen"
+                          leftIcon={<Maximize2 className="w-3.5 h-3.5" />}
+                          label="Fullscreen"
+                          hideLabelOnMobile
+                        />
+                      )}
                     </div>
                     {parsed !== null && mode !== "flow" && (
                       <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">
@@ -908,6 +920,37 @@ export default function JsonViewerClient() {
         initialCommand={curlCommand}
         onRun={executeCurlCommand}
       />
+
+      {flowFullscreen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Fullscreen Flow View"
+          className="fixed inset-0 z-50 flex flex-col bg-background text-foreground"
+        >
+          <div className="pane-header shrink-0">
+            <span className="inline-flex items-center gap-1">
+              Flow View
+              <InfoHelp text={MODES.flow.help} label="About Flow View" side="bottom" />
+            </span>
+            <span className="ml-3 hidden text-[10px] font-normal normal-case tracking-normal opacity-50 sm:inline">
+              Pan · scroll to zoom · drag nodes · Esc to close
+            </span>
+            <button
+              type="button"
+              onClick={() => setFlowFullscreen(false)}
+              className="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/15 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              title="Close fullscreen Flow View (Esc)"
+              aria-label="Close fullscreen Flow View"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1">
+            <JsonFlowView parsed={parsed} dark={dark} />
+          </div>
+        </div>
+      )}
 
       <footer className="status-bar flex-wrap gap-y-1.5 px-3 sm:px-4">
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
