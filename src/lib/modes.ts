@@ -11,14 +11,14 @@
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeftRight, BarChart3, BookOpen, Bug, Columns2, Eraser, FormInput,
-  GitBranch, Hash, Lightbulb, PackageMinus, Scissors, Share2, StickyNote,
+  GitBranch, Hash, Lightbulb, PackageMinus, Scissors, Share2, ShieldCheck, StickyNote,
   TreePine, Wand2,
 } from "lucide-react";
 
 export type PanelMode =
   | "tree" | "visual" | "flow" | "diff"
   | "mock" | "debug" | "trim" | "clean" | "minimal"
-  | "structure" | "practices" | "tokens"
+  | "structure" | "practices" | "tokens" | "schema"
   | "convert" | "notes" | "share" | "learn";
 
 export type ModeGroup = "view" | "tools" | "analyze" | "transform" | "learn";
@@ -143,6 +143,14 @@ export const MODES: Record<PanelMode, ModeConfig> = {
     group: "analyze",
     layout: "split",
     help: "Rough token counts for LLM context (approximate; real models tokenize differently). Compare JSON vs YAML/XML.",
+  },
+  schema: {
+    id: "schema",
+    label: "Schema Validator",
+    icon: ShieldCheck,
+    group: "analyze",
+    layout: "split",
+    help: "Paste a JSON Schema (Draft 7) and instantly see whether the current JSON is valid — with per-field error paths.",
   },
   convert: {
     id: "convert",

@@ -41,6 +41,7 @@ const JsonMinimalMode = dynamic(() => import("@/components/JsonMinimalMode"), { 
 const JsonStructureAnalyzer = dynamic(() => import("@/components/JsonStructureAnalyzer"), { ssr: false, loading: panelLoading });
 const JsonBestPractices = dynamic(() => import("@/components/JsonBestPractices"), { ssr: false, loading: panelLoading });
 const JsonTokenEstimator = dynamic(() => import("@/components/JsonTokenEstimator"), { ssr: false, loading: panelLoading });
+const JsonSchemaValidator = dynamic(() => import("@/components/JsonSchemaValidator"), { ssr: false, loading: panelLoading });
 const JsonLearnPanel = dynamic(() => import("@/components/JsonLearnPanel"), { ssr: false, loading: panelLoading });
 const JsonSharePanel = dynamic(() => import("@/components/JsonSharePanel"), { ssr: false, loading: panelLoading });
 const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), { ssr: false, loading: panelLoading });
@@ -901,6 +902,7 @@ export default function JsonViewerClient() {
               {mode === "structure" && <JsonStructureAnalyzer parsed={parsed} />}
               {mode === "practices" && <JsonBestPractices parsed={parsed} />}
               {mode === "tokens" && <JsonTokenEstimator json={json} parsed={parsed} />}
+              {mode === "schema" && <JsonSchemaValidator json={json} dark={dark} />}
               {mode === "convert" && <JsonConvertPanel parsed={parsed} dark={dark} />}
               {mode === "notes" && <JsonNoteEditor />}
               {mode === "learn" && (
