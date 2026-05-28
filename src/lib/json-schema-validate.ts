@@ -1,6 +1,6 @@
 import Ajv, { type ErrorObject } from "ajv";
 
-const ajv = new Ajv({ allErrors: true, strict: false });
+const ajv = new Ajv({ allErrors: true, strict: false, validateSchema: false });
 
 export type ValidationStatus = "idle" | "valid" | "invalid" | "schema-error" | "json-error";
 

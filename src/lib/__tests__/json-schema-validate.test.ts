@@ -194,4 +194,27 @@ describe("validateJsonAgainstSchema — error states", () => {
     const result = validateJsonAgainstSchema("{bad json}", "{also bad}");
     expect(result.status).toBe("schema-error");
   });
+
+  it("accepts schemas with $schema: draft/2020-12 without throwing", () => {
+    const schema = JSON.stringify({
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      type: "object",
+      required: ["id"],
+      properties: { id: { type: "string" } },
+    });
+    const result = validateJsonAgainstSchema(JSON.stringify({ id: "abc" }), schema);
+    expect(result.status).toBe("valid");
+  });
+
+  it("still reports errors for schemas with $schema: draft/2020-12", () => {
+    const schema = JSON.stringify({
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      type: "object",
+      required: ["id"],
+      properties: { id: { type: "string" } },
+    });
+    const result = validateJsonAgainstSchema(JSON.stringify({ id: 123 }), schema);
+    expect(result.status).toBe("invalid");
+    expect(result.errors[0].instancePath).toBe("/id");
+  });
 });
