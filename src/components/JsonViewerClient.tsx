@@ -47,7 +47,7 @@ const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), { ssr:
 const JsonFlowView = dynamic(() => import("@/components/JsonFlowView"), { ssr: false, loading: panelLoading });
 import { useSettings } from "@/contexts/SettingsContext";
 import { repairJson } from "@/lib/json-debug";
-import { safeDecodeJsonAsync, decodeCurlShare, decodeCurlCmd } from "@/lib/share";
+import { safeDecodeJsonAsync, decodeCurlShare, decodeCurlCmd, decodeBundleAsync } from "@/lib/share";
 import { parseCurl, executeCurl, labelFromCurlRequest } from "@/lib/curl-executor";
 import { getToolLaunchConfig, type ToolLaunchConfig } from "@/lib/tool-links";
 import {
@@ -267,6 +267,22 @@ export default function JsonViewerClient() {
         if (cancelled || !cmd) return;
         setCurlCommand(cmd);
         setCurlOpen(true);
+      });
+      return () => { cancelled = true; };
+    }
+
+    const openBundleMatch = hash.match(/^#open-bundle=(.+)/);
+    if (openBundleMatch) {
+      let cancelled = false;
+      void decodeBundleAsync(openBundleMatch[1]).then((bundleEntries) => {
+        if (cancelled || !bundleEntries.length) return;
+        const newTabs = bundleEntries.map((entry) => ({
+          id: crypto.randomUUID(),
+          name: entry.title || "Shared JSON",
+          json: entry.json,
+        }));
+        setTabsState((prev) => ({ tabs: [...prev.tabs, ...newTabs], activeId: newTabs[0].id }));
+        setParserJson(newTabs[0].json);
       });
       return () => { cancelled = true; };
     }

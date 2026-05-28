@@ -58,11 +58,10 @@ export default function BundleViewer() {
     return () => { cancelled = true; };
   }, []);
 
-  const openAllInNewTabs = () => {
-    entries.forEach((_, i) => {
-      const url = encodedUrls[i];
-      if (url) window.open(url, "_blank", "noopener,noreferrer");
-    });
+  const openAllInEditor = () => {
+    const bundleHash = window.location.hash.match(/^#bundle=(.+)/);
+    if (!bundleHash) return;
+    window.open(`/#open-bundle=${bundleHash[1]}`, "_blank", "noopener,noreferrer");
   };
 
   const allEncoded = entries.length > 0 && entries.every((_, i) => !!encodedUrls[i]);
@@ -120,13 +119,13 @@ export default function BundleViewer() {
               </div>
               {entries.length > 1 && (
                 <button
-                  onClick={openAllInNewTabs}
-                  disabled={!allEncoded}
+                  onClick={openAllInEditor}
+                  disabled={entries.length === 0}
                   className="shrink-0 flex items-center gap-1.5 text-[11px] px-3 py-2 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title={allEncoded ? "Open every entry in a new tab" : "Preparing links…"}
+                  title="Open all entries as tabs in the editor"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  Open all in new tabs
+                  Open all in editor
                 </button>
               )}
             </div>
