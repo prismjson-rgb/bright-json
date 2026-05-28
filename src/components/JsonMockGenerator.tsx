@@ -1,11 +1,42 @@
 "use client";
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { Wand2, RefreshCw, Download, ArrowRight, Plus, Trash2 } from "lucide-react";
+import { Wand2, RefreshCw, Download, ArrowRight, Plus, Trash2, Sparkles } from "lucide-react";
 import { generateMockJson, type MockTemplate, type DateFormat, type CustomField } from "@/lib/json-mock";
 import { toast } from "sonner";
 import { InfoHelp } from "@/components/app/InfoHelp";
 import { MODES } from "@/lib/modes";
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}/;
+
+function inferType(value: unknown): CustomField["type"] | null {
+  if (typeof value === "boolean") return "boolean";
+  if (typeof value === "number") return "number";
+  if (typeof value === "string") {
+    if (UUID_RE.test(value)) return "uuid";
+    if (value.includes("@")) return "email";
+    if (DATE_RE.test(value)) return "date";
+    return "string";
+  }
+  return null; // object, array, null — skip
+}
+
+function inferFieldsFromJson(jsonStr: string): CustomField[] | null {
+  try {
+    let parsed = JSON.parse(jsonStr);
+    if (Array.isArray(parsed)) parsed = parsed[0];
+    if (!parsed || typeof parsed !== "object") return null;
+    const fields: CustomField[] = [];
+    for (const [key, val] of Object.entries(parsed as Record<string, unknown>)) {
+      const type = inferType(val);
+      if (type) fields.push({ name: key, type });
+    }
+    return fields.length ? fields : null;
+  } catch {
+    return null;
+  }
+}
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -19,7 +50,7 @@ const TEMPLATES: { id: MockTemplate; label: string; desc: string }[] = [
 
 const FIELD_TYPES = ["string", "number", "boolean", "email", "uuid", "date"] as const;
 
-export default function JsonMockGenerator({ onUseJson, dark }: { onUseJson: (j: string) => void; dark: boolean }) {
+export default function JsonMockGenerator({ onUseJson, dark, currentJson }: { onUseJson: (j: string) => void; dark: boolean; currentJson?: string }) {
   const [template, setTemplate] = useState<MockTemplate>("user");
   const [count, setCount] = useState(5);
   const [nested, setNested] = useState(true);
@@ -42,6 +73,14 @@ export default function JsonMockGenerator({ onUseJson, dark }: { onUseJson: (j: 
     URL.revokeObjectURL(url);
   };
 
+  const seedFromCurrentJson = useCallback(() => {
+    const fields = currentJson ? inferFieldsFromJson(currentJson) : null;
+    if (!fields) { toast.error("No valid JSON in editor to seed from"); return; }
+    setCustomFields(fields);
+    setTemplate("custom");
+    toast.success(`Seeded ${fields.length} field${fields.length !== 1 ? "s" : ""} from current JSON`);
+  }, [currentJson]);
+
   const addField = () => setCustomFields(f => [...f, { name: `field${f.length + 1}`, type: "string" }]);
   const removeField = (i: number) => setCustomFields(f => f.filter((_, idx) => idx !== i));
   const updateField = (i: number, patch: Partial<CustomField>) =>
@@ -57,6 +96,20 @@ export default function JsonMockGenerator({ onUseJson, dark }: { onUseJson: (j: 
       <div className="flex flex-1 min-h-0">
         {/* Config panel */}
         <div className="w-64 shrink-0 border-r border-border flex flex-col overflow-y-auto p-4 gap-4">
+          {/* Seed from current JSON */}
+          {currentJson?.trim() && (
+            <button
+              onClick={seedFromCurrentJson}
+              className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border border-primary/30 bg-primary/8 hover:bg-primary/15 text-primary transition-colors text-left"
+            >
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <div>
+                <div className="text-xs font-medium leading-none">Seed from current JSON</div>
+                <div className="text-[10px] opacity-70 mt-0.5 leading-tight">Use editor JSON as field template</div>
+              </div>
+            </button>
+          )}
+
           {/* Template */}
           <div>
             <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 block">Template</label>

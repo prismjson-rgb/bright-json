@@ -894,7 +894,7 @@ export default function JsonViewerClient() {
                   </div>
                 </>
               )}
-              {mode === "mock" && <JsonMockGenerator onUseJson={handleUseJson} dark={dark} />}
+              {mode === "mock" && <JsonMockGenerator onUseJson={handleUseJson} dark={dark} currentJson={json} />}
               {mode === "debug" && <JsonDebugger json={json} onFix={setJson} />}
               {mode === "trim" && <JsonTrimmer parsed={parsed} dark={dark} />}
               {mode === "minimal" && <JsonMinimalMode parsed={parsed} dark={dark} />}
