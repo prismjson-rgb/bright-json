@@ -222,9 +222,18 @@ export default function JsonViewerClient() {
 
     const jsonMatch = hash.match(/^#json=(.+)/);
     if (jsonMatch) {
+      const nameParam = new URLSearchParams(window.location.search).get("name");
       let cancelled = false;
       void safeDecodeJsonAsync(jsonMatch[1]).then((decoded) => {
-        if (!cancelled && decoded) setJson(decoded);
+        if (!cancelled && decoded) {
+          if (nameParam) {
+            const tab = { id: crypto.randomUUID(), name: nameParam, json: decoded };
+            setTabsState((prev) => ({ tabs: [...prev.tabs, tab], activeId: tab.id }));
+            setParserJson(decoded);
+          } else {
+            setJson(decoded);
+          }
+        }
       });
       return () => { cancelled = true; };
     }

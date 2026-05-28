@@ -48,7 +48,9 @@ export default function BundleViewer() {
         try {
           const encoded = await encodeJsonAsync(decoded[i].json);
           if (cancelled) return;
-          urls[i] = `/#json=${encoded}`;
+          const title = decoded[i].title;
+          const titleParam = title ? `?name=${encodeURIComponent(title)}` : "";
+          urls[i] = `/${titleParam}#json=${encoded}`;
           setEncodedUrls({ ...urls });
         } catch {}
       }
