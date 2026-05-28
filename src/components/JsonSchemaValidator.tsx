@@ -2,13 +2,12 @@
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { ShieldCheck, ShieldX, AlertTriangle, FileJson, ChevronRight } from "lucide-react";
-import Ajv, { type ErrorObject } from "ajv";
+import type { ErrorObject } from "ajv";
+import { validateJsonAgainstSchema, errorPath, type ValidationResult } from "@/lib/json-schema-validate";
 import { InfoHelp } from "@/components/app/InfoHelp";
 import { MODES } from "@/lib/modes";
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
-
-const ajv = new Ajv({ allErrors: true, strict: false });
 
 const SAMPLE_SCHEMA = `{
   "type": "object",
@@ -23,57 +22,12 @@ const SAMPLE_SCHEMA = `{
   "additionalProperties": true
 }`;
 
-interface ValidationState {
-  status: "idle" | "valid" | "invalid" | "schema-error" | "json-error";
-  errors: ErrorObject[];
-  schemaErrorMsg?: string;
-}
-
-function errorPath(e: ErrorObject): string {
-  const path = e.instancePath || "(root)";
-  if (e.keyword === "required") {
-    const missing = (e.params as { missingProperty?: string }).missingProperty ?? "";
-    return path === "(root)" ? `/${missing}` : `${path}/${missing}`;
-  }
-  return path;
-}
-
 export default function JsonSchemaValidator({ json, dark }: { json: string; dark: boolean }) {
   const [schemaText, setSchemaText] = useState("");
-  const [validation, setValidation] = useState<ValidationState>({ status: "idle", errors: [] });
+  const [validation, setValidation] = useState<ValidationResult>({ status: "idle", errors: [] });
 
   useEffect(() => {
-    const trimmedSchema = schemaText.trim();
-    const trimmedJson = json.trim();
-
-    if (!trimmedSchema || !trimmedJson) {
-      setValidation({ status: "idle", errors: [] });
-      return;
-    }
-
-    let schema: unknown;
-    try {
-      schema = JSON.parse(trimmedSchema);
-    } catch (e) {
-      setValidation({ status: "schema-error", errors: [], schemaErrorMsg: (e as Error).message });
-      return;
-    }
-
-    let data: unknown;
-    try {
-      data = JSON.parse(trimmedJson);
-    } catch {
-      setValidation({ status: "json-error", errors: [] });
-      return;
-    }
-
-    try {
-      const validate = ajv.compile(schema as object);
-      const valid = validate(data);
-      setValidation({ status: valid ? "valid" : "invalid", errors: validate.errors ?? [] });
-    } catch (e) {
-      setValidation({ status: "schema-error", errors: [], schemaErrorMsg: (e as Error).message });
-    }
+    setValidation(validateJsonAgainstSchema(json, schemaText));
   }, [json, schemaText]);
 
   const { status, errors, schemaErrorMsg } = validation;
