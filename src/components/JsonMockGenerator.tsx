@@ -2,41 +2,10 @@
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { Wand2, RefreshCw, Download, ArrowRight, Plus, Trash2, Sparkles } from "lucide-react";
-import { generateMockJson, type MockTemplate, type DateFormat, type CustomField } from "@/lib/json-mock";
+import { generateMockJson, inferFieldsFromJson, type MockTemplate, type DateFormat, type CustomField } from "@/lib/json-mock";
 import { toast } from "sonner";
 import { InfoHelp } from "@/components/app/InfoHelp";
 import { MODES } from "@/lib/modes";
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const DATE_RE = /^\d{4}-\d{2}-\d{2}/;
-
-function inferType(value: unknown): CustomField["type"] | null {
-  if (typeof value === "boolean") return "boolean";
-  if (typeof value === "number") return "number";
-  if (typeof value === "string") {
-    if (UUID_RE.test(value)) return "uuid";
-    if (value.includes("@")) return "email";
-    if (DATE_RE.test(value)) return "date";
-    return "string";
-  }
-  return null; // object, array, null — skip
-}
-
-function inferFieldsFromJson(jsonStr: string): CustomField[] | null {
-  try {
-    let parsed = JSON.parse(jsonStr);
-    if (Array.isArray(parsed)) parsed = parsed[0];
-    if (!parsed || typeof parsed !== "object") return null;
-    const fields: CustomField[] = [];
-    for (const [key, val] of Object.entries(parsed as Record<string, unknown>)) {
-      const type = inferType(val);
-      if (type) fields.push({ name: key, type });
-    }
-    return fields.length ? fields : null;
-  } catch {
-    return null;
-  }
-}
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
