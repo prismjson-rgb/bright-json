@@ -84,7 +84,7 @@ export default async function LearnArticleRoute({
     image: { "@type": "ImageObject", url: `${BASE}/og-image.png`, width: 1200, height: 630 },
     url: `${BASE}/learn/${slug}/`,
     datePublished: section.publishedAt || "2025-12-01",
-    dateModified: new Date().toISOString().split("T")[0],
+    dateModified: section.updatedAt || section.publishedAt || "2025-12-01",
     mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/learn/${slug}/` },
   };
 

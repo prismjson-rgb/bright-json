@@ -74,6 +74,7 @@ export const LEARN_SECTIONS: Array<{
       keyTerms: Array.isArray(data.keyTerms) ? data.keyTerms.filter((t) => t != null) : [],
       tryExample: data.tryExample,
       publishedAt: data.publishedAt ?? null,
+      updatedAt: data.updatedAt ?? null,
       _order: typeof data.order === "number" ? data.order : 999,
     });
   }
@@ -95,6 +96,7 @@ export interface LearnSection {
   keyTerms: string[];
   tryExample?: string;
   publishedAt?: string | null;
+  updatedAt?: string | null;
 }
 
 export const LEARN_SECTIONS: LearnSection[] = ${JSON.stringify(out, null, 2)};

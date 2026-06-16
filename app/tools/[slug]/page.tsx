@@ -81,6 +81,28 @@ export default async function ToolPage({
     isPartOf: { "@type": "WebPage", "@id": `${BASE}/tools/` },
   };
 
+  const softwareLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: tool.title,
+    applicationCategory: "DeveloperApplication",
+    applicationSubCategory: tool.category || "JSON Tool",
+    operatingSystem: "Web",
+    browserRequirements: "Requires JavaScript. Runs in any modern browser.",
+    url: `${BASE}/tools/${slug}/`,
+    description: tool.metaDescription || tool.summary,
+    image: `${BASE}/og-image.png`,
+    isAccessibleForFree: true,
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    featureList: tool.highlights,
+    publisher: {
+      "@type": "Organization",
+      name: "JSON Prism",
+      url: `${BASE}/`,
+      logo: `${BASE}/icons/icon-512.png`,
+    },
+  };
+
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -103,6 +125,10 @@ export default async function ToolPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(pageLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(softwareLd) }}
       />
       <script
         type="application/ld+json"

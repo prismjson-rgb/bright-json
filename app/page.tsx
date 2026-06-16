@@ -8,7 +8,7 @@ import { safeJsonLd } from "@/lib/json-ld";
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
 export const metadata: Metadata = {
-  title: "JSON Editor Online - Free JSON Formatter, Validator & Diff Tool",
+  title: "JSON Editor Online – Free Formatter, Validator & Diff",
   description:
     "Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser with no sign-up and no data upload.",
   alternates: {
@@ -70,6 +70,20 @@ export default function HomePage() {
     logo: `${BASE}/icons/icon-512.png`,
   };
 
+  const websiteLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "JSON Prism",
+    url: `${BASE}/`,
+    description: home.metaDescription,
+    publisher: {
+      "@type": "Organization",
+      name: "JSON Prism",
+      url: `${BASE}/`,
+      logo: { "@type": "ImageObject", url: `${BASE}/icons/icon-512.png` },
+    },
+  };
+
   const itemListLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -103,6 +117,10 @@ export default function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteLd) }}
       />
       <script
         type="application/ld+json"
