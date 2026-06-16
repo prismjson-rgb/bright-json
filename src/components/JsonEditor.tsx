@@ -1,6 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
@@ -26,6 +26,22 @@ export default function JsonEditor({ value, onChange, error, dark, editorSetting
   const editorRef = useRef<any>(null);
   const onSearchOpenRef = useRef(onSearchOpen);
   useEffect(() => { onSearchOpenRef.current = onSearchOpen; }, [onSearchOpen]);
+
+  // Defer mounting Monaco (a heavy chunk + init) off the critical path. We paint
+  // a lightweight text placeholder first so first paint / LCP isn't blocked, then
+  // load the real editor when the browser is idle or the user interacts with it.
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (ready) return;
+    const trigger = () => setReady(true);
+    const w = window as any;
+    if (typeof w.requestIdleCallback === "function") {
+      const id = w.requestIdleCallback(trigger, { timeout: 2000 });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(trigger, 1200);
+    return () => clearTimeout(id);
+  }, [ready]);
 
   const handleMount = useCallback((editor: any, _monaco: any) => {
     editorRef.current = editor;
@@ -95,6 +111,28 @@ export default function JsonEditor({ value, onChange, error, dark, editorSetting
     renderLineHighlight: "line" as const,
     bracketPairColorization: true,
   };
+
+  if (!ready) {
+    return (
+      <div className="h-full w-full relative">
+        <pre
+          role="textbox"
+          tabIndex={0}
+          aria-label="JSON editor (loading)"
+          onPointerDown={() => setReady(true)}
+          onFocus={() => setReady(true)}
+          className="h-full w-full overflow-auto px-4 pt-3 font-mono text-[13px] leading-5 text-foreground/90 whitespace-pre-wrap break-words cursor-text outline-none m-0"
+        >
+          {value}
+        </pre>
+        {error && (
+          <div className="absolute bottom-0 left-0 right-0 bg-error/90 text-white text-xs px-3 py-1.5 font-mono truncate animate-slide-up">
+            ⚠ {error}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full relative">
