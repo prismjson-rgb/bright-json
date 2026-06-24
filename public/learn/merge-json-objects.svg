@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" role="img" aria-labelledby="t d" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace">
+  <title id="t">Merging two JSON objects</title>
+  <desc id="d">When two JSON objects are merged, shared keys take the value from the second object, so the right-hand side wins on conflicts.</desc>
+  <rect width="760" height="380" rx="16" fill="#090d17"/>
+
+  <!-- A -->
+  <rect x="28" y="60" width="216" height="180" rx="14" fill="#0d1322" stroke="rgba(255,255,255,0.10)"/>
+  <text x="46" y="90" fill="#67e8f9" font-size="13" letter-spacing="2" font-weight="700">OBJECT A</text>
+  <g font-size="14">
+    <text x="46" y="128"><tspan fill="#64748b">{</tspan></text>
+    <text x="66" y="154"><tspan fill="#67e8f9">"theme"</tspan><tspan fill="#64748b">:</tspan> <tspan fill="#6ee7b7">"light"</tspan><tspan fill="#64748b">,</tspan></text>
+    <text x="66" y="180"><tspan fill="#67e8f9">"size"</tspan><tspan fill="#64748b">:</tspan> <tspan fill="#fcd34d">12</tspan></text>
+    <text x="46" y="206"><tspan fill="#64748b">}</tspan></text>
+  </g>
+
+  <text x="268" y="156" fill="#22d3ee" font-size="24" font-weight="700" text-anchor="middle">+</text>
+
+  <!-- B -->
+  <rect x="292" y="60" width="216" height="180" rx="14" fill="#0d1322" stroke="rgba(255,255,255,0.10)"/>
+  <text x="310" y="90" fill="#fb7185" font-size="13" letter-spacing="2" font-weight="700">OBJECT B</text>
+  <g font-size="14">
+    <text x="310" y="128"><tspan fill="#64748b">{</tspan></text>
+    <text x="330" y="154"><tspan fill="#67e8f9">"theme"</tspan><tspan fill="#64748b">:</tspan> <tspan fill="#fb7185">"dark"</tspan><tspan fill="#64748b">,</tspan></text>
+    <text x="330" y="180"><tspan fill="#67e8f9">"lang"</tspan><tspan fill="#64748b">:</tspan> <tspan fill="#6ee7b7">"en"</tspan></text>
+    <text x="310" y="206"><tspan fill="#64748b">}</tspan></text>
+  </g>
+
+  <!-- Arrow -->
+  <g stroke="#22d3ee" stroke-width="2" fill="none">
+    <path d="M540 150 H572"/>
+    <path d="M564 142 l8 8 l-8 8"/>
+  </g>
+  <text x="556" y="130" fill="#94a3b8" font-size="11" text-anchor="middle">merge</text>
+
+  <!-- Result -->
+  <rect x="584" y="60" width="148" height="180" rx="14" fill="#0d1322" stroke="rgba(34,211,238,0.35)"/>
+  <text x="600" y="90" fill="#22d3ee" font-size="12" letter-spacing="1.5" font-weight="700">RESULT</text>
+  <g font-size="12.5">
+    <text x="600" y="124"><tspan fill="#64748b">{</tspan></text>
+    <text x="612" y="146"><tspan fill="#67e8f9">"theme"</tspan><tspan fill="#64748b">:</tspan></text>
+    <text x="624" y="164"><tspan fill="#fb7185">"dark"</tspan><tspan fill="#64748b">,</tspan></text>
+    <text x="612" y="186"><tspan fill="#67e8f9">"size"</tspan><tspan fill="#64748b">:</tspan> <tspan fill="#fcd34d">12</tspan><tspan fill="#64748b">,</tspan></text>
+    <text x="612" y="208"><tspan fill="#67e8f9">"lang"</tspan><tspan fill="#64748b">:</tspan> <tspan fill="#6ee7b7">"en"</tspan></text>
+    <text x="600" y="230"><tspan fill="#64748b">}</tspan></text>
+  </g>
+
+  <text x="380" y="300" fill="#fb7185" font-size="13" text-anchor="middle" font-weight="600">On a key conflict, the right-hand object wins</text>
+  <text x="380" y="324" fill="#94a3b8" font-size="11.5" text-anchor="middle">"theme" became "dark" (from B); unique keys from both are kept</text>
+</svg>
