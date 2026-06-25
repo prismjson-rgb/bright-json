@@ -10,7 +10,7 @@ const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 // Stable site-wide fallback. Bump this only when page structure/copy
 // meaningfully changes. Avoid `new Date()` here: a lastmod that moves on
 // every build trains crawlers to ignore the signal.
-const SITE_LASTMOD = "2026-06-16";
+const SITE_LASTMOD = "2026-06-25";
 
 function toDate(value?: string | null): string {
   return value || SITE_LASTMOD;

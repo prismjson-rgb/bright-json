@@ -69,6 +69,8 @@ Repairing is a fallback. The real fix is constraining the model so it returns cl
 
 Even with JSON mode, validate before you trust the data: a response can be *syntactically* valid JSON yet still have the wrong keys or types. Pair a parser check with a [schema validation](/learn/json-schema-basics/) step for anything that feeds a downstream system.
 
+**Go deeper:** [Cleaning JSON from ChatGPT](/learn/clean-chatgpt-json/) for markdown fences and chatter, [Repairing Truncated LLM JSON](/learn/repair-truncated-llm-json/) for responses cut off by the token limit, [Getting Reliable JSON from LLMs](/learn/reliable-json-from-llms/) for structured output, and [Validating LLM JSON Against a Schema](/learn/validate-llm-json-schema/) for shape checks.
+
 ## Frequently asked questions
 
 **Why does ChatGPT wrap JSON in ```` ```json ````?**

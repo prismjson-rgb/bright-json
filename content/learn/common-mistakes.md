@@ -50,6 +50,8 @@ Fixed:
 {"name": "Alice", "city": "London"}
 ```
 
+Deep dive: [Single Quotes in JSON](/learn/fix-single-quotes-json/).
+
 ## Mistake 3: Unquoted keys
 
 JavaScript allows `{name: "Alice"}` but JSON does not. Every key must be a quoted string.
@@ -65,6 +67,8 @@ Fixed:
 ```json
 {"name": "Alice", "age": 30}
 ```
+
+Deep dive: [Unquoted Keys in JSON](/learn/fix-unquoted-keys-json/).
 
 ## Mistake 4: undefined or NaN values
 
@@ -121,6 +125,8 @@ This is valid JSON but `count` is a string. If your API expects a number, it wil
 {"count": 42}
 ```
 
+Deep dive: [true vs "true": Booleans and Strings in JSON](/learn/json-true-vs-string-true/).
+
 ## Mistake 7: Duplicate keys
 
 JSON parsers handle duplicate keys inconsistently — some keep the first, some keep the last. Never use duplicate keys.
@@ -132,10 +138,13 @@ JSON parsers handle duplicate keys inconsistently — some keep the first, some 
 }
 ```
 
+Deep dive: [Duplicate Keys in JSON](/learn/json-duplicate-keys/) — why this is valid but dangerous.
+
 ## How to find mistakes fast
 
 - Paste into a validator — it points to the exact line and character
 - Check the error message: "Unexpected token ," usually means trailing comma; "Unexpected token '" means single quotes
+- Decode a specific error: [Unexpected token < at position 0](/learn/unexpected-token-in-json/), [Unexpected end of JSON input](/learn/unexpected-end-of-json-input/), [missing comma](/learn/missing-comma-json/), or [what the position number means](/learn/json-parse-error-position/)
 
 ## Try it in JSON Prism
 

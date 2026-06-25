@@ -3,6 +3,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 import { ArrowRight } from "lucide-react";
 import { encodeJson, isTooLarge } from "@/lib/share";
 
@@ -14,20 +15,63 @@ interface MarkdownArticleBodyProps {
   variant?: "default" | "landing";
 }
 
+// Display labels for the code-block header, keyed by the fenced-block language.
+const LANG_LABELS: Record<string, string> = {
+  json: "JSON",
+  js: "JAVASCRIPT",
+  javascript: "JAVASCRIPT",
+  jsx: "JSX",
+  ts: "TYPESCRIPT",
+  typescript: "TYPESCRIPT",
+  py: "PYTHON",
+  python: "PYTHON",
+  go: "GO",
+  bash: "BASH",
+  sh: "BASH",
+  shell: "BASH",
+  console: "SHELL",
+  sql: "SQL",
+  yaml: "YAML",
+  yml: "YAML",
+  toml: "TOML",
+  html: "HTML",
+  xml: "XML",
+  csv: "CSV",
+  text: "TEXT",
+  plaintext: "TEXT",
+};
+
+// Recursively pull the raw text out of React children — needed because, with
+// syntax highlighting, a code block's children are nested <span> nodes rather
+// than a plain string. The raw text drives the "Try in JSON Prism" button and
+// the JSON-detection heuristic.
+function nodeToText(node: React.ReactNode): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(nodeToText).join("");
+  if (React.isValidElement(node)) {
+    return nodeToText((node.props as { children?: React.ReactNode }).children);
+  }
+  return "";
+}
+
 function CodeBlock({
   code,
   lang,
+  children,
   onTry,
 }: {
   code: string;
   lang?: string;
+  children?: React.ReactNode;
   onTry?: (json: string) => void;
 }) {
   const trimmed = code.trim();
-  const isJson =
-    lang === "json" ||
+  const looksLikeJson =
     (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
     (trimmed.startsWith("[") && trimmed.endsWith("]"));
+  const isJson = lang === "json" || (!lang && looksLikeJson);
+  const label = lang ? LANG_LABELS[lang] ?? lang.toUpperCase() : isJson ? "JSON" : "TEXT";
 
   const handleTry = () => {
     if (onTry) {
@@ -52,11 +96,13 @@ function CodeBlock({
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/90" />
         </div>
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-600">
-          JSON
+          {label}
         </span>
       </div>
       <pre className="max-h-[360px] overflow-auto bg-[#080b14] p-4 font-mono text-xs leading-6 text-slate-200 sm:p-5">
-        <code>{code}</code>
+        <code className={lang ? `hljs language-${lang}` : "hljs"}>
+          {children ?? code}
+        </code>
       </pre>
       {isJson && (
         <div className="border-t border-white/[0.07] bg-white/[0.03] px-4 py-3">
@@ -93,6 +139,7 @@ export function MarkdownArticleBody({
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[[rehypeHighlight, { detect: false, ignoreMissing: true }]]}
         components={{
           p: ({ children }) => (
             <p
@@ -210,17 +257,42 @@ export function MarkdownArticleBody({
               {children}
             </td>
           ),
+          img: ({ src, alt }) => (
+            <figure className="my-7">
+              <img
+                src={typeof src === "string" ? src : ""}
+                alt={alt ?? ""}
+                loading="lazy"
+                decoding="async"
+                className="mx-auto w-full max-w-2xl rounded-2xl border border-white/[0.1] bg-[#090d17]"
+              />
+              {alt && (
+                <figcaption className="mt-3 text-center text-xs text-muted-foreground">
+                  {alt}
+                </figcaption>
+              )}
+            </figure>
+          ),
           pre: ({ children }) => {
-            const codeEl = React.Children.only(children) as React.ReactElement;
-            const code = String(codeEl?.props?.children ?? "").replace(/\n$/, "");
-            const lang = codeEl?.props?.className?.replace(/^language-/, "");
-            return <CodeBlock code={code} lang={lang} onTry={onTryInEditor} />;
+            const codeEl = React.Children.only(children) as React.ReactElement<{
+              className?: string;
+              children?: React.ReactNode;
+            }>;
+            const className = String(codeEl?.props?.className ?? "");
+            const lang = className.match(/language-([\w-]+)/)?.[1];
+            const code = nodeToText(codeEl?.props?.children).replace(/\n$/, "");
+            return (
+              <CodeBlock code={code} lang={lang} onTry={onTryInEditor}>
+                {codeEl?.props?.children}
+              </CodeBlock>
+            );
           },
           code: (props) => {
             const { children } = props;
-            const isInline =
-              !("className" in props) ||
-              !String(props.className ?? "").startsWith("language-");
+            const className = String(props.className ?? "");
+            // Block code carries a `language-*` or highlight.js `hljs` class;
+            // anything else is inline code.
+            const isInline = !/language-|hljs/.test(className);
             if (isInline) {
               return (
                 <code
