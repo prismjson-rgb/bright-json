@@ -8,6 +8,8 @@ appHref: /app/?tool=json-share-links
 badge: Collaboration
 order: 16
 keywords: [share json link, json url encoder, short json link]
+relatedTools: [json-bundle-viewer, json-notes]
+relatedLearn: [performance-large-files, security]
 highlights:
   - Fragment-based sharing by default
   - Optional short links for large payloads

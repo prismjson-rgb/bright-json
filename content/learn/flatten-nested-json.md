@@ -5,6 +5,8 @@ metaDescription: "Deeply nested JSON is hard to query and export. Learn how to f
 level: practical
 order: 47
 keyTerms: [flatten json, nested json, dotted keys, jq, json to csv]
+relatedTools: [json-minimal-mode, json-structure-analyzer]
+relatedLearn: [objects-arrays-depth, merge-json-objects, performance-large-files]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

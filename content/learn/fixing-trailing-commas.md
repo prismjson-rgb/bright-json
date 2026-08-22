@@ -5,6 +5,8 @@ metaDescription: "A trailing comma is the most common JSON syntax error. Learn w
 level: practical
 order: 23
 keyTerms: [trailing comma, json error, remove trailing comma, json syntax, fix json]
+relatedTools: [json-validator, json-trimmer]
+relatedLearn: [common-mistakes, fix-single-quotes-json, missing-comma-json]
 publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---

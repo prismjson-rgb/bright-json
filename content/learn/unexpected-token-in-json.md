@@ -5,6 +5,8 @@ metaDescription: "\"Unexpected token < in JSON at position 0\" almost always mea
 level: practical
 order: 27
 keyTerms: [unexpected token, json parse error, position 0, html not json, json.parse]
+relatedTools: [json-debugger, json-validator]
+relatedLearn: [common-mistakes, json-parse-error-position, fix-unquoted-keys-json]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

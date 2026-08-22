@@ -5,6 +5,8 @@ order: 15
 metaTitle: "JSONPath Tutorial: Query and Extract JSON Data"
 metaDescription: "JSONPath lets you query JSON like XPath for XML. Select nested values with $, ., .., and []. RFC 9535 standard."
 keyTerms: []
+relatedTools: [json-tree-view, json-visual-editor]
+relatedLearn: [query-json-with-jq, objects-arrays-depth]
 publishedAt: "2025-12-10"
 ---
 

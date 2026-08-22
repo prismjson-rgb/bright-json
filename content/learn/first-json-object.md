@@ -5,6 +5,8 @@ level: beginner
 order: 5
 tryExample: '{"name": "Your Name", "favoriteColor": "blue", "luckyNumber": 7}'
 keyTerms: []
+relatedTools: [json-formatter, json-visual-editor]
+relatedLearn: [what-is-json, objects-arrays-depth, common-patterns]
 publishedAt: "2025-12-01"
 ---
 

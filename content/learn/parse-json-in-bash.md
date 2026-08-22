@@ -5,6 +5,8 @@ metaDescription: "Bash can't parse JSON natively — use jq. Learn how to pipe c
 level: intermediate
 order: 55
 keyTerms: [bash json, jq, curl json, shell script, parse json]
+relatedTools: [json-formatter]
+relatedLearn: [query-json-with-jq, parse-stringify]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

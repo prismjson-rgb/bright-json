@@ -8,6 +8,8 @@ appHref: /app/?tool=json-converter
 badge: Transform
 order: 7
 keywords: [json to yaml, json to xml, json to csv]
+relatedTools: [json-formatter, json-trimmer]
+relatedLearn: [convert-json-to-csv, json-vs-xml-csv, json-vs-yaml]
 highlights:
   - Multiple output formats
   - Browser-based conversion

@@ -5,6 +5,8 @@ metaDescription: "LLMs hit token limits mid-response, leaving JSON with unclosed
 level: intermediate
 order: 35
 keyTerms: [truncated json, llm output, unclosed brackets, max tokens, repair json]
+relatedTools: [ai-json-cleaner, json-debugger]
+relatedLearn: [clean-chatgpt-json, fixing-llm-json, reliable-json-from-llms]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

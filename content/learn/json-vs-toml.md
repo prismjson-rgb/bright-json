@@ -5,6 +5,8 @@ metaDescription: "TOML is built for human-edited config; JSON is built for data 
 level: intermediate
 order: 41
 keyTerms: [toml, json config, configuration, comments, ini]
+relatedTools: [json-converter]
+relatedLearn: [json-alternatives, json-vs-yaml]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

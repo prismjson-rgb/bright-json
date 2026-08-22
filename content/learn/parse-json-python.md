@@ -5,6 +5,8 @@ metaDescription: "Python's json module maps cleanly to dicts and lists. Learn lo
 level: intermediate
 order: 52
 keyTerms: [python json, json.loads, json.dumps, dict, parse json]
+relatedTools: [json-formatter, json-validator]
+relatedLearn: [parse-stringify, parse-json-javascript]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

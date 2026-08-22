@@ -8,6 +8,8 @@ appHref: /app/?tool=json-minimal-mode
 badge: Payload reduction
 order: 11
 keywords: [json filter, json minimal mode, reduce json payload]
+relatedTools: [json-trimmer, json-structure-analyzer]
+relatedLearn: [flatten-nested-json, performance-large-files]
 highlights:
   - Include or exclude paths
   - Cut payload size quickly

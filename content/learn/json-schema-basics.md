@@ -5,6 +5,8 @@ order: 12
 metaTitle: "JSON Schema Tutorial: Validate and Define JSON Structure"
 metaDescription: "JSON Schema defines and validates JSON structure. Learn type checking, required fields, patterns, and validation tools."
 keyTerms: []
+relatedTools: [json-validator, json-best-practices-checker]
+relatedLearn: [validate-llm-json-schema, common-patterns, valid-vs-invalid]
 publishedAt: "2025-12-10"
 ---
 

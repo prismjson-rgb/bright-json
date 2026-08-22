@@ -5,6 +5,8 @@ order: 1
 metaTitle: "What is JSON? A Complete Introduction for Beginners"
 metaDescription: "JSON (JavaScript Object Notation) is a lightweight data format used by 70%+ of APIs. Learn what JSON is, why it exists, and when to use it."
 keyTerms: [JSON, data interchange, API, lightweight, text-based]
+relatedTools: [json-formatter, json-validator]
+relatedLearn: [six-data-types, syntax-rules, json-vs-xml-csv]
 publishedAt: "2025-12-01"
 ---
 

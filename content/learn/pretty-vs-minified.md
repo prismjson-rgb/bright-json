@@ -4,6 +4,8 @@ metaDescription: "Learn the difference between pretty-printed and minified JSON,
 level: practical
 order: 11
 keyTerms: []
+relatedTools: [json-formatter, json-trimmer]
+relatedLearn: [minify-json, parse-stringify]
 publishedAt: "2025-12-03"
 ---
 

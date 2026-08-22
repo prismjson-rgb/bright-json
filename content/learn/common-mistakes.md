@@ -5,6 +5,8 @@ order: 14
 metaTitle: "Top JSON Mistakes: Trailing Commas, Quotes, and How to Fix"
 metaDescription: "Avoid the most common JSON errors: trailing commas, single quotes, unquoted keys, and JavaScript-only values. Quick fixes and validation tips."
 keyTerms: []
+relatedTools: [json-validator, json-debugger]
+relatedLearn: [fixing-trailing-commas, fix-single-quotes-json, fix-unquoted-keys-json, unexpected-token-in-json]
 publishedAt: "2025-12-05"
 ---
 

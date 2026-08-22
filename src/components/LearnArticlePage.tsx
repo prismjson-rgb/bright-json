@@ -1,6 +1,7 @@
 "use client";
 
 import { MarkdownArticleBody } from "./MarkdownArticleBody";
+import { RelatedLinks } from "./site/RelatedLinks";
 import type { TutorialSection } from "@/lib/learn-content";
 import { encodeJson, isTooLarge } from "@/lib/share";
 import Link from "next/link";
@@ -43,6 +44,8 @@ export function LearnArticlePage({ section, prev, next }: LearnArticlePageProps)
         tryExample={section.tryExample}
         onTryInEditor={handleTryInEditor}
       />
+
+      <RelatedLinks relatedTools={section.relatedTools} relatedLearn={section.relatedLearn} variant="light" />
 
       <nav
         className="mt-12 pt-8 border-t border-border flex flex-wrap gap-4 justify-between"

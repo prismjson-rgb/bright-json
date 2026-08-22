@@ -5,6 +5,8 @@ metaDescription: "Even valid JSON from an LLM can have the wrong shape. Learn ho
 level: intermediate
 order: 37
 keyTerms: [validate json, json schema, llm output, ajv, pydantic]
+relatedTools: [json-validator, ai-json-cleaner]
+relatedLearn: [json-schema-basics, reliable-json-from-llms, fixing-llm-json]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

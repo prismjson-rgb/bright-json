@@ -5,6 +5,8 @@ metaDescription: "Postgres has two JSON types. Learn why jsonb is almost always 
 level: advanced
 order: 54
 keyTerms: [postgresql json, jsonb, gin index, json query, database json]
+relatedTools: [json-formatter, json-validator]
+relatedLearn: [json-schema-basics, parse-stringify]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

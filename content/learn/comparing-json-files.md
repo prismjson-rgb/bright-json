@@ -5,6 +5,8 @@ metaDescription: "Comparing JSON by line misses real changes. Learn how structur
 level: practical
 order: 21
 keyTerms: [compare json, json diff, json compare, diff json files, compare api responses]
+relatedTools: [json-diff-viewer, json-bundle-viewer]
+relatedLearn: [tree-vs-graph-view, merge-json-objects]
 publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---

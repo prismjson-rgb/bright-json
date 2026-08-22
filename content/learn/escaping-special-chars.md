@@ -4,6 +4,8 @@ metaDescription: "Learn how JSON escaping works for quotes, backslashes, newline
 level: intermediate
 order: 13
 keyTerms: []
+relatedTools: [json-validator, json-debugger]
+relatedLearn: [json-bom-error, common-mistakes, syntax-rules]
 publishedAt: "2025-12-04"
 ---
 

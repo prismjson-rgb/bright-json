@@ -5,6 +5,8 @@ metaDescription: "Stop parsing LLM JSON with regex. Learn how JSON mode, structu
 level: intermediate
 order: 36
 keyTerms: [structured output, json mode, llm json, schema, function calling]
+relatedTools: [ai-json-cleaner, json-validator]
+relatedLearn: [fixing-llm-json, validate-llm-json-schema, repair-truncated-llm-json]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

@@ -5,6 +5,8 @@ metaDescription: "JSON and YAML both store structured data, but suit different j
 level: comfortable
 order: 22
 keyTerms: [json vs yaml, yaml vs json, data format, config file, json to yaml]
+relatedTools: [json-converter]
+relatedLearn: [json-vs-xml-csv, json-alternatives, json-vs-toml]
 publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---

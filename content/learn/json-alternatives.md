@@ -4,6 +4,8 @@ metaDescription: "Compare JSON with JSON5, JSONC, YAML, TOML, MessagePack, Proto
 level: expert
 order: 18
 keyTerms: []
+relatedTools: [json-converter]
+relatedLearn: [json-vs-yaml, json-vs-protobuf, json-vs-toml]
 publishedAt: "2025-12-09"
 ---
 

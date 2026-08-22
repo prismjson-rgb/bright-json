@@ -5,6 +5,8 @@ metaDescription: "JSON has no date type. Learn why ISO 8601 / RFC 3339 strings a
 level: intermediate
 order: 42
 keyTerms: [json date, iso 8601, rfc 3339, timestamp, utc]
+relatedTools: [json-validator, json-visual-editor]
+relatedLearn: [json-big-numbers, json-null-vs-missing, common-mistakes]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

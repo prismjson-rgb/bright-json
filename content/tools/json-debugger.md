@@ -8,6 +8,8 @@ appHref: /app/?tool=json-debugger
 badge: Repair
 order: 8
 keywords: [json debugger, fix json errors, repair json]
+relatedTools: [json-validator, json-formatter]
+relatedLearn: [common-mistakes, unexpected-token-in-json, json-parse-error-position, missing-comma-json]
 highlights:
   - Surface parsing failures quickly
   - Repair common syntax issues

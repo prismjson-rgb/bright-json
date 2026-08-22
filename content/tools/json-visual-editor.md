@@ -8,6 +8,8 @@ appHref: /app/?tool=json-visual-editor
 badge: No-code editing
 order: 4
 keywords: [json editor, json editor online, json visual editor, edit json online, form json editor]
+relatedTools: [json-tree-view, json-formatter, json-validator]
+relatedLearn: [objects-arrays-depth, common-patterns, parse-stringify]
 highlights:
   - Form-style editing
   - Raw JSON stays in sync

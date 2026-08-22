@@ -75,8 +75,25 @@ export const LEARN_SECTIONS: Array<{
       tryExample: data.tryExample,
       publishedAt: data.publishedAt ?? null,
       updatedAt: data.updatedAt ?? null,
+      relatedTools: Array.isArray(data.relatedTools) ? data.relatedTools.filter((t) => t != null) : [],
+      relatedLearn: Array.isArray(data.relatedLearn) ? data.relatedLearn.filter((t) => t != null) : [],
       _order: typeof data.order === "number" ? data.order : 999,
     });
+  }
+
+  const learnIds = new Set(sections.map((s) => s.id));
+  const toolSlugs = new Set(
+    fs.existsSync(TOOLS_DIR)
+      ? fs.readdirSync(TOOLS_DIR).filter((f) => f.endsWith(".md") && f !== "README.md").map((f) => f.replace(/\.md$/, ""))
+      : []
+  );
+  for (const section of sections) {
+    for (const ref of section.relatedLearn) {
+      if (!learnIds.has(ref)) throw new Error(`content/learn/${section.id}.md: relatedLearn references unknown slug "${ref}"`);
+    }
+    for (const ref of section.relatedTools) {
+      if (!toolSlugs.has(ref)) throw new Error(`content/learn/${section.id}.md: relatedTools references unknown slug "${ref}"`);
+    }
   }
 
   sections.sort((a, b) => a._order - b._order);
@@ -97,6 +114,8 @@ export interface LearnSection {
   tryExample?: string;
   publishedAt?: string | null;
   updatedAt?: string | null;
+  relatedTools: string[];
+  relatedLearn: string[];
 }
 
 export const LEARN_SECTIONS: LearnSection[] = ${JSON.stringify(out, null, 2)};
@@ -314,7 +333,24 @@ export const TOOL_SLUGS: string[] = [];
           }))
         : [],
       contentMarkdown: content.trim(),
+      relatedTools: Array.isArray(data.relatedTools) ? data.relatedTools.filter((t) => t != null) : [],
+      relatedLearn: Array.isArray(data.relatedLearn) ? data.relatedLearn.filter((t) => t != null) : [],
     });
+  }
+
+  const toolSlugs = new Set(tools.map((t) => t.slug));
+  const learnIds = new Set(
+    fs.existsSync(LEARN_DIR)
+      ? fs.readdirSync(LEARN_DIR).filter((f) => f.endsWith(".md") && f !== "README.md").map((f) => f.replace(/\.md$/, ""))
+      : []
+  );
+  for (const tool of tools) {
+    for (const ref of tool.relatedTools) {
+      if (!toolSlugs.has(ref)) throw new Error(`content/tools/${tool.slug}.md: relatedTools references unknown slug "${ref}"`);
+    }
+    for (const ref of tool.relatedLearn) {
+      if (!learnIds.has(ref)) throw new Error(`content/tools/${tool.slug}.md: relatedLearn references unknown slug "${ref}"`);
+    }
   }
 
   tools.sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
@@ -335,6 +371,8 @@ export interface ToolContent {
   useCases: string[];
   faqs: Array<{ question: string; answer: string }>;
   contentMarkdown: string;
+  relatedTools: string[];
+  relatedLearn: string[];
 }
 export const TOOLS: ToolContent[] = ${JSON.stringify(tools, null, 2)};
 export const TOOL_SLUGS: string[] = ${JSON.stringify(tools.map((tool) => tool.slug))};

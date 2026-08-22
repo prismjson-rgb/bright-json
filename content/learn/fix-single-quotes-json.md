@@ -5,6 +5,8 @@ metaDescription: "JSON requires double quotes for every key and string. Learn wh
 level: practical
 order: 30
 keyTerms: [single quotes, double quotes, json string, json.parse, invalid json]
+relatedTools: [json-validator, json-debugger]
+relatedLearn: [common-mistakes, fix-unquoted-keys-json, syntax-rules]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

@@ -8,6 +8,8 @@ appHref: /app/?tool=json-structure-analyzer
 badge: Metrics
 order: 12
 keywords: [json analyzer, json structure analyzer, inspect json]
+relatedTools: [json-tree-view, json-best-practices-checker]
+relatedLearn: [objects-arrays-depth, performance-large-files, common-patterns]
 highlights:
   - Count keys and types
   - Spot deep nesting

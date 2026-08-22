@@ -5,6 +5,8 @@ metaDescription: "JSON requires every property name to be a double-quoted string
 level: practical
 order: 31
 keyTerms: [unquoted keys, property names, json object, json.parse, invalid json]
+relatedTools: [json-validator, json-debugger]
+relatedLearn: [fix-single-quotes-json, common-mistakes, syntax-rules]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

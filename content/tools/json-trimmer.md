@@ -8,6 +8,8 @@ appHref: /app/?tool=json-trimmer
 badge: Strict mode
 order: 9
 keywords: [json trimmer, json cleanup, remove trailing commas json]
+relatedTools: [json-formatter, json-validator]
+relatedLearn: [minify-json, fixing-trailing-commas, json5-vs-jsonc]
 highlights:
   - Remove comments and trailing commas
   - Normalize loose input

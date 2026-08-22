@@ -5,6 +5,8 @@ order: 9
 metaTitle: "How JSON is Used in REST APIs — Complete Guide"
 metaDescription: "Learn how JSON powers REST APIs. Request and response examples, Content-Type headers, and parsing in JavaScript, Python, and more."
 keyTerms: []
+relatedTools: [json-formatter, json-validator]
+relatedLearn: [common-patterns, validate-webhook-payloads, parse-stringify]
 publishedAt: "2025-12-09"
 ---
 

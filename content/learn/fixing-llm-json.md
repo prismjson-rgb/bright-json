@@ -5,6 +5,8 @@ metaDescription: "LLMs often return JSON wrapped in markdown, with trailing comm
 level: practical
 order: 19
 keyTerms: [LLM JSON, ChatGPT JSON, Claude JSON, fix JSON, structured output, json repair]
+relatedTools: [ai-json-cleaner, json-validator]
+relatedLearn: [clean-chatgpt-json, repair-truncated-llm-json, reliable-json-from-llms]
 publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---

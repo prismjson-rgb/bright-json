@@ -5,6 +5,8 @@ order: 4
 metaTitle: "JSON Syntax Rules: Keys, Quotes, Commas, and More"
 metaDescription: "Master JSON syntax: double quotes for keys and strings, no trailing commas, no comments. Avoid common JSON mistakes."
 keyTerms: []
+relatedTools: [json-validator, json-formatter]
+relatedLearn: [common-mistakes, valid-vs-invalid, what-is-json]
 publishedAt: "2025-12-04"
 ---
 

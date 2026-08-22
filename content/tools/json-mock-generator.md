@@ -8,6 +8,8 @@ appHref: /app/?tool=json-mock-generator
 badge: Mock data
 order: 15
 keywords: [json mock generator, sample json generator, fake json data]
+relatedTools: [json-validator, json-visual-editor]
+relatedLearn: [common-patterns, json-schema-basics, first-json-object]
 highlights:
   - Faster prototyping
   - Good for UI and API mocks

@@ -5,6 +5,8 @@ metaDescription: "true and \"true\" are different types in JSON, and so are 5 an
 level: intermediate
 order: 46
 keyTerms: [json boolean, type coercion, string vs boolean, quotes, json types]
+relatedTools: [json-validator, json-visual-editor]
+relatedLearn: [json-null-vs-missing, six-data-types]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

@@ -5,6 +5,8 @@ metaDescription: "Combining two JSON objects sounds simple until nested keys col
 level: practical
 order: 48
 keyTerms: [merge json, deep merge, shallow merge, object spread, json combine]
+relatedTools: [json-diff-viewer, json-visual-editor]
+relatedLearn: [flatten-nested-json, comparing-json-files]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

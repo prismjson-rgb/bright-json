@@ -4,6 +4,8 @@ metaDescription: "Compare JSON, XML, and CSV with examples, strengths, limitatio
 level: beginner
 order: 2
 keyTerms: []
+relatedTools: [json-converter]
+relatedLearn: [what-is-json, json-vs-yaml, convert-json-to-csv]
 publishedAt: "2025-12-08"
 ---
 

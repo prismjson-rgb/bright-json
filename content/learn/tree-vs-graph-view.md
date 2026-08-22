@@ -5,6 +5,8 @@ metaDescription: "Tree view and graph view both visualize JSON, but they solve d
 level: advanced
 order: 20
 keyTerms: [json tree view, json graph view, json visualizer, json flow, visualize json]
+relatedTools: [json-tree-view, json-flow-view]
+relatedLearn: [objects-arrays-depth, comparing-json-files]
 publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---

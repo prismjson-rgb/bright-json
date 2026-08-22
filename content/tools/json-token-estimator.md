@@ -8,6 +8,8 @@ appHref: /app/?tool=json-token-estimator
 badge: Token cost
 order: 14
 keywords: [json token estimator, llm token json, estimate tokens json]
+relatedTools: [ai-json-cleaner, json-minimal-mode]
+relatedLearn: [count-json-tokens-llm, minify-json, performance-large-files]
 highlights:
   - Approximate token usage
   - Compare format overhead

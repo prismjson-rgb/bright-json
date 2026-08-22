@@ -8,6 +8,8 @@ appHref: /app/?tool=json-notes
 badge: Context
 order: 17
 keywords: [json annotation tool, json documentation, json comment workaround, annotate json fields]
+relatedTools: [json-share-links, json-visual-editor]
+relatedLearn: [common-patterns, json-schema-basics]
 highlights:
   - Keep notes with the payload
   - Helpful during reviews

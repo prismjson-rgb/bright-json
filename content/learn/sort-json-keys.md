@@ -5,6 +5,8 @@ metaDescription: "Sorting object keys makes JSON deterministic — smaller git d
 level: practical
 order: 49
 keyTerms: [sort json keys, deterministic, git diff, canonical json, stable order]
+relatedTools: [json-formatter, json-best-practices-checker]
+relatedLearn: [pretty-vs-minified, common-patterns]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

@@ -8,6 +8,8 @@ appHref: /bundle/
 badge: Multi-document
 order: 18
 keywords: [json bundle, share multiple json files, json bundle viewer]
+relatedTools: [json-diff-viewer, json-share-links]
+relatedLearn: [comparing-json-files, json-in-apis]
 highlights:
   - Share related JSON together
   - Better for repro sets

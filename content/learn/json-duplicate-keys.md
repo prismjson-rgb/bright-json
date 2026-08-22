@@ -5,6 +5,8 @@ metaDescription: "JSON doesn't forbid duplicate object keys, but parsers disagre
 level: advanced
 order: 45
 keyTerms: [duplicate keys, json object, last wins, parser behavior, json security]
+relatedTools: [json-validator, json-debugger]
+relatedLearn: [json-null-vs-missing, common-mistakes]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

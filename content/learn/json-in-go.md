@@ -5,6 +5,8 @@ metaDescription: "Go's encoding/json maps JSON to structs via tags. Learn Marsha
 level: advanced
 order: 56
 keyTerms: [go json, encoding/json, struct tags, marshal, omitempty]
+relatedTools: [json-formatter, json-validator]
+relatedLearn: [parse-stringify, json-schema-basics]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

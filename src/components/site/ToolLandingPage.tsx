@@ -3,6 +3,7 @@ import { ArrowRight, ChevronRight, Layers3, ShieldCheck, Sparkles } from "lucide
 import { MarkdownArticleBody } from "@/components/MarkdownArticleBody";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { FaqAccordion } from "@/components/site/FaqAccordion";
+import { RelatedLinks } from "@/components/site/RelatedLinks";
 import type { ToolContent } from "@/lib/tool-content";
 import type { ToolFaq } from "@/lib/tool-faqs";
 
@@ -312,6 +313,8 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
                 </ul>
               </div>
             )}
+
+            <RelatedLinks relatedTools={tool.relatedTools} relatedLearn={tool.relatedLearn} variant="dark" />
 
             {tool.keywords.length > 0 && (
               <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">

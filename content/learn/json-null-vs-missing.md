@@ -5,6 +5,8 @@ metaDescription: "An explicit null, an absent key, and an empty string are three
 level: intermediate
 order: 44
 keyTerms: [json null, missing key, empty string, undefined, optional fields]
+relatedTools: [json-validator, json-tree-view]
+relatedLearn: [json-duplicate-keys, json-true-vs-string-true, six-data-types]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

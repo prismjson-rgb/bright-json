@@ -4,6 +4,8 @@ metaDescription: "Learn how to handle large JSON files with streaming parsers, W
 level: advanced
 order: 16
 keyTerms: []
+relatedTools: [json-minimal-mode, json-token-estimator]
+relatedLearn: [minify-json, flatten-nested-json, count-json-tokens-llm]
 publishedAt: "2025-12-11"
 ---
 

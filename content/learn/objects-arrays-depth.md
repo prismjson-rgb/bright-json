@@ -4,6 +4,8 @@ metaDescription: "Understand JSON objects, arrays, nesting, ordered lists, key-v
 level: comfortable
 order: 6
 keyTerms: []
+relatedTools: [json-tree-view, json-structure-analyzer]
+relatedLearn: [common-patterns, flatten-nested-json, performance-large-files]
 publishedAt: "2025-12-02"
 ---
 

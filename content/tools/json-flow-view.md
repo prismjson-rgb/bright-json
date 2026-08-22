@@ -8,6 +8,8 @@ appHref: /app/?tool=json-flow-view
 badge: Visualization
 order: 5
 keywords: [json graph viewer, json flow view, visualize json]
+relatedTools: [json-tree-view, json-structure-analyzer]
+relatedLearn: [tree-vs-graph-view, objects-arrays-depth]
 highlights:
   - Zoom and pan through structure
   - Understand hierarchy quickly

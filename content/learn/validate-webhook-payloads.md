@@ -5,6 +5,8 @@ metaDescription: "Webhooks from Stripe, GitHub, and Shopify send JSON you don't 
 level: intermediate
 order: 25
 keyTerms: [webhook payload, validate webhook, stripe webhook, github webhook, json schema]
+relatedTools: [json-validator, json-best-practices-checker]
+relatedLearn: [json-schema-basics, security, json-in-apis]
 publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---

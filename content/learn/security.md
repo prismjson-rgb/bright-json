@@ -5,6 +5,8 @@ order: 17
 metaTitle: "JSON Security: Injection, Deserialization, and Validation"
 metaDescription: "Secure your JSON handling: prevent injection, validate with schema, limit depth, sanitize output. Enterprise security guide."
 keyTerms: []
+relatedTools: [json-best-practices-checker, json-validator]
+relatedLearn: [validate-webhook-payloads, escaping-special-chars]
 publishedAt: "2025-12-11"
 ---
 

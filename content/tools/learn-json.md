@@ -8,6 +8,8 @@ appHref: /learn/
 badge: Tutorial
 order: 19
 keywords: [learn json, json tutorial, json guide]
+relatedTools: [json-validator, json-formatter, json-debugger, json-tree-view]
+relatedLearn: [what-is-json, six-data-types, syntax-rules, common-mistakes]
 highlights:
   - Dedicated lesson pages
   - Covers beginner to advanced topics

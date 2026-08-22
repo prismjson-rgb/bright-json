@@ -5,6 +5,8 @@ order: 7
 metaTitle: "Common JSON Patterns: API Responses, Configs, and More"
 metaDescription: "Learn the most common JSON patterns: list of objects, nested config, key-value lookup. Copy-paste ready examples."
 keyTerms: []
+relatedTools: [json-mock-generator, json-visual-editor]
+relatedLearn: [objects-arrays-depth, json-schema-basics, json-in-apis]
 publishedAt: "2025-12-05"
 ---
 

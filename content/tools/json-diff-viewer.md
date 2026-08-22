@@ -8,6 +8,8 @@ appHref: /app/?tool=json-diff-viewer
 badge: Diff
 order: 6
 keywords: [json diff, compare json, json compare tool]
+relatedTools: [json-formatter, json-bundle-viewer]
+relatedLearn: [comparing-json-files, merge-json-objects]
 highlights:
   - Side-by-side comparison
   - Faster change review

@@ -5,6 +5,8 @@ metaDescription: "JSON is human-readable text; Protobuf is a compact binary form
 level: intermediate
 order: 40
 keyTerms: [protobuf, protocol buffers, binary format, grpc, serialization]
+relatedTools: [json-converter]
+relatedLearn: [json-alternatives, json-vs-yaml]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

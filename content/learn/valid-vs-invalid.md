@@ -4,6 +4,8 @@ metaDescription: "Learn what makes JSON valid or invalid, with examples of trail
 level: comfortable
 order: 8
 keyTerms: []
+relatedTools: [json-validator, json-debugger]
+relatedLearn: [common-mistakes, syntax-rules, unexpected-token-in-json]
 publishedAt: "2025-12-03"
 ---
 

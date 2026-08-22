@@ -8,6 +8,8 @@ appHref: /app/?tool=json-formatter
 badge: Formatting
 order: 1
 keywords: [json formatter, json beautifier, pretty print json]
+relatedTools: [json-validator, json-trimmer, json-tree-view]
+relatedLearn: [pretty-vs-minified, minify-json, syntax-rules, common-mistakes]
 highlights:
   - Beautify minified payloads instantly.
   - Keep formatting local in the browser.

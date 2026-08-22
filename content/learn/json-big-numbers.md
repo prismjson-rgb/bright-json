@@ -5,6 +5,8 @@ metaDescription: "Large integers like 64-bit IDs silently lose precision when JS
 level: advanced
 order: 43
 keyTerms: [big numbers, int64, precision, bigint, safe integer]
+relatedTools: [json-validator, json-debugger]
+relatedLearn: [json-dates, json-null-vs-missing]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

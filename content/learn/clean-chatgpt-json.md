@@ -5,6 +5,8 @@ metaDescription: "ChatGPT often wraps JSON in ```json fences or adds chatter. Le
 level: intermediate
 order: 34
 keyTerms: [chatgpt json, markdown fences, code block, clean json, llm output]
+relatedTools: [ai-json-cleaner, json-validator]
+relatedLearn: [fixing-llm-json, repair-truncated-llm-json, reliable-json-from-llms]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

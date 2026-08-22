@@ -5,6 +5,8 @@ metaDescription: "Plain JSON forbids comments and trailing commas. JSONC and JSO
 level: intermediate
 order: 39
 keyTerms: [json5, jsonc, json comments, trailing commas, config files]
+relatedTools: [json-trimmer, json-validator]
+relatedLearn: [fixing-trailing-commas, syntax-rules]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

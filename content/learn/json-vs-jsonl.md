@@ -5,6 +5,8 @@ metaDescription: "JSONL stores one JSON object per line; JSON stores one documen
 level: intermediate
 order: 38
 keyTerms: [jsonl, ndjson, json lines, streaming, log files]
+relatedTools: [json-converter, json-formatter]
+relatedLearn: [json-alternatives, minify-json]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

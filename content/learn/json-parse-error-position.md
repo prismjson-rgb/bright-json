@@ -5,6 +5,8 @@ metaDescription: "JSON errors report a position like \"at position 42\". Learn w
 level: practical
 order: 29
 keyTerms: [json position, parse error, character index, json.parse, json line column]
+relatedTools: [json-debugger, json-validator]
+relatedLearn: [unexpected-token-in-json, unexpected-end-of-json-input, common-mistakes]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

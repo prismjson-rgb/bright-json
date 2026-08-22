@@ -5,6 +5,8 @@ metaDescription: "An invisible byte-order mark at the start of a file causes \"U
 level: practical
 order: 32
 keyTerms: [byte order mark, bom, feff, json parse error, utf-8]
+relatedTools: [json-debugger, json-validator]
+relatedLearn: [escaping-special-chars, common-mistakes]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

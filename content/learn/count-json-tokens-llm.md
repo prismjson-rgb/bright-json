@@ -5,6 +5,8 @@ metaDescription: "JSON is token-heavy in LLM prompts. Learn how tokens are count
 level: advanced
 order: 26
 keyTerms: [json tokens, llm context, token count, token estimator, prompt cost]
+relatedTools: [json-token-estimator, ai-json-cleaner]
+relatedLearn: [performance-large-files, fixing-llm-json]
 publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---

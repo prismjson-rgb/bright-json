@@ -5,6 +5,8 @@ metaDescription: "Minifying removes whitespace to shrink JSON for transport. Lea
 level: practical
 order: 51
 keyTerms: [minify json, compress json, whitespace, gzip, payload size]
+relatedTools: [json-formatter, json-trimmer]
+relatedLearn: [pretty-vs-minified, performance-large-files]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

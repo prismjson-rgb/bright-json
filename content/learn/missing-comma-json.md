@@ -5,6 +5,8 @@ metaDescription: "A missing comma between two members is a top JSON error. Learn
 level: practical
 order: 33
 keyTerms: [missing comma, json separator, expected comma, json.parse, json syntax]
+relatedTools: [json-validator, json-debugger]
+relatedLearn: [fixing-trailing-commas, common-mistakes, unexpected-token-in-json]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

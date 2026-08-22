@@ -8,6 +8,8 @@ appHref: /app/?tool=ai-json-cleaner
 badge: LLM cleanup
 order: 10
 keywords: [ai json cleaner, extract json from text, llm json fixer]
+relatedTools: [json-validator, json-token-estimator]
+relatedLearn: [fixing-llm-json, clean-chatgpt-json, repair-truncated-llm-json, reliable-json-from-llms]
 highlights:
   - Extract JSON from mixed text
   - Good for LLM and chatbot output

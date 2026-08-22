@@ -5,6 +5,8 @@ metaDescription: "jq is the command-line tool for slicing, filtering, and reshap
 level: intermediate
 order: 50
 keyTerms: [jq, query json, command line, filter json, json transform]
+relatedTools: [json-tree-view]
+relatedLearn: [jsonpath, parse-json-in-bash]
 publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---

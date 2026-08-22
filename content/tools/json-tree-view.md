@@ -8,6 +8,8 @@ appHref: /app/?tool=json-tree-view
 badge: Navigation
 order: 3
 keywords: [json tree viewer, json viewer, json explorer]
+relatedTools: [json-flow-view, json-structure-analyzer, json-visual-editor]
+relatedLearn: [tree-vs-graph-view, objects-arrays-depth, common-patterns]
 highlights:
   - Expand and collapse nested nodes
   - Search structure faster

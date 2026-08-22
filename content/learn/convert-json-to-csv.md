@@ -5,6 +5,8 @@ metaDescription: "Convert JSON to CSV the right way: flatten arrays of objects i
 level: practical
 order: 24
 keyTerms: [json to csv, convert json, flatten json, csv export, json array to csv]
+relatedTools: [json-converter]
+relatedLearn: [json-vs-xml-csv, flatten-nested-json]
 publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---
