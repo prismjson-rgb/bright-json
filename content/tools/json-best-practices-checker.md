@@ -8,7 +8,7 @@ appHref: /app/?tool=json-best-practices-checker
 badge: Quality
 order: 13
 keywords: [json best practices, json linting, review json structure]
-relatedTools: [json-structure-analyzer, json-validator]
+relatedTools: [json-schema-validator, json-structure-analyzer, json-validator]
 relatedLearn: [security, common-mistakes, performance-large-files]
 highlights:
   - Flags maintainability risks

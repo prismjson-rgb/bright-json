@@ -8,7 +8,7 @@ appHref: /app/?tool=json-validator
 badge: Validation
 order: 2
 keywords: [json validator, validate json, json syntax checker]
-relatedTools: [json-debugger, json-formatter, json-best-practices-checker]
+relatedTools: [json-schema-validator, json-debugger, json-formatter, json-best-practices-checker]
 relatedLearn: [valid-vs-invalid, common-mistakes, syntax-rules, unexpected-token-in-json]
 highlights:
   - Fast syntax feedback

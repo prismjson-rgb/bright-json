@@ -3,6 +3,7 @@ import type { PanelMode } from "./modes";
 export type ToolSlug =
   | "json-formatter"
   | "json-validator"
+  | "json-schema-validator"
   | "json-tree-view"
   | "json-visual-editor"
   | "json-flow-view"
@@ -44,6 +45,13 @@ export const TOOL_LAUNCH_CONFIG: Record<ToolSlug, ToolLaunchConfig> = {
     hint: "Paste JSON to validate syntax and inspect exact parser errors in the editor.",
     appHref: "/app/?tool=json-validator",
     mode: "tree",
+  },
+  "json-schema-validator": {
+    slug: "json-schema-validator",
+    title: "JSON Schema Validator",
+    hint: "Paste a JSON Schema (Draft 7) to validate the current JSON against it, with per-field error paths.",
+    appHref: "/app/?tool=json-schema-validator",
+    mode: "schema",
   },
   "json-tree-view": {
     slug: "json-tree-view",
