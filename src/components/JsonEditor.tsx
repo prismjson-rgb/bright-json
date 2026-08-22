@@ -19,13 +19,13 @@ interface JsonEditorProps {
   error: string | null;
   dark: boolean;
   editorSettings?: EditorSettings;
-  onSearchOpen?: () => void;
+  onFocusChange?: (focused: boolean) => void;
 }
 
-export default function JsonEditor({ value, onChange, error, dark, editorSettings, onSearchOpen }: JsonEditorProps) {
+export default function JsonEditor({ value, onChange, error, dark, editorSettings, onFocusChange }: JsonEditorProps) {
   const editorRef = useRef<any>(null);
-  const onSearchOpenRef = useRef(onSearchOpen);
-  useEffect(() => { onSearchOpenRef.current = onSearchOpen; }, [onSearchOpen]);
+  const onFocusChangeRef = useRef(onFocusChange);
+  useEffect(() => { onFocusChangeRef.current = onFocusChange; }, [onFocusChange]);
 
   // Defer mounting Monaco (a heavy chunk + init) off the critical path. We paint
   // a lightweight text placeholder first so first paint / LCP isn't blocked, then
@@ -47,25 +47,11 @@ export default function JsonEditor({ value, onChange, error, dark, editorSetting
     editorRef.current = editor;
     editor.focus();
 
-    // Intercept Ctrl+F / Cmd+F in the capture phase on the editor DOM node.
-    // This fires before Monaco's internal keyboard handler, so Monaco's native
-    // find widget never opens. addCommand runs inside Monaco's system which
-    // fires *alongside* the built-in action (causing the widget flash), so the
-    // capture-phase approach is the reliable fix.
-    const dom = editor.getDomNode() as HTMLElement | null;
-    if (dom) {
-      dom.addEventListener(
-        "keydown",
-        (e: KeyboardEvent) => {
-          if ((e.metaKey || e.ctrlKey) && !e.shiftKey && (e.key === "f" || e.key === "F")) {
-            e.stopPropagation();
-            e.preventDefault();
-            onSearchOpenRef.current?.();
-          }
-        },
-        { capture: true },
-      );
-    }
+    // Editor owns Cmd+F while it has focus (Monaco's native find/replace widget).
+    // The app-level search (right-side tree view) only takes over Cmd+F when
+    // focus is elsewhere, gated via onFocusChange below.
+    editor.onDidFocusEditorText(() => onFocusChangeRef.current?.(true));
+    editor.onDidBlurEditorText(() => onFocusChangeRef.current?.(false));
   }, []);
 
   useEffect(() => {
