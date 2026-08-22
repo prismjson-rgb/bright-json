@@ -1,7 +1,7 @@
 ---
 title: JSON Visual Editor
-metaTitle: JSON Editor Online | Visual JSON Editor for Structured Edits
-metaDescription: Edit JSON online through visual form controls while keeping the source JSON synchronized, valid, and ready to copy.
+metaTitle: JSON Editor Online | Free Visual Editor, No Signup
+metaDescription: Edit JSON with visual form controls — no raw syntax needed. 100% browser-based, nothing uploaded, free forever.
 summary: Edit JSON online without hand-editing commas, brackets, or quote marks.
 category: Edit
 appHref: /app/?tool=json-visual-editor

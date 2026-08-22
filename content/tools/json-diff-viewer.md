@@ -1,7 +1,7 @@
 ---
 title: JSON Diff Viewer
-metaTitle: JSON Diff Tool | Compare Two JSON Documents Side by Side
-metaDescription: Compare JSON documents with a focused side-by-side diff workflow that highlights additions, removals, and changed values.
+metaTitle: JSON Diff Viewer | Compare Two JSON Files, Free
+metaDescription: Spot every addition, removal, and change between two JSON documents instantly. Private, browser-based, no signup.
 summary: Review payload changes faster with a dedicated JSON comparison workflow.
 category: Compare
 appHref: /app/?tool=json-diff-viewer

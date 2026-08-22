@@ -1,5 +1,6 @@
 ---
 title: Your First JSON Object
+metaTitle: "Your First JSON Object: A Beginner's Walkthrough"
 metaDescription: "Write your first JSON object with clear examples of keys, values, commas, data types, and common beginner mistakes."
 level: beginner
 order: 5

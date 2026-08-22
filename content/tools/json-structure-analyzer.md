@@ -1,7 +1,7 @@
 ---
 title: JSON Structure Analyzer
-metaTitle: JSON Structure Analyzer | Measure JSON Complexity and Shape
-metaDescription: Inspect depth, type mix, and object complexity to understand how large and complicated a JSON payload really is.
+metaTitle: JSON Structure Analyzer | Free Complexity & Depth Report
+metaDescription: Instantly see depth, type mix, and complexity for any JSON payload. Private and browser-based — nothing is uploaded.
 summary: Get high-level metrics that explain the structure and size of a JSON document.
 category: Analyze
 appHref: /app/?tool=json-structure-analyzer

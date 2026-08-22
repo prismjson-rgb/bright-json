@@ -1,7 +1,7 @@
 ---
 title: JSON Notes
-metaTitle: JSON Notes Workspace | Keep Working Notes Beside JSON
-metaDescription: Store working notes, observations, and task context next to the active JSON document inside the browser workspace.
+metaTitle: JSON Notes | Private Workspace for JSON + Annotations
+metaDescription: Keep notes beside your JSON without leaving the tab. Nothing is saved to a server — 100% private, browser-only.
 summary: Add context to payload reviews without switching into a separate notes app.
 category: Collaborate
 appHref: /app/?tool=json-notes

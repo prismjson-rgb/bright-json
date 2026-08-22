@@ -1,7 +1,7 @@
 ---
 title: JSON Debugger
-metaTitle: JSON Debugger | Fix Common JSON Parse Errors Faster
-metaDescription: Debug malformed JSON with targeted feedback and repair-oriented workflows for common parser failures.
+metaTitle: JSON Debugger | Instantly Fix Parse Errors, Free
+metaDescription: Find and fix broken JSON in seconds with exact error locations. Runs 100% in your browser — no upload, no signup.
 summary: Find and fix JSON syntax problems without guessing where the payload broke.
 category: Debug
 appHref: /app/?tool=json-debugger

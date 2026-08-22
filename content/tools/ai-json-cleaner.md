@@ -1,7 +1,7 @@
 ---
 title: AI JSON Cleaner
-metaTitle: AI JSON Cleaner | Extract JSON From LLM Output
-metaDescription: Pull usable JSON out of messy AI responses, mixed prose, and fenced code blocks without leaving the browser.
+metaTitle: AI JSON Cleaner | Extract Clean JSON From LLM Output
+metaDescription: Pull valid JSON out of messy ChatGPT or Claude output in one paste. 100% private — runs in your browser, free.
 summary: Recover structured JSON from LLM output that is wrapped in commentary, markdown, or partial formatting.
 category: AI workflow
 appHref: /app/?tool=ai-json-cleaner

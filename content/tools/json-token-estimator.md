@@ -1,7 +1,7 @@
 ---
 title: JSON Token Estimator
-metaTitle: JSON Token Estimator | Approximate LLM Token Cost for JSON
-metaDescription: Estimate how expensive JSON may be in LLM contexts and compare formats before sending data to a model.
+metaTitle: JSON Token Estimator | Free, Private LLM Token Counter
+metaDescription: Estimate LLM token cost for any JSON payload instantly. 100% browser-based — nothing is uploaded, no signup required.
 summary: Understand the likely token footprint of JSON before it reaches an LLM.
 category: AI analysis
 appHref: /app/?tool=json-token-estimator

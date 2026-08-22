@@ -1,7 +1,7 @@
 ---
 title: JSON Tree View
-metaTitle: JSON Tree Viewer | Explore Nested JSON Structures Faster
-metaDescription: View JSON as a collapsible tree to inspect nested objects, large arrays, and deeply structured payloads without losing context.
+metaTitle: JSON Tree Viewer | Explore Nested JSON, Free & Private
+metaDescription: Browse deeply nested JSON as a collapsible tree without losing context. 100% browser-based — nothing is ever uploaded.
 summary: Browse large JSON documents with expand, collapse, and search-friendly structure.
 category: Explore
 appHref: /app/?tool=json-tree-view

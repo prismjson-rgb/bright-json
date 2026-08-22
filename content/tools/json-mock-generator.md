@@ -1,7 +1,7 @@
 ---
 title: JSON Mock Generator
-metaTitle: JSON Mock Generator | Create Sample JSON for APIs and UI Work
-metaDescription: Generate realistic sample JSON for prototyping, testing, demos, and UI development without building payloads from scratch.
+metaTitle: JSON Mock Generator | Free Sample Data for APIs & UI
+metaDescription: Generate realistic mock JSON for testing and prototyping in seconds. No account needed — runs entirely in your browser.
 summary: Create sample JSON faster when you need believable structures for testing and demos.
 category: Generate
 appHref: /app/?tool=json-mock-generator

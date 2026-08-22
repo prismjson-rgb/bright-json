@@ -1,7 +1,7 @@
 ---
 title: JSON Flow View
-metaTitle: JSON Graph View | Visualize JSON Relationships and Hierarchy
-metaDescription: Explore JSON as a graph with draggable nodes, zoom controls, and a visual way to understand hierarchy and relationships.
+metaTitle: JSON Graph View | Visualize Nested JSON, Free & Private
+metaDescription: See JSON as an interactive graph with draggable, zoomable nodes. Runs entirely in your browser — no upload required.
 summary: Turn nested JSON into a visual map when raw text and trees are not enough.
 category: Visualize
 appHref: /app/?tool=json-flow-view

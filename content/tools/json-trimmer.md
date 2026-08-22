@@ -1,7 +1,7 @@
 ---
 title: JSON Trimmer
-metaTitle: JSON Trimmer | Strip Comments, Trailing Commas, and Noise
-metaDescription: Turn loose JSON-like input into strict JSON by removing comments, trailing commas, and formatting noise.
+metaTitle: JSON Trimmer | Strip Comments & Trailing Commas, Free
+metaDescription: Clean loose JSON-like input into strict JSON in seconds — no upload, no account, runs entirely in your browser.
 summary: Clean permissive input so it becomes strict JSON ready for tooling and production systems.
 category: Cleanup
 appHref: /app/?tool=json-trimmer
