@@ -1,7 +1,7 @@
 ---
 title: JSON Prism
-metaTitle: JSON Editor Online - Free JSON Formatter, Validator & Diff Tool
-metaDescription: Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser with no sign-up and no data upload.
+metaTitle: JSON Prism | All-in-One JSON Toolkit — 19 Free Tools
+metaDescription: Format, validate, edit, diff, and convert JSON in one free browser-based workspace. 19 tools, no sign-up, nothing ever uploaded.
 faqs:
   - question: Is JSON Prism free to use?
     answer: Yes. JSON Prism is completely free. There is no sign-up, no subscription, and no usage limit. All core tools - formatter, validator, diff viewer, converter, debugger, and more - are available immediately.
@@ -23,7 +23,7 @@ trustPoints:
 
 ## What is JSON Prism?
 
-JSON Prism is a free online JSON editor and browser-based JSON workspace built for developers. It combines 19 JSON tools in a single interface - format, validate, diff, convert, debug, edit, and analyze JSON without installing anything or sending data to a server.
+JSON Prism is a free, browser-based JSON toolkit built for developers. It combines 19 JSON tools in a single workspace - format, validate, diff, convert, debug, edit, and analyze JSON without installing anything or sending data to a server.
 
 ## Core tools
 

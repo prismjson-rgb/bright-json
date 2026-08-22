@@ -117,12 +117,12 @@ export function HomePageSEOContent() {
         <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             <div>
-              <Eyebrow>JSON editor online</Eyebrow>
+              <Eyebrow>19 JSON tools, one workspace</Eyebrow>
               <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Free online JSON editor — format, validate, edit, and compare JSON.
+                The free, all-in-one JSON toolkit — everything in one workspace.
               </h1>
               <p className="mt-5 max-w-xl text-base leading-8 text-slate-400">
-                JSON Prism is a free browser-based JSON editor for developers working with
+                JSON Prism is a free browser-based JSON toolkit for developers working with
                 API responses, configs, test fixtures, and generated payloads. Paste JSON once,
                 then move between formatter, validator, visual editor, tree view, diff, converter,
                 debugger, and sharing tools without opening another tab.

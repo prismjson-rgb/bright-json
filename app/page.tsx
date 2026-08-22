@@ -8,16 +8,16 @@ import { safeJsonLd } from "@/lib/json-ld";
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
 export const metadata: Metadata = {
-  title: "JSON Editor Online – Free Formatter, Validator & Diff",
+  title: "JSON Prism | All-in-One JSON Toolkit — 19 Free Tools",
   description:
-    "Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser with no sign-up and no data upload.",
+    "Format, validate, edit, diff, and convert JSON in one free browser-based workspace. 19 tools, no sign-up, nothing ever uploaded.",
   alternates: {
     canonical: `${BASE}/`,
   },
   openGraph: {
-    title: "JSON Editor Online - Free JSON Formatter, Validator & Diff Tool",
+    title: "JSON Prism — The Free All-in-One JSON Toolkit",
     description:
-      "Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser.",
+      "Format, validate, edit, diff, and convert JSON in one free browser-based workspace. 19 tools, no sign-up, nothing ever uploaded.",
     type: "website",
     url: `${BASE}/`,
     siteName: "JSON Prism",
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "JSON Editor Online - Free JSON Formatter, Validator & Diff Tool",
+    title: "JSON Prism — The Free All-in-One JSON Toolkit",
     description:
-      "Free online JSON editor and formatter. Format, validate, diff, convert, debug, and edit JSON in your browser.",
+      "Format, validate, edit, diff, and convert JSON in one free browser-based workspace. 19 tools, no sign-up, nothing ever uploaded.",
     images: [`${BASE}/og-image.png`],
   },
 };
