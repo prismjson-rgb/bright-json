@@ -21,6 +21,10 @@ useCases:
 faqs:
   - question: "What is the best way to learn JSON from scratch?"
     answer: "Start with the basics: what JSON is, its six data types, and the syntax rules. Then practice reading and writing real JSON — API responses are the most common real-world JSON you will encounter. JSON Prism's learn section walks through everything from beginner to advanced in order."
+  - question: "Is JSON hard to learn?"
+    answer: "No. JSON has only six data types and a handful of syntax rules — most developers are comfortable reading and writing it within an hour. What takes longer is not the format itself but surrounding skills: working with nested structures, JSON Schema, and language-specific parsing quirks. If you already write code in any language, JSON is one of the easier formats to pick up."
+  - question: "How do I learn JSON quickly?"
+    answer: "Skip the theory and start with a real example: paste a JSON payload from an API you use into the JSON Validator, then work through What is JSON? and The Six JSON Data Types. Most developers are productive with JSON syntax in under an hour — fluency with parsing, schema, and edge cases comes from working with real payloads afterward, not from reading more."
   - question: "How long does it take to learn JSON?"
     answer: "JSON's syntax can be learned in under an hour — it has only six data types and a handful of rules. Working fluently with JSON in code (parsing, serializing, validating) takes a day or two of practice. Advanced topics like JSON Schema and JSONPath take longer to master."
   - question: "Do I need to know JavaScript to use JSON?"

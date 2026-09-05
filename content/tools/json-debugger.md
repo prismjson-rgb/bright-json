@@ -19,6 +19,8 @@ useCases:
   - Invalid API mocks
   - Import troubleshooting
 faqs:
+  - question: "How do I debug JSON parsing failures in workflows?"
+    answer: "Paste the exact payload that failed — from a webhook, API response, or pipeline step — into the JSON Debugger instead of guessing from a log message. It flags the specific parse failure with line context, and separately catches causes that don't show up as clean syntax errors in most workflow logs: invisible characters, output truncated by an upstream timeout, or a non-standard JSON variant. Fixing it here is faster than re-running the whole workflow to reproduce the failure."
   - question: "What does a JSON debugger do that a validator does not?"
     answer: "A validator tells you whether JSON is valid or not, and where the syntax error is. A debugger goes further — it suggests likely fixes, explains what the error means in plain language, and can auto-correct common mistakes like trailing commas or single quotes."
   - question: "How do I find why my JSON is not parsing?"

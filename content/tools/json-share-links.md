@@ -19,6 +19,8 @@ useCases:
   - Support tickets
   - Repro steps
 faqs:
+  - question: "How do I share a JSON file?"
+    answer: "Open it in JSON Prism, then create a share link from the Share panel. For small payloads, the JSON is encoded directly into the URL fragment — nothing is uploaded. For larger files, an optional short link stores the JSON temporarily and expires automatically. Either way, the recipient opens the link and sees the exact JSON, already formatted, with no file attachment needed."
   - question: "How do JSON share links work?"
     answer: "When you create a share link, your JSON is encoded and stored (or embedded in the URL itself for small documents). Anyone with the link can open it and see the JSON pre-loaded in JSON Prism's viewer. No account is required."
   - question: "Is my JSON secure in a share link?"

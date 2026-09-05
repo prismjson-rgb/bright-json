@@ -134,6 +134,11 @@ An ordered list of values enclosed in square brackets `[]`. Array elements can b
 }
 ```
 
+## Frequently asked questions
+
+**Does JSON support boolean values?**
+Yes. Boolean is one of JSON's six data types, with exactly two valid values: `true` and `false`, always lowercase. The boolean `true` is not the same as the string `"true"` — see [true vs "true"](/learn/json-true-vs-string-true/) for how that distinction causes bugs.
+
 ## Try it in JSON Prism
 
 Paste any JSON into the [JSON Validator](/tools/json-validator/) to confirm every value uses a valid type. The validator reports exactly which line contains an unsupported value so you can fix it immediately.

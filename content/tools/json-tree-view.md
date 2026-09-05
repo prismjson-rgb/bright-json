@@ -19,6 +19,8 @@ useCases:
   - Event payload reviews
   - Schema exploration
 faqs:
+  - question: "How do I navigate deeply nested JSON without scrolling?"
+    answer: "Collapse the branches you don't need so only the path you're working on stays visible, instead of scrolling past irrelevant siblings. Combine that with the search feature to jump straight to a key or value — matching nodes expand and scroll into view automatically, so you land on the right spot without manually opening every level."
   - question: "What is a JSON tree view?"
     answer: "A tree view renders JSON as a collapsible hierarchy — each object and array becomes an expandable node. This lets you navigate large nested documents without scrolling through raw text. You can collapse branches you do not need and focus on the part of the structure that matters."
   - question: "How do I find a value deep inside a large JSON file?"

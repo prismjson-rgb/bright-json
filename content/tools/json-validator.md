@@ -19,6 +19,8 @@ useCases:
   - Config validation
   - QA handoff
 faqs:
+  - question: "How do I check if my JSON is valid?"
+    answer: "Paste it into the JSON Validator — it parses your input as you type and reports the first syntax error it finds, with the exact line and character position. If no error appears and you see a valid confirmation, the JSON is syntactically correct. This checks structure only; to confirm the data itself matches a contract (required fields, types, ranges), use the JSON Schema Validator."
   - question: "Why is my JSON invalid?"
     answer: "The most common causes are: a trailing comma after the last item in an object or array, single quotes instead of double quotes, an unquoted key, a comment (JSON has no comment syntax), or a JavaScript-only value like undefined or NaN. The validator will point to the exact line and character where the error occurs."
   - question: "Is valid JSON the same as correct JSON?"

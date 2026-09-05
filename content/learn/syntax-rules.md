@@ -95,6 +95,14 @@ Douglas Crockford intentionally removed comments from JSON because he observed t
 
 JSON5 relaxes several of these rules — it allows comments, trailing commas, single quotes, and unquoted keys. But JSON5 is not JSON. Standard parsers like `JSON.parse()` will reject JSON5 syntax. Use JSON5 only if your toolchain explicitly supports it.
 
+## Frequently asked questions
+
+**What are two syntax rules for writing a JSON array?**
+A JSON array is enclosed in square brackets `[ ]`, with elements separated by commas and no trailing comma after the last item — `["apple", "banana", "cherry"]` is valid, `["apple", "banana",]` is not.
+
+**Can a JSON array contain mixed types?**
+Yes. `[1, "two", true, null]` is valid JSON — array elements don't need to share a type. Keeping them uniform is a best practice for predictability, not a syntax requirement.
+
 ## Try it in JSON Prism
 
 Run your JSON through the [JSON Validator](/tools/json-validator/) to catch any rule violations instantly. For a reference on which specific mistakes are most common and how to fix them, see [Common JSON Mistakes](/learn/common-mistakes/).
