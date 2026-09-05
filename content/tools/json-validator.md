@@ -1,7 +1,7 @@
 ---
 title: JSON Validator
-metaTitle: JSON Validator Online | Validate JSON Syntax in the Browser
-metaDescription: Validate JSON syntax with instant parser feedback, line awareness, and a browser-based editor built for quick debugging.
+metaTitle: JSON Validator Online | Free, Instant Syntax Check
+metaDescription: Validate JSON syntax instantly with exact error locations. 100% browser-based — nothing is uploaded, no signup required.
 summary: Check whether JSON is valid before it breaks a deployment, import, or API request.
 category: Validate
 appHref: /app/?tool=json-validator

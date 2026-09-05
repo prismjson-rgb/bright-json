@@ -2,8 +2,8 @@
 title: JSON Syntax Rules — The Golden Rules
 level: beginner
 order: 4
-metaTitle: "JSON Syntax Rules: Keys, Quotes, Commas, and More"
-metaDescription: "Master JSON syntax: double quotes for keys and strings, no trailing commas, no comments. Avoid common JSON mistakes."
+metaTitle: "JSON Syntax Rules Explained (With Examples)"
+metaDescription: "The exact JSON syntax rules for quoted keys, commas, and comments, explained with valid and invalid examples side by side."
 keyTerms: []
 relatedTools: [json-validator, json-formatter]
 relatedLearn: [common-mistakes, valid-vs-invalid, what-is-json]

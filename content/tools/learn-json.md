@@ -1,7 +1,7 @@
 ---
 title: Learn JSON
-metaTitle: Learn JSON | Structured JSON Tutorials From Basics to Advanced
-metaDescription: Study JSON through dedicated lessons that cover syntax, structure, APIs, security, schema, and practical usage.
+metaTitle: Learn JSON | 56 Free Tutorials, Beginner to Advanced
+metaDescription: Learn JSON step by step with 56 hands-on lessons — syntax, APIs, schema, security, and more. Every lesson links to a live tool.
 summary: A structured learning library for JSON fundamentals and advanced production topics.
 category: Learn
 appHref: /learn/

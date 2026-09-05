@@ -2,8 +2,8 @@
 title: The Six JSON Data Types
 level: beginner
 order: 3
-metaTitle: "JSON Data Types: String, Number, Boolean, Null, Object, Array"
-metaDescription: "JSON supports exactly six data types. Learn strings, numbers, booleans, null, objects, and arrays with examples."
+metaTitle: "The 6 JSON Data Types, Explained With Examples"
+metaDescription: "String, number, boolean, null, object, array — JSON's six data types explained clearly, with real examples for each."
 keyTerms: [string, number, boolean, null, object, array]
 relatedTools: [json-validator, json-tree-view]
 relatedLearn: [what-is-json, syntax-rules, json-null-vs-missing]

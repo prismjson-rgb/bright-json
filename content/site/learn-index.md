@@ -2,7 +2,7 @@
 title: JSON Tutorial
 heroEyebrow: Learning cluster
 heroTitle: Complete JSON Tutorial — Beginner to Expert
-heroDescription: Master JSON with 50+ focused articles. Covers data types and syntax, fixing parse errors, working with LLM and ChatGPT output, format comparisons, transformations, and language-specific guides for Python, JavaScript, Go, and SQL. Each topic has its own URL for bookmarking and sharing.
+heroDescription: 56 free, hands-on JSON lessons covering syntax, APIs, schema, security, and LLM/ChatGPT JSON. Every lesson links to a live tool.
 tags:
   - JSON basics
   - REST APIs
