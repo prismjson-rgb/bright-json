@@ -53,6 +53,34 @@ export default function LeftRail({
         </div>
       )}
 
+      {/* Donate — placed ahead of Import so it's the first thing a returning
+       *  user sees, not buried at the bottom where it reads like a footer link. */}
+      <div className={`border-b border-border/60 ${iconOnly ? "flex justify-center py-1.5" : "p-2"}`}>
+        <a
+          href="https://s.jsonprism.com/donate"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Support JSON Prism"
+          aria-label="Donate"
+          className={`inline-flex items-center gap-1.5 rounded-md font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 transition-colors ${
+            iconOnly ? "justify-center w-9 h-9" : "w-full justify-start px-3 py-2 text-xs"
+          }`}
+        >
+          <HandHeart className="w-[15px] h-[15px] shrink-0" />
+          {!iconOnly && (
+            <span className="inline-flex items-center gap-1 min-w-0">
+              <span className="truncate">Donate</span>
+              <InfoHelp
+                text="JSON Prism runs entirely in your browser — no account, no ads, nothing you paste ever touches a server. If it's saved you a headache or two, a small donation keeps it that way and helps me keep building. Never required, always appreciated. ❤️"
+                label="About Donate"
+                side="right"
+                className="shrink-0"
+              />
+            </span>
+          )}
+        </a>
+      </div>
+
       {/* Input section (Import / From URL / Export) — surfaced here because
        *  users kept missing these buried in the editor toolbar, especially
        *  From URL. Keeping it as the first rail group makes the entry
@@ -207,26 +235,9 @@ export default function LeftRail({
         );
       })}
 
-      {/* Donate: sits above the legal footer, styled distinct from mode buttons */}
-      <div className={`mt-auto border-t border-border/60 ${iconOnly ? "flex justify-center py-1.5" : "p-2"}`}>
-        <a
-          href="https://s.jsonprism.com/donate"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="Support JSON Prism"
-          aria-label="Donate"
-          className={`inline-flex items-center gap-1.5 rounded-md font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 transition-colors ${
-            iconOnly ? "justify-center w-9 h-9" : "w-full justify-start px-3 py-2 text-xs"
-          }`}
-        >
-          <HandHeart className="w-[15px] h-[15px] shrink-0" />
-          {!iconOnly && <span className="truncate">Donate</span>}
-        </a>
-      </div>
-
       {/* Footer: legal links */}
       {!iconOnly && (
-        <div className="border-t border-border/60 p-2">
+        <div className="mt-auto border-t border-border/60 p-2">
           <div className="flex items-center justify-center gap-2 pb-1">
             <Link href="/privacy" className="text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">Privacy</Link>
             <span className="text-[9px] text-muted-foreground/30">·</span>
