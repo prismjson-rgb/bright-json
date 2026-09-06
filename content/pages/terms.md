@@ -24,8 +24,9 @@ JSON Prism is a free, browser-based tool that provides the following functionali
 - Rich-text notes (stored locally on your device)
 - Import from file, URL, or drag-and-drop
 - Share via URL fragment or optional 30-day short link
+- Optional, voluntary one-time donation via a third-party payment processor
 
-All processing occurs locally in your browser. JSON content is never sent to any server except when you explicitly opt in to short links — see the Privacy Policy for details.
+All processing occurs locally in your browser. JSON content is never sent to any server except when you explicitly opt in to short links, or choose to make a donation — see the Privacy Policy for details.
 
 ## Use license
 
@@ -44,6 +45,16 @@ You are solely responsible for the JSON content you process using this tool. You
 - Contains malicious code or payloads
 
 Because all data remains in your browser, you are responsible for ensuring you have the right to process any data you input into the app.
+
+## Donations
+
+JSON Prism includes an optional "Donate" feature that lets you make a voluntary, pay-what-you-want financial contribution to support the project. Donations are processed by Dodo Payments, our third-party payment processor and merchant of record, which handles billing, payment methods, currency conversion, and applicable tax. By making a donation, you also agree to Dodo Payments' own terms of service and privacy policy.
+
+A donation is a voluntary contribution, not a purchase of goods, services, or a subscription. It does not unlock any additional feature or capability. Choosing not to donate has no effect on your ability to use JSON Prism, which remains fully free and unrestricted regardless of any contribution made.
+
+### No refund policy
+
+All donations made through JSON Prism are final and non-refundable. Because a donation is a voluntary contribution rather than payment for goods or services, we do not provide refunds, credits, or exchanges for any donation amount, except where required by applicable law. If you believe a donation was made in error — for example, a duplicate or unauthorized charge — contact Dodo Payments directly, as they act as merchant of record and handle all billing inquiries and payment disputes.
 
 ## Disclaimer of warranties
 

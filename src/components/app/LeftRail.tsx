@@ -69,7 +69,7 @@ export default function LeftRail({
           <HandHeart className="w-[15px] h-[15px] shrink-0" />
           {!iconOnly && (
             <span className="inline-flex items-center gap-1 min-w-0">
-              <span className="truncate">Donate</span>
+              <span className="truncate">Donate ❤️</span>
               <InfoHelp
                 text="JSON Prism runs entirely in your browser — no account, no ads, nothing you paste ever touches a server. If it's saved you a headache or two, a small donation keeps it that way and helps me keep building. Never required, always appreciated. ❤️"
                 label="About Donate"
