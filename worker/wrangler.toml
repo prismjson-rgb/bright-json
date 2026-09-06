@@ -17,3 +17,11 @@ id = "4c864c997c894ae8bbf2547253fb0d47"
 [vars]
 SITE_URL = "https://jsonprism.com"
 ALLOWED_ORIGIN = "https://jsonprism.com"
+# "test_mode" or "live_mode" — the provided API key is a live-mode key, so this
+# is live_mode. Real charges happen when /donate is hit.
+DODO_ENVIRONMENT = "live_mode"
+DODO_DONATE_PRODUCT_ID = "pdt_0Nn1NzRGNxaV1e9XQbkfl"
+
+# DODO_API_KEY is a secret, not a var — set it with:
+#   wrangler secret put DODO_API_KEY
+# (never commit it here)

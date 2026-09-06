@@ -22,6 +22,12 @@ interface Env {
   SHORT_LINKS: KVNamespace;
   SITE_URL: string;
   ALLOWED_ORIGIN: string;
+  /** Dodo Payments secret API key. Set via `wrangler secret put DODO_API_KEY` — never in wrangler.toml. */
+  DODO_API_KEY: string;
+  /** "test_mode" or "live_mode" — selects which Dodo API host to call. */
+  DODO_ENVIRONMENT: string;
+  /** Product ID (pdt_...) of the pay-what-you-want donation product in the Dodo dashboard. */
+  DODO_DONATE_PRODUCT_ID: string;
 }
 
 const MAX_PAYLOAD_BYTES = 200_000;
@@ -242,9 +248,53 @@ async function handlePost(req: Request, env: Env): Promise<Response> {
   );
 }
 
+/**
+ * GET /donate → creates a fresh Dodo Payments checkout session for the
+ * pay-what-you-want donation product and 302s straight to it. Sessions are
+ * single-use and expire in 24h, so this must be generated per-visit rather
+ * than linking to a static checkout URL.
+ */
+async function handleDonate(env: Env): Promise<Response> {
+  const apiBase = env.DODO_ENVIRONMENT === "live_mode"
+    ? "https://live.dodopayments.com"
+    : "https://test.dodopayments.com";
+
+  let res: Response;
+  try {
+    res = await fetch(`${apiBase}/checkouts`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.DODO_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        product_cart: [{ product_id: env.DODO_DONATE_PRODUCT_ID, quantity: 1 }],
+        return_url: env.SITE_URL,
+      }),
+    });
+  } catch {
+    return new Response("Unable to reach the payment provider. Please try again shortly.", { status: 502 });
+  }
+
+  if (!res.ok) {
+    return new Response("Unable to start checkout. Please try again shortly.", { status: 502 });
+  }
+
+  const data = await res.json() as { checkout_url?: string | null };
+  if (!data.checkout_url) {
+    return new Response("Unable to start checkout. Please try again shortly.", { status: 502 });
+  }
+
+  return Response.redirect(data.checkout_url, 302);
+}
+
 async function handleGet(url: URL, env: Env): Promise<Response> {
   if (url.pathname === "/" || url.pathname === "") {
     return Response.redirect(env.SITE_URL, 302);
+  }
+
+  if (url.pathname === "/donate" || url.pathname === "/donate/") {
+    return handleDonate(env);
   }
 
   const slug = url.pathname.slice(1);

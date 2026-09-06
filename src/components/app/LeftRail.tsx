@@ -1,5 +1,5 @@
 "use client";
-import { Download, TerminalSquare, Upload, X } from "lucide-react";
+import { Download, HandHeart, TerminalSquare, Upload, X } from "lucide-react";
 import Link from "next/link";
 import Logo from "./Logo";
 import { AppButton } from "./AppButton";
@@ -207,9 +207,26 @@ export default function LeftRail({
         );
       })}
 
+      {/* Donate: sits above the legal footer, styled distinct from mode buttons */}
+      <div className={`mt-auto border-t border-border/60 ${iconOnly ? "flex justify-center py-1.5" : "p-2"}`}>
+        <a
+          href="https://s.jsonprism.com/donate"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Support JSON Prism"
+          aria-label="Donate"
+          className={`inline-flex items-center gap-1.5 rounded-md font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 transition-colors ${
+            iconOnly ? "justify-center w-9 h-9" : "w-full justify-start px-3 py-2 text-xs"
+          }`}
+        >
+          <HandHeart className="w-[15px] h-[15px] shrink-0" />
+          {!iconOnly && <span className="truncate">Donate</span>}
+        </a>
+      </div>
+
       {/* Footer: legal links */}
       {!iconOnly && (
-        <div className="mt-auto border-t border-border/60 p-2">
+        <div className="border-t border-border/60 p-2">
           <div className="flex items-center justify-center gap-2 pb-1">
             <Link href="/privacy" className="text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">Privacy</Link>
             <span className="text-[9px] text-muted-foreground/30">·</span>
