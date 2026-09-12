@@ -12,6 +12,7 @@ const Editor = dynamic(() => import("@monaco-editor/react"), {
 });
 
 import type { EditorSettings } from "@/lib/settings";
+import type { DebugIssue } from "@/lib/json-debug";
 
 interface JsonEditorProps {
   value: string;
@@ -20,12 +21,22 @@ interface JsonEditorProps {
   dark: boolean;
   editorSettings?: EditorSettings;
   onFocusChange?: (focused: boolean) => void;
+  /** Rich diagnostics (analyzeJson output) — drives Monaco's error/warning markers. */
+  issues?: DebugIssue[];
+  /** Fires when the user clicks directly on a marked (issue) token in the editor. */
+  onIssueFocus?: (issue: DebugIssue) => void;
+  /** Hands the mounted Monaco editor instance up so the parent can reveal/jump to lines. */
+  onEditorMount?: (editor: any) => void;
 }
 
-export default function JsonEditor({ value, onChange, error, dark, editorSettings, onFocusChange }: JsonEditorProps) {
+export default function JsonEditor({ value, onChange, error, dark, editorSettings, onFocusChange, issues, onIssueFocus, onEditorMount }: JsonEditorProps) {
   const editorRef = useRef<any>(null);
   const onFocusChangeRef = useRef(onFocusChange);
   useEffect(() => { onFocusChangeRef.current = onFocusChange; }, [onFocusChange]);
+  const issuesRef = useRef<DebugIssue[]>(issues ?? []);
+  useEffect(() => { issuesRef.current = issues ?? []; }, [issues]);
+  const onIssueFocusRef = useRef(onIssueFocus);
+  useEffect(() => { onIssueFocusRef.current = onIssueFocus; }, [onIssueFocus]);
 
   // Defer mounting Monaco (a heavy chunk + init) off the critical path. We paint
   // a lightweight text placeholder first so first paint / LCP isn't blocked, then
@@ -52,8 +63,24 @@ export default function JsonEditor({ value, onChange, error, dark, editorSetting
     // focus is elsewhere, gated via onFocusChange below.
     editor.onDidFocusEditorText(() => onFocusChangeRef.current?.(true));
     editor.onDidBlurEditorText(() => onFocusChangeRef.current?.(false));
+
+    // Clicking directly on a marked (squiggly-underlined) token focuses the
+    // matching issue in the JSON Debugger panel, if one is open.
+    editor.onMouseDown((e: any) => {
+      const pos = e.target?.position;
+      if (!pos) return;
+      const hit = issuesRef.current.find(
+        (issue) => issue.line === pos.lineNumber && pos.column >= issue.col && pos.column <= issue.col + issue.length
+      );
+      if (hit) onIssueFocusRef.current?.(hit);
+    });
+
+    onEditorMount?.(editor);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // analyzeJson() is the single diagnostic authority: every squiggle in the
+  // editor comes from the same issue list the JSON Debugger panel renders.
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -62,29 +89,16 @@ export default function JsonEditor({ value, onChange, error, dark, editorSetting
     const monaco = (window as any).monaco;
     if (!monaco) return;
 
-    if (error) {
-      const match = error.match(/position (\d+)/);
-      let line = 1, col = 1;
-      if (match) {
-        const pos = parseInt(match[1]);
-        const text = value.substring(0, pos);
-        line = (text.match(/\n/g) || []).length + 1;
-        col = pos - text.lastIndexOf("\n");
-      }
-      monaco.editor.setModelMarkers(model, "json", [
-        {
-          severity: monaco.MarkerSeverity.Error,
-          message: error,
-          startLineNumber: line,
-          startColumn: col,
-          endLineNumber: line,
-          endColumn: col + 1,
-        },
-      ]);
-    } else {
-      monaco.editor.setModelMarkers(model, "json", []);
-    }
-  }, [error, value]);
+    const markers = (issues ?? []).map((issue) => ({
+      severity: issue.severity === "error" ? monaco.MarkerSeverity.Error : monaco.MarkerSeverity.Warning,
+      message: `${issue.title}\n${issue.message}`,
+      startLineNumber: issue.line,
+      startColumn: issue.col,
+      endLineNumber: issue.line,
+      endColumn: issue.col + issue.length,
+    }));
+    monaco.editor.setModelMarkers(model, "json-debug", markers);
+  }, [issues]);
 
   const opts = editorSettings ?? {
     fontSize: 13,

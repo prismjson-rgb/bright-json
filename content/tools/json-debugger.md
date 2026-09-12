@@ -26,9 +26,13 @@ faqs:
   - question: "How do I find why my JSON is not parsing?"
     answer: "Paste the JSON into the debugger. It will pinpoint the exact location of the error and explain the problem — for example 'Unexpected comma after line 12, key age'. Common causes include trailing commas, single quotes, unquoted keys, and comments left in from a JSONC source."
   - question: "Can the debugger fix my JSON automatically?"
-    answer: "For common mistakes like trailing commas, single quotes, and unquoted keys, the debugger can apply automatic fixes and show you the corrected JSON. More complex structural problems require manual editing, but the debugger will tell you exactly what needs to change."
+    answer: "For common mistakes like trailing commas, single quotes, unquoted keys, and JSON wrapped in a markdown code fence or extra text, the debugger can apply automatic fixes — and shows you a before/after preview of exactly what will change before you apply it. More complex structural problems require manual editing, but the debugger will tell you exactly what needs to change."
   - question: "My JSON looks right but still fails — why?"
     answer: "Invisible characters are a common culprit: zero-width spaces, non-breaking spaces, or byte-order marks (BOM) copied from a Word document or certain editors can appear invisible but break parsers. The debugger detects and highlights these hidden characters."
+  - question: "Can it clean up JSON that an LLM wrapped in a code block or extra text?"
+    answer: "Yes — paste the raw response as-is. If it's wrapped in a ```json code fence, or has explanatory text before or after the JSON block ('Here is your JSON:' is a common one), the debugger detects the wrapper and extracts just the JSON automatically, then runs the normal repair pass on what's inside."
+  - question: "Does the debugger catch duplicate keys?"
+    answer: "Yes. Duplicate keys are technically valid JSON syntax, so JSON.parse won't warn you about them — but the later value silently overwrites the earlier one. The debugger flags every repeated key with its exact line number so you catch a bug a validator would let sail straight through."
 ---
 The JSON Debugger is a repair-oriented tool that pinpoints exactly why a JSON payload fails to parse and guides you through fixing it. A validator tells you something is broken. The JSON Debugger tells you where the break is, what kind of error it is, and what a corrected version would look like. For long payloads with compounding syntax mistakes — common in LLM output, hand-edited configs, and pasted API responses — that distinction matters.
 
@@ -48,6 +52,9 @@ The JSON Debugger is a repair-oriented tool that pinpoints exactly why a JSON pa
 - Escaped characters that break inside double-quoted strings
 - Deeply nested payloads where a missing comma twenty levels in causes an opaque failure at the root
 - Comment syntax (`//` or `/* */`) left in after editing a JSON5 or JSONC file
+- Markdown code fences left around JSON copied from an LLM response (` ```json ... ``` `)
+- Extra prose surrounding the JSON block, like "Here is your JSON:" before it or "Hope this helps!" after
+- Duplicate object keys — flagged with their line number, since this is valid syntax that a parser won't warn you about but silently drops the earlier value
 
 ## JSON code example
 

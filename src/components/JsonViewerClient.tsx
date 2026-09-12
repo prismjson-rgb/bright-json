@@ -4,13 +4,16 @@ import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check,
   Minimize2, Maximize2, ArrowUpDown, Sparkles, Wrench, Upload, MousePointerClick, Share2, X,
+  ChevronDown, Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
 import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
+import { useJsonDebug } from "@/hooks/useJsonDebug";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import JsonEditor from "@/components/JsonEditor";
 import JsonTabBar from "@/components/JsonTabBar";
 import OverlaySidebar from "@/components/OverlaySidebar";
@@ -35,6 +38,7 @@ const JsonSearchPanel = dynamic(() => import("@/components/JsonSearchPanel"), { 
 const JsonNoteEditor = dynamic(() => import("@/components/JsonNoteEditor"), { ssr: false, loading: panelLoading });
 const JsonMockGenerator = dynamic(() => import("@/components/JsonMockGenerator"), { ssr: false, loading: panelLoading });
 const JsonDebugger = dynamic(() => import("@/components/JsonDebugger"), { ssr: false, loading: panelLoading });
+const JsonFixPreview = dynamic(() => import("@/components/JsonFixPreview"), { ssr: false });
 const JsonTrimmer = dynamic(() => import("@/components/JsonTrimmer"), { ssr: false, loading: panelLoading });
 const JsonAiCleaner = dynamic(() => import("@/components/JsonAiCleaner"), { ssr: false, loading: panelLoading });
 const JsonUnescapePanel = dynamic(() => import("@/components/JsonUnescapePanel"), { ssr: false, loading: panelLoading });
@@ -48,7 +52,7 @@ const JsonSharePanel = dynamic(() => import("@/components/JsonSharePanel"), { ss
 const SettingsPanel = dynamic(() => import("@/components/SettingsPanel"), { ssr: false, loading: panelLoading });
 const JsonFlowView = dynamic(() => import("@/components/JsonFlowView"), { ssr: false, loading: panelLoading });
 import { useSettings } from "@/contexts/SettingsContext";
-import { repairJson } from "@/lib/json-debug";
+import { repairJson, summarizeFixes, type DebugIssue } from "@/lib/json-debug";
 import { safeDecodeJsonAsync, decodeCurlShare, decodeCurlCmd, decodeBundleAsync } from "@/lib/share";
 import { parseCurl, executeCurl, labelFromCurlRequest } from "@/lib/curl-executor";
 import { getToolLaunchConfig, type ToolLaunchConfig } from "@/lib/tool-links";
@@ -132,6 +136,32 @@ export default function JsonViewerClient() {
 
   const { query, setQuery, matchCount, currentMatchIndex, currentMatch, nextMatch, prevMatch } = useJsonSearch(parsed);
 
+  // analyzeJson() is the single diagnostic authority: the editor's Monaco
+  // markers, the JSON Debugger panel, and the fix-preview dialog all read
+  // from this one list so they never drift out of sync with each other.
+  const issues = useJsonDebug(json);
+  const fixableIssues = issues.filter((i) => i.autoFixable);
+  const [activeIssueId, setActiveIssueId] = useState<string | null>(null);
+  const [fixPreviewOpen, setFixPreviewOpen] = useState(false);
+  const editorApiRef = useRef<any>(null);
+
+  const jumpToIssue = useCallback((issue: DebugIssue) => {
+    const editor = editorApiRef.current;
+    if (!editor) return;
+    editor.revealLineInCenter(issue.line);
+    editor.setPosition({ lineNumber: issue.line, column: issue.col });
+    editor.focus();
+  }, []);
+
+  const handleSelectIssue = useCallback((issue: DebugIssue) => {
+    setActiveIssueId(issue.id);
+    jumpToIssue(issue);
+  }, [jumpToIssue]);
+
+  const handleIssueFocusFromEditor = useCallback((issue: DebugIssue) => {
+    setActiveIssueId(issue.id);
+  }, []);
+
   const setJson = useCallback(
     (value: string) => {
       setTabsState((prev) => ({
@@ -143,6 +173,18 @@ export default function JsonViewerClient() {
     [setParserJson]
   );
 
+  /** Applies a fix result (from the fast path or the preview dialog) and
+   *  reports back exactly what changed, instead of a generic success toast. */
+  const applyFixResult = useCallback((fixedJson: string, summaryLines: string[]) => {
+    setJson(fixedJson);
+    if (summaryLines.length > 0) {
+      toast.success("Fixed JSON", { description: `${summaryLines.join(" · ")} — JSON is now valid.` });
+    } else {
+      toast.success("JSON repaired");
+    }
+  }, [setJson]);
+
+  /** Fast path: repair → reparse → reformat in one step, no preview. */
   const handleRepairJson = useCallback(() => {
     if (!json.trim()) return;
     try {
@@ -150,12 +192,11 @@ export default function JsonViewerClient() {
       const obj = JSON.parse(fixed);
       const indent = settings.format.beautifyIndent;
       const out = JSON.stringify(obj, null, indent);
-      setJson(out);
-      toast.success("JSON repaired");
+      applyFixResult(out, summarizeFixes(issues));
     } catch {
       toast.error("Could not repair JSON — structure may need manual edits");
     }
-  }, [json, setJson, settings.format.beautifyIndent]);
+  }, [json, issues, applyFixResult, settings.format.beautifyIndent]);
 
   // Sync parser when switching tabs (not on json edit — only when activeId changes)
   useEffect(() => {
@@ -763,14 +804,36 @@ export default function JsonViewerClient() {
                     label="Sort"
                     hideLabelOnMobile
                   />
-                  <AppButton
-                    onClick={handleRepairJson}
-                    disabled={!hasJson || !error}
-                    title="Repair invalid JSON (quotes, commas, brackets, etc.)"
-                    leftIcon={<Wrench className="w-3.5 h-3.5" />}
-                    label="Fix"
-                    hideLabelOnMobile
-                  />
+                  <div className="flex items-center">
+                    <AppButton
+                      onClick={handleRepairJson}
+                      disabled={!hasJson || fixableIssues.length === 0}
+                      title="Fix invalid JSON (quotes, commas, brackets, etc.)"
+                      leftIcon={<Wrench className="w-3.5 h-3.5" />}
+                      label="Fix"
+                      hideLabelOnMobile
+                      className="rounded-r-none"
+                    />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <AppButton
+                          disabled={!hasJson || fixableIssues.length === 0}
+                          title="Fix options"
+                          iconOnly
+                          leftIcon={<ChevronDown className="w-3 h-3" />}
+                          className="rounded-l-none border-l border-border/50 px-1 w-5"
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuItem onClick={handleRepairJson} className="text-xs gap-2">
+                          <Wrench className="w-3.5 h-3.5" /> Fix automatically
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setFixPreviewOpen(true)} className="text-xs gap-2">
+                          <Eye className="w-3.5 h-3.5" /> Preview changes
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
                 <input
                   ref={fileRef}
@@ -801,7 +864,17 @@ export default function JsonViewerClient() {
                 />
               )}
               <div className="flex-1 min-h-0 relative">
-                <JsonEditor value={json} onChange={setJson} error={error} dark={dark} editorSettings={settings.editor} onFocusChange={(focused) => { editorFocusedRef.current = focused; }} />
+                <JsonEditor
+                  value={json}
+                  onChange={setJson}
+                  error={error}
+                  dark={dark}
+                  editorSettings={settings.editor}
+                  onFocusChange={(focused) => { editorFocusedRef.current = focused; }}
+                  issues={issues}
+                  onIssueFocus={handleIssueFocusFromEditor}
+                  onEditorMount={(editor) => { editorApiRef.current = editor; }}
+                />
                 {!hasJson && (
                   <div className="absolute inset-0 z-10 pointer-events-none flex flex-col items-center justify-center p-6 text-center">
                       <div className="max-w-[280px] bg-surface1/60 backdrop-blur-md border border-border/80 rounded-xl p-6 shadow-sm text-sm text-foreground/80 pointer-events-auto cursor-default">
@@ -919,7 +992,15 @@ export default function JsonViewerClient() {
                 </>
               )}
               {mode === "mock" && <JsonMockGenerator onUseJson={handleUseJson} dark={dark} currentJson={json} />}
-              {mode === "debug" && <JsonDebugger json={json} onFix={setJson} />}
+              {mode === "debug" && (
+                <JsonDebugger
+                  json={json}
+                  issues={issues}
+                  activeIssueId={activeIssueId}
+                  onSelectIssue={handleSelectIssue}
+                  onOpenFixPreview={() => setFixPreviewOpen(true)}
+                />
+              )}
               {mode === "trim" && <JsonTrimmer parsed={parsed} dark={dark} />}
               {mode === "minimal" && <JsonMinimalMode parsed={parsed} dark={dark} />}
               {mode === "structure" && <JsonStructureAnalyzer parsed={parsed} />}
@@ -963,6 +1044,14 @@ export default function JsonViewerClient() {
       >
         <SettingsPanel onClose={() => setSettingsOpen(false)} />
       </OverlaySidebar>
+
+      <JsonFixPreview
+        open={fixPreviewOpen}
+        onOpenChange={setFixPreviewOpen}
+        json={json}
+        issues={issues}
+        onApply={applyFixResult}
+      />
 
       <CurlPanel
         open={curlOpen}
