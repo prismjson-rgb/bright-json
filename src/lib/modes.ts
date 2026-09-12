@@ -11,7 +11,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowLeftRight, BarChart3, BookOpen, Bug, Columns2, Eraser, FormInput,
-  GitBranch, Hash, Lightbulb, PackageMinus, Scissors, Share2, ShieldCheck, StickyNote,
+  GitBranch, Hash, Lightbulb, PackageMinus, Quote, Scissors, Share2, ShieldCheck, StickyNote,
   TreePine, Wand2,
 } from "lucide-react";
 
@@ -19,7 +19,7 @@ export type PanelMode =
   | "tree" | "visual" | "flow" | "diff"
   | "mock" | "debug" | "trim" | "clean" | "minimal"
   | "structure" | "practices" | "tokens" | "schema"
-  | "convert" | "notes" | "share" | "learn";
+  | "convert" | "unescape" | "notes" | "share" | "learn";
 
 export type ModeGroup = "view" | "tools" | "analyze" | "transform" | "learn";
 
@@ -158,7 +158,15 @@ export const MODES: Record<PanelMode, ModeConfig> = {
     icon: ArrowLeftRight,
     group: "transform",
     layout: "split",
-    help: "Turn valid JSON into YAML, XML, or CSV. Output is read-only; edit the source JSON on the left.",
+    help: "Turn valid JSON into YAML, TOON, XML, CSV, or an escaped JSON string. Output is read-only; edit the source JSON on the left.",
+  },
+  unescape: {
+    id: "unescape",
+    label: "String to JSON",
+    icon: Quote,
+    group: "transform",
+    layout: "focused",
+    help: "Paste an escaped JSON string (with \\\" and \\n) — copied from a log line, code, or an API field — and convert it back into readable JSON.",
   },
   notes: {
     id: "notes",

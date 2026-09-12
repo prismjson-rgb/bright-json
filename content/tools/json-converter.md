@@ -8,7 +8,7 @@ appHref: /app/?tool=json-converter
 badge: Transform
 order: 7
 keywords: [json to yaml, json to xml, json to csv]
-relatedTools: [json-formatter, json-trimmer]
+relatedTools: [json-formatter, json-trimmer, json-to-string]
 relatedLearn: [convert-json-to-csv, json-vs-xml-csv, json-vs-yaml]
 highlights:
   - Multiple output formats
@@ -77,5 +77,6 @@ The nested `items` array is the kind of structure that requires attention when t
 
 - [JSON Formatter](/tools/json-formatter/) — pretty-print and validate before converting to avoid producing malformed output in the target format
 - [JSON Trimmer](/tools/json-trimmer/) — strip trailing commas and comments from loose JSON so it converts cleanly
+- [JSON to String](/tools/json-to-string/) — escape JSON into a quoted string literal for embedding in code or config values
 - [JSON vs XML and CSV](/learn/json-vs-xml-csv/) — understand the structural trade-offs before choosing a target format
 - [JSON Alternatives](/learn/json-alternatives/) — broader overview of when YAML, TOML, or other formats are a better fit than JSON

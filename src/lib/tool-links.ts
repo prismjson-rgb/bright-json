@@ -1,4 +1,5 @@
 import type { PanelMode } from "./modes";
+import type { ConvertFormat } from "@/hooks/useJsonConvert";
 
 export type ToolSlug =
   | "json-formatter"
@@ -9,6 +10,8 @@ export type ToolSlug =
   | "json-flow-view"
   | "json-diff-viewer"
   | "json-converter"
+  | "json-to-string"
+  | "string-to-json"
   | "json-debugger"
   | "json-trimmer"
   | "ai-json-cleaner"
@@ -28,6 +31,8 @@ export interface ToolLaunchConfig {
   hint: string;
   appHref: string;
   mode?: PanelMode;
+  /** Convert-mode only: preselect a specific output tab (e.g. "string"). */
+  convertFormat?: ConvertFormat;
   opensShare?: boolean;
 }
 
@@ -87,6 +92,21 @@ export const TOOL_LAUNCH_CONFIG: Record<ToolSlug, ToolLaunchConfig> = {
     hint: "Convert valid JSON into YAML, XML, or CSV from the transform panel.",
     appHref: "/app/?tool=json-converter",
     mode: "convert",
+  },
+  "json-to-string": {
+    slug: "json-to-string",
+    title: "JSON to String Converter",
+    hint: "Convert JSON into an escaped string literal you can embed in code, logs, or config values.",
+    appHref: "/app/?tool=json-to-string",
+    mode: "convert",
+    convertFormat: "string",
+  },
+  "string-to-json": {
+    slug: "string-to-json",
+    title: "String to JSON Converter",
+    hint: "Paste an escaped JSON string and recover the readable JSON it represents.",
+    appHref: "/app/?tool=string-to-json",
+    mode: "unescape",
   },
   "json-debugger": {
     slug: "json-debugger",

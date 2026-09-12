@@ -37,6 +37,7 @@ const JsonMockGenerator = dynamic(() => import("@/components/JsonMockGenerator")
 const JsonDebugger = dynamic(() => import("@/components/JsonDebugger"), { ssr: false, loading: panelLoading });
 const JsonTrimmer = dynamic(() => import("@/components/JsonTrimmer"), { ssr: false, loading: panelLoading });
 const JsonAiCleaner = dynamic(() => import("@/components/JsonAiCleaner"), { ssr: false, loading: panelLoading });
+const JsonUnescapePanel = dynamic(() => import("@/components/JsonUnescapePanel"), { ssr: false, loading: panelLoading });
 const JsonMinimalMode = dynamic(() => import("@/components/JsonMinimalMode"), { ssr: false, loading: panelLoading });
 const JsonStructureAnalyzer = dynamic(() => import("@/components/JsonStructureAnalyzer"), { ssr: false, loading: panelLoading });
 const JsonBestPractices = dynamic(() => import("@/components/JsonBestPractices"), { ssr: false, loading: panelLoading });
@@ -669,6 +670,25 @@ export default function JsonViewerClient() {
           </main>
         )}
 
+        {layout === "focused" && mode === "unescape" && (
+          <main className="flex flex-1 min-h-0 flex-col min-w-0">
+            <div className="md:hidden">
+              <MobileHeader
+                mode={mode}
+                onOpenMenu={() => setMobileMenuOpen(true)}
+                onOpenShare={handleShareClick}
+                onOpenSettings={handleSettingsClick}
+                searchOpen={searchOpen}
+                onSearchToggle={handleSearchToggle}
+                shareActive={shareOpen}
+                settingsActive={settingsOpen}
+                hasJson={hasJson}
+              />
+            </div>
+            <JsonUnescapePanel onUseJson={handleUseJson} dark={dark} />
+          </main>
+        )}
+
         {layout === "split" && (
           <main className="flex flex-1 min-h-0 flex-col md:flex-row min-w-0 overflow-y-auto md:overflow-visible">
             <div className="md:hidden">
@@ -906,7 +926,7 @@ export default function JsonViewerClient() {
               {mode === "practices" && <JsonBestPractices parsed={parsed} />}
               {mode === "tokens" && <JsonTokenEstimator json={json} parsed={parsed} />}
               {mode === "schema" && <JsonSchemaValidator json={json} dark={dark} />}
-              {mode === "convert" && <JsonConvertPanel parsed={parsed} dark={dark} />}
+              {mode === "convert" && <JsonConvertPanel parsed={parsed} dark={dark} initialFormat={launchConfig?.convertFormat} />}
               {mode === "notes" && <JsonNoteEditor />}
               {mode === "learn" && (
                 <JsonLearnPanel

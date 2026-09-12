@@ -21,15 +21,17 @@ const TABS: { id: ConvertFormat; label: string; lang: string }[] = [
   { id: "toon", label: "TOON", lang: "yaml" }, // using yaml language for rough syntax highlighting since it is similar
   { id: "xml", label: "XML", lang: "xml" },
   { id: "csv", label: "CSV", lang: "plaintext" },
+  { id: "string", label: "String", lang: "plaintext" },
 ];
 
 interface JsonConvertPanelProps {
   parsed: unknown;
   dark: boolean;
+  initialFormat?: ConvertFormat;
 }
 
-export default function JsonConvertPanel({ parsed, dark }: JsonConvertPanelProps) {
-  const { format, setFormat, output, fileExtension, mimeType } = useJsonConvert(parsed);
+export default function JsonConvertPanel({ parsed, dark, initialFormat }: JsonConvertPanelProps) {
+  const { format, setFormat, output, fileExtension, mimeType } = useJsonConvert(parsed, initialFormat);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
