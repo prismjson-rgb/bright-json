@@ -4,6 +4,7 @@ import { MarkdownArticleBody } from "@/components/MarkdownArticleBody";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { FaqAccordion } from "@/components/site/FaqAccordion";
 import { RelatedLinks } from "@/components/site/RelatedLinks";
+import { InlineJsonFormatter } from "@/components/site/InlineJsonFormatter";
 import type { ToolContent } from "@/lib/tool-content";
 import type { ToolFaq } from "@/lib/tool-faqs";
 
@@ -111,6 +112,11 @@ const TOOL_PREVIEW_CONTENT: Record<string, React.ReactNode> = {
   ),
 };
 
+// Tools that get a real, working widget instead of the static code preview.
+// Kept to a short allowlist deliberately — this is a heavier, more involved
+// section, so it's opt-in per tool rather than default behavior.
+const LIVE_WIDGET_TOOLS = new Set(["json-formatter"]);
+
 function DefaultPreviewCode() {
   return (
     <pre className="text-[12px] leading-[1.6]">
@@ -162,6 +168,8 @@ function ToolPreview({ appHref, title }: { appHref?: string; title: string }) {
 // ---------------------------------------------------------------------------
 export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolFaq[] }) {
   const appLink = (tool.appHref || "/").replace(/^\/app\//, "/");
+  const toolKey = tool.appHref?.match(/tool=([^&]+)/)?.[1] ?? "";
+  const hasLiveWidget = LIVE_WIDGET_TOOLS.has(toolKey);
 
   // Split title into first words + last word for gradient accent
   const words = tool.title.split(" ");
@@ -187,7 +195,7 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
             <span className="text-slate-400 truncate">{tool.title}</span>
           </nav>
 
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div className={`grid items-center gap-12 lg:gap-16 ${hasLiveWidget ? "" : "lg:grid-cols-2"}`}>
             {/* Left: text */}
             <div>
               <Eyebrow>{tool.badge || tool.category || "Tool"}</Eyebrow>
@@ -236,10 +244,20 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
             </div>
 
             {/* Right: code preview (desktop only) */}
-            <div className="hidden lg:block">
-              <ToolPreview appHref={tool.appHref} title={tool.title} />
-            </div>
+            {!hasLiveWidget && (
+              <div className="hidden lg:block">
+                <ToolPreview appHref={tool.appHref} title={tool.title} />
+              </div>
+            )}
           </div>
+
+          {/* Live widget — full width, visible at every breakpoint, replaces the
+              static code preview for tools worth trying inline. */}
+          {hasLiveWidget && (
+            <div className="mt-14">
+              <InlineJsonFormatter appHref={tool.appHref ?? "/app/?tool=json-formatter"} title={tool.title} />
+            </div>
+          )}
         </div>
       </section>
 
