@@ -10,6 +10,9 @@ export type ToolSlug =
   | "json-flow-view"
   | "json-diff-viewer"
   | "json-converter"
+  | "json-to-csv"
+  | "json-to-yaml"
+  | "json-to-xml"
   | "json-to-string"
   | "string-to-json"
   | "json-debugger"
@@ -92,6 +95,30 @@ export const TOOL_LAUNCH_CONFIG: Record<ToolSlug, ToolLaunchConfig> = {
     hint: "Convert valid JSON into YAML, XML, or CSV from the transform panel.",
     appHref: "/app/?tool=json-converter",
     mode: "convert",
+  },
+  "json-to-csv": {
+    slug: "json-to-csv",
+    title: "JSON to CSV Converter",
+    hint: "Convert a JSON array of objects into a spreadsheet-ready CSV file.",
+    appHref: "/app/?tool=json-to-csv",
+    mode: "convert",
+    convertFormat: "csv",
+  },
+  "json-to-yaml": {
+    slug: "json-to-yaml",
+    title: "JSON to YAML Converter",
+    hint: "Convert JSON into clean, properly indented YAML.",
+    appHref: "/app/?tool=json-to-yaml",
+    mode: "convert",
+    convertFormat: "yaml",
+  },
+  "json-to-xml": {
+    slug: "json-to-xml",
+    title: "JSON to XML Converter",
+    hint: "Convert JSON into well-formed XML with a customizable root element.",
+    appHref: "/app/?tool=json-to-xml",
+    mode: "convert",
+    convertFormat: "xml",
   },
   "json-to-string": {
     slug: "json-to-string",
