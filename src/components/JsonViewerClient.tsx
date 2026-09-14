@@ -11,7 +11,9 @@ import { useTheme } from "@/hooks/useTheme";
 import { useJsonParser } from "@/hooks/useJsonParser";
 import { useJsonSearch } from "@/hooks/useJsonSearch";
 import { useJsonDebug } from "@/hooks/useJsonDebug";
+import { useDonatePrompt } from "@/hooks/useDonatePrompt";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { DonatePromptModal } from "@/components/DonatePromptModal";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import JsonEditor from "@/components/JsonEditor";
@@ -612,6 +614,7 @@ export default function JsonViewerClient() {
   }, [setJson]);
 
   const hasJson = !!json.trim();
+  const donatePrompt = useDonatePrompt(hasJson);
 
   // Status bar label mirrors the current overlay/mode context.
   const statusLabel = shareOpen
@@ -1052,6 +1055,8 @@ export default function JsonViewerClient() {
         issues={issues}
         onApply={applyFixResult}
       />
+
+      <DonatePromptModal open={donatePrompt.open} onDismiss={donatePrompt.dismiss} />
 
       <CurlPanel
         open={curlOpen}
