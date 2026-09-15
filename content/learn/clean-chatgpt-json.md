@@ -1,14 +1,14 @@
 ---
 title: "Cleaning JSON from ChatGPT and LLMs"
 metaTitle: "Clean ChatGPT JSON (Strip Markdown Fences)"
-metaDescription: "ChatGPT often wraps JSON in ```json fences or adds chatter. Learn how to strip the markdown and prose so the output parses cleanly every time."
+metaDescription: "ChatGPT can wrap JSON in code fences or add chatter. Learn how to remove those wrappers and validate the extracted JSON."
 level: intermediate
 order: 34
 keyTerms: [chatgpt json, markdown fences, code block, clean json, llm output]
 relatedTools: [ai-json-cleaner, json-validator]
 relatedLearn: [fixing-llm-json, repair-truncated-llm-json, reliable-json-from-llms]
 publishedAt: "2026-06-25"
-updatedAt: "2026-06-25"
+updatedAt: "2026-09-15"
 ---
 
 **Quick answer:** When ChatGPT returns JSON, it often wraps it in a ```` ```json ```` markdown fence or adds a sentence like *"Sure! Here's the JSON:"* - both of which make `JSON.parse()` fail. The fix is to **extract just the JSON** before parsing. Paste the raw reply into the [AI JSON Cleaner](/tools/ai-json-cleaner/) to strip fences, prose, and trailing commas in one step.
@@ -26,21 +26,19 @@ Any one of these throws `Unexpected token` the moment you call `JSON.parse()`.
 
 ## The quick fix: extract the JSON
 
-A pragmatic approach is to pull out everything between the first `{` (or `[`) and the last matching `}` (or `]`):
+A safe first step for a fenced reply is to extract the fenced body and parse it. Parsing is the check that the extracted text really is JSON:
 
 ```js
-function extractJson(reply) {
+function parseFencedJson(reply) {
   const fenced = reply.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const body = fenced ? fenced[1] : reply;
-  const start = body.search(/[{[]/);
-  const end = Math.max(body.lastIndexOf("}"), body.lastIndexOf("]"));
-  return body.slice(start, end + 1);
+  if (!fenced) throw new Error("No fenced JSON block found");
+  return JSON.parse(fenced[1]);
 }
 
-JSON.parse(extractJson(reply));
+parseFencedJson(reply);
 ```
 
-This handles the two most common cases - a fenced block, or JSON buried in prose. For messier output (smart quotes, trailing commas, truncation), the [AI JSON Cleaner](/tools/ai-json-cleaner/) applies a fuller repair pass and shows you the cleaned result.
+This handles a complete fenced JSON block, including arrays and primitive values. If JSON is mixed into prose, blindly slicing from the first `{` to the last `}` can include unrelated text or split nested data incorrectly. Use the [AI JSON Cleaner](/tools/ai-json-cleaner/) for messier output, then validate the cleaned result.
 
 ## The better fix: stop the chatter at the source
 
@@ -62,7 +60,7 @@ If you're piping large JSON into or out of a model, remember that JSON's quotes 
 It's trained to format code in markdown for readability. The fences look right in a chat window but aren't part of the JSON, so they break `JSON.parse()`.
 
 **How do I remove the code fences from ChatGPT output?**
-Extract the text between the fences (or between the first `{`/`[` and the last `}`/`]`), or paste the reply into the [AI JSON Cleaner](/tools/ai-json-cleaner/) which strips them automatically.
+Extract the text between the fences and parse it, or paste the reply into the [AI JSON Cleaner](/tools/ai-json-cleaner/) to remove wrappers and validate the result.
 
 **How do I stop ChatGPT from adding explanations?**
 Instruct it to return only valid JSON with no markdown or commentary, and use the API's JSON / structured-output mode, which constrains the response to JSON.

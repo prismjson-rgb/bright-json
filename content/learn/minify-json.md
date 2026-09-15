@@ -8,7 +8,7 @@ keyTerms: [minify json, compress json, whitespace, gzip, payload size]
 relatedTools: [json-formatter, json-trimmer]
 relatedLearn: [pretty-vs-minified, performance-large-files]
 publishedAt: "2026-06-25"
-updatedAt: "2026-06-25"
+updatedAt: "2026-09-15"
 ---
 
 **Quick answer:** Minifying JSON strips all non-essential **whitespace** - indentation, line breaks, and spaces after `:` and `,` - without changing the data. It shrinks payloads for network transport. The data is byte-for-byte equivalent once parsed; only the formatting is gone. Minify (and re-expand) instantly with the [JSON Formatter](/tools/json-formatter/).
@@ -34,7 +34,7 @@ No indentation, no newlines, no space after the colons and commas. `JSON.parse()
 
 ## How much it saves
 
-For deeply nested, pretty-printed data, whitespace can be a meaningful share of the bytes - commonly **10–30%** before compression. But the bigger lever is usually **gzip or brotli**, which most servers apply on top:
+For deeply nested, pretty-printed data, whitespace can be a meaningful share of the bytes. The savings depend on indentation and payload structure. Compression such as gzip or brotli can reduce repeated keys and structure further:
 
 - Minifying removes whitespace.
 - Gzip/brotli then removes the *repetition* (repeated keys, repeated structure), which is where JSON's real bloat lives.
@@ -63,7 +63,7 @@ Use the [JSON Formatter](/tools/json-formatter/) to switch between minified and 
 No. It only removes insignificant whitespace. `JSON.parse()` produces an identical object from minified or pretty JSON - minifying is reversible by reformatting.
 
 **How much smaller is minified JSON?**
-Typically 10–30% before compression, depending on how much indentation it had. After gzip/brotli the difference shrinks, because the compressor already collapses the whitespace.
+It depends on how much whitespace the original document has. Compare byte counts for your own file. After gzip or brotli, the difference often shrinks because compression handles repeated whitespace well.
 
 **Should I minify or gzip my JSON?**
 Both. Minify to remove whitespace and enable gzip/brotli on the server to remove the repetition. Together they're more effective than either alone.

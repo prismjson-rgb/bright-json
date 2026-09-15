@@ -7,6 +7,7 @@ keyTerms: []
 relatedTools: [json-minimal-mode, json-token-estimator]
 relatedLearn: [minify-json, flatten-nested-json, count-json-tokens-llm]
 publishedAt: "2025-12-11"
+updatedAt: "2026-09-15"
 ---
 
 Parsing a large JSON file is straightforward until it is not. A 5MB file parses instantly. A 500MB file can freeze a browser tab, exhaust a server's memory, or trigger a timeout. Understanding how parsers work - and the alternatives when they break down - is essential for working with production data at scale.
@@ -100,7 +101,7 @@ Cursor-based pagination (using a cursor token instead of page numbers) is more e
 
 For data volumes where even streaming JSON is too slow, consider:
 
-- **MessagePack** - binary JSON equivalent, typically 20–50% smaller, 2–5x faster to parse
+- **MessagePack** - binary serialization for JSON-like data; benchmark size and parsing speed for your own payloads
 - **BSON** - binary JSON used by MongoDB, supports more types
 - **Parquet** - columnar format ideal for analytics on millions of records
 - **Arrow** - in-memory columnar format with near-zero deserialization cost
@@ -109,9 +110,9 @@ For data volumes where even streaming JSON is too slow, consider:
 
 Before paying the cost of parsing a huge JSON file, reduce it:
 
-- Minify first - remove whitespace (saves 15–30%)
+- Minify first if the source contains significant indentation or spacing
 - Remove unused fields - if you only need 3 of 50 keys, strip the rest before parsing
-- Compress - gzip typically reduces JSON by 70–90%; always use it for API transfers
+- Compress responses for transfer when clients support it; measure the compressed size and CPU cost
 
 ## Try it in JSON Prism
 

@@ -7,14 +7,14 @@
 
 @layer base {
   html {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 }
 
@@ -86,6 +86,7 @@
 .learn-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
 .learn-filters button { border: 1px solid #383f42; background: transparent; color: var(--learn-muted); border-radius: 2px; font-size: 12px; padding: 6px 11px; cursor: pointer; }
 .learn-filters button[aria-pressed="true"] { background: #30393b; color: var(--learn-text); border-color: #536260; }
+.learn-filter-count { margin-left: 7px; color: var(--learn-subtle); font-variant-numeric: tabular-nums; }
 .learn-lesson-list { border: 1px solid var(--learn-border); border-radius: 3px; overflow: hidden; }
 .learn-lesson-row { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 14px 0 0; border-bottom: 1px solid #292e30; background: var(--learn-panel); }
 .learn-lesson-row:last-child { border-bottom: 0; }
@@ -100,6 +101,7 @@
 .learn-reading-time, .learn-lesson-level { flex: none; color: var(--learn-subtle); font-size: 10px; text-align: right; }
 .learn-reading-time { width: 50px; }.learn-lesson-level { width: 145px; text-transform: uppercase; letter-spacing: .04em; }
 .learn-empty { margin: 0; padding: 26px 16px; background: var(--learn-panel); color: var(--learn-muted); font-size: 13px; }
+.learn-empty p { margin: 0 0 12px; }.learn-empty button { color: var(--learn-accent); border: 1px solid var(--learn-border); background: transparent; padding: 7px 10px; cursor: pointer; }
 .learn-course-overview { margin-top: 48px; border-top: 1px solid var(--learn-border); padding-top: 22px; }
 .learn-course-overview h2 { margin: 8px 0 14px; color: var(--learn-text); font-size: clamp(18px, 2vw, 23px); font-weight: 650; }
 .learn-course-tags { display: flex; flex-wrap: wrap; gap: 7px; }.learn-course-tags span { border: 1px solid var(--learn-border); padding: 5px 9px; color: var(--learn-muted); font-size: 11px; }

@@ -8,7 +8,7 @@ keyTerms: [LLM JSON, ChatGPT JSON, Claude JSON, fix JSON, structured output, jso
 relatedTools: [ai-json-cleaner, json-validator]
 relatedLearn: [clean-chatgpt-json, repair-truncated-llm-json, reliable-json-from-llms]
 publishedAt: "2026-06-16"
-updatedAt: "2026-06-16"
+updatedAt: "2026-09-15"
 ---
 
 **Quick answer:** Large language models like ChatGPT, Claude, and Gemini frequently return JSON that won't parse because it's wrapped in markdown code fences, prefixed with explanatory prose, or contains trailing commas, comments, single quotes, or is cut off mid-response. To fix it: strip everything outside the outermost `{ }` or `[ ]`, remove trailing commas and comments, and re-validate. The [AI JSON Cleaner](/tools/ai-json-cleaner/) does this in one step.
@@ -63,7 +63,7 @@ For input that is valid JSON5 (comments and trailing commas only), the [JSON Tri
 
 Repairing is a fallback. The real fix is constraining the model so it returns clean JSON in the first place:
 
-1. **Use structured output / JSON mode.** Most APIs now support a response format that guarantees syntactically valid JSON - `response_format: { type: "json_object" }` or a JSON-schema-constrained mode. This eliminates fences, prose, and trailing commas at the source.
+1. **Use structured output / JSON mode.** When your provider supports these formats, they reduce malformed syntax. Schema-constrained output also helps enforce the expected shape for completed, non-refusal responses. Check for incomplete output and refusals before parsing.
 2. **Provide a schema.** Passing a [JSON Schema](/learn/json-schema-basics/) (or a tool/function definition) tells the model the exact shape to produce and reduces hallucinated keys.
 3. **Lower the temperature.** For data extraction, a temperature near 0 makes output more deterministic and less likely to wander into prose.
 4. **Ask for the object only.** An explicit instruction - "Respond with a single JSON object and no other text" - measurably reduces preamble.
