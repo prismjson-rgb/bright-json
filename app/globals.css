@@ -33,6 +33,48 @@
   padding: 0;
 }
 
+/* Workspace chrome follows the imported design; tools retain their controls. */
+.workspace { --radius: 0.2rem; }
+.dark .workspace, .dark .workspace-tool-browser {
+  --bg: 225 18% 5%;
+  --surface-1: 225 20% 4%;
+  --surface-2: 225 16% 7%;
+  --border: 225 12% 15%;
+  --text-1: 225 12% 94%;
+  --text-2: 225 10% 81%;
+  --text-3: 225 8% 65%;
+  --primary: 166 57% 55%;
+  --primary-foreground: 225 20% 8%;
+  --json-key: 166 43% 72%;
+  --json-string: 48 60% 73%;
+  --json-number: 278 58% 78%;
+  --json-boolean: 210 68% 73%;
+}
+.workspace .toolbar-header, .workspace .pane-header, .workspace .status-bar,
+.workspace aside.bg-surface1 { background: hsl(var(--surface-1)); }
+.workspace-toolbar { background: hsl(var(--surface-2)); }
+.workspace .pane-header { min-height: 32px; padding: 5px 12px; font-size: 10px; font-weight: 400; }
+.workspace .workspace-view-tabs { padding: 2px; background: hsl(var(--surface-1)); border-radius: 3px; }
+.workspace-view-tabs button { padding: 6px 10px; border: 0; border-radius: 2px; }
+.workspace-view-tabs button[aria-selected="true"] { background: hsl(var(--border)); }
+.workspace-view-tabs button[aria-selected="true"] svg { color: hsl(var(--primary)); }
+.workspace-actions > button, .workspace-actions > div > button { border: 1px solid hsl(var(--border)); border-radius: 2px; }
+.workspace .workspace-beautify { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border-color: hsl(var(--primary)); }
+.workspace-document-tabs > div { align-items: center; }
+.workspace-document-tabs > div > div { height: 34px; border-top-color: transparent; border-left-color: transparent; border-right-color: transparent; }
+.workspace-rail > div { flex-shrink: 0; }
+.workspace-rail button { border-radius: 2px; }
+.workspace .status-bar { min-height: 28px; }
+.workspace .glow-dot, .workspace .glow-dot-error { width: 6px; height: 6px; box-shadow: none; }
+@media (min-width: 768px) {
+  .workspace-tool-browser { top: 56px; left: 18px; transform: none; }
+}
+@media (max-width: 767px) {
+  .workspace-toolbar { gap: 6px; padding: 6px 8px; }
+  .workspace-view-tabs { width: 100%; }
+  .workspace-view-tabs button { flex: 1; }
+}
+
 @layer components {
   .toolbar-btn {
     @apply flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium

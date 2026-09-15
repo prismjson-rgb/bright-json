@@ -49,14 +49,14 @@ export default function JsonTabBar({
   };
 
   return (
-    <div className="flex items-end border-b border-border/60 bg-[hsl(var(--pane-header))] shrink-0 px-1.5 pt-2">
+    <div className="workspace-document-tabs flex items-center min-w-0 flex-1 px-2 h-[46px]">
       <div className="flex min-w-0 max-w-[calc(100%-4.5rem)] items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {tabs.map((tab) => (
           <div
             key={tab.id}
-            className={`group flex items-center gap-1.5 px-2.5 py-1 border border-transparent rounded-t-md text-xs font-medium shrink-0 cursor-pointer transition-colors min-w-0 max-w-[160px] ${
+            className={`group flex items-center gap-1.5 px-2.5 py-1 border border-transparent rounded-sm text-xs font-mono font-medium shrink-0 cursor-pointer transition-colors min-w-0 max-w-[190px] ${
               tab.id === activeId
-                ? "border-t-primary/60 border-l-primary/60 border-r-primary/60 text-foreground"
+                ? "border-b-primary bg-secondary/40 text-foreground"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
             }`}
           >

@@ -4,6 +4,7 @@
 
 import { idbGet, idbSet } from "@/lib/json-prism-idb";
 import { readPreference } from "./local-preferences";
+import { restoreHistory, type JsonHistory } from "./json-history";
 
 const IDB_KEY = "json-prism-tabs-v1";
 const LEGACY_LS_KEY = "json-prism-tabs";
@@ -22,6 +23,7 @@ export interface TabData {
   id: string;
   name: string;
   json: string;
+  history?: JsonHistory;
   notes?: import("@tiptap/react").JSONContent;
   curlMeta?: CurlMeta;
 }
@@ -54,7 +56,7 @@ function normalizeTabsState(data: unknown): TabsState | null {
   const valid = d.tabs.filter((t) => t && t.id && t.name != null && typeof t.json === "string");
   if (valid.length === 0) return null;
   const activeId = valid.some((t) => t.id === d.activeId) ? d.activeId : valid[0].id;
-  return { tabs: valid, activeId };
+  return { tabs: valid.map(tab => tab.history === undefined ? tab : { ...tab, history: restoreHistory(tab.history) }), activeId };
 }
 
 export async function loadTabs(): Promise<TabsState | null> {

@@ -1,13 +1,19 @@
 "use client";
-import { Download, HandHeart, TerminalSquare, Upload, X } from "lucide-react";
+import { ArrowUpRight, Download, HandHeart, Heart, Search, TerminalSquare, Upload, X } from "lucide-react";
 import Link from "next/link";
 import { DONATE_URL } from "@/lib/deployment";
 import Logo from "./Logo";
 import { AppButton } from "./AppButton";
 import { InfoHelp } from "./InfoHelp";
-import { RAIL_GROUPS, railModesForGroup, type PanelMode } from "@/lib/modes";
+import { type PanelMode } from "@/lib/modes";
+import { workspaceTool } from "@/lib/workspace-tools";
+import type { ToolSlug } from "@/lib/tool-links";
 
 interface LeftRailProps {
+  favourites: ToolSlug[];
+  onToggleFavourite: (slug: ToolSlug) => void;
+  onSelectTool: (slug: ToolSlug) => void;
+  onOpenTools: () => void;
   mode: PanelMode;
   onModeChange: (mode: PanelMode) => void;
   /** Desktop: collapse to icon-only rail. Ignored in mobile sheet. */
@@ -23,7 +29,7 @@ interface LeftRailProps {
 }
 
 export default function LeftRail({
-  mode, onModeChange,
+  mode, favourites, onToggleFavourite, onSelectTool, onOpenTools,
   collapsed = false,
   onClose,
   hasJson, onImport, onExport, onOpenCurl,
@@ -35,8 +41,8 @@ export default function LeftRail({
 
   return (
     <aside
-      className={`flex flex-col border-r border-border bg-surface1 overflow-y-auto overflow-x-hidden shrink-0 ${
-        isMobile ? "w-full min-w-0" : iconOnly ? "w-12" : "w-44"
+      className={`workspace-rail flex flex-col border-r border-border bg-surface1 overflow-y-auto overflow-x-hidden shrink-0 ${
+        isMobile ? "w-full min-w-0" : iconOnly ? "w-12" : "w-[244px]"
       }`}
     >
       {/* Header (mobile only — desktop logo lives in top header) */}
@@ -54,26 +60,40 @@ export default function LeftRail({
         </div>
       )}
 
-      {/* Donate — placed ahead of Import so it's the first thing a returning
-       *  user sees, not buried at the bottom where it reads like a footer link. */}
+      <div className="px-2.5 pt-2.5">
+        <button type="button" onClick={onOpenTools} aria-label="All tools" title="All tools (Ctrl/Cmd+Shift+K)" className="flex items-center gap-2 w-full border border-border bg-secondary/40 px-3 py-2 text-[13px] rounded-sm hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring">
+          <Search className="h-4 w-4 text-primary" />
+          {!iconOnly && <><span className="flex-1 text-left">All tools</span><kbd className="text-[10px] text-muted-foreground">⇧⌘K</kbd></>}
+        </button>
+      </div>
       {DONATE_URL && <div className={`border-b border-border/60 ${iconOnly ? "flex justify-center py-1.5" : "p-2"}`}>
+        <div className="relative">
         <a
           href={DONATE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          title="Support JSON Prism"
+          title="Support JSON Prism — opens the payment gateway in a new tab"
           aria-label="Donate"
-          className={`inline-flex items-center gap-1.5 rounded-md font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 transition-colors ${
-            iconOnly ? "justify-center w-9 h-9" : "w-full justify-start px-3 py-2 text-xs"
+          className={`inline-flex items-center gap-1.5 rounded-md font-medium border border-primary/30 bg-primary/10 text-foreground hover:bg-primary/20 transition-colors ${
+            iconOnly ? "justify-center w-9 h-9" : "w-full justify-start pl-3 pr-14 py-2 text-xs"
           }`}
         >
-          <HandHeart className="w-[15px] h-[15px] shrink-0" />
+          <HandHeart className="w-[15px] h-[15px] shrink-0 text-rose-600 dark:text-rose-300" />
           {!iconOnly && (
             <span className="inline-flex items-center gap-1 min-w-0">
-              <span className="truncate">Donate ❤️</span>
+              <span className="truncate text-rose-600 dark:text-rose-300">Support this project</span>
             </span>
           )}
+          {!iconOnly && <ArrowUpRight className="absolute right-3 w-3.5 h-3.5 text-primary" aria-hidden="true" />}
+          <span className="sr-only">Opens the payment gateway in a new tab</span>
         </a>
+        {!iconOnly && <InfoHelp
+          text="JSON Prism runs entirely in your browser — no account, no ads, nothing you paste ever touches a server. If it's saved you a headache or two, a small donation keeps it that way and helps me keep building. Never required, always appreciated. ❤️"
+          label="About Donate"
+          side="right"
+          className="absolute right-9 top-1/2 -translate-y-1/2"
+        />}
+        </div>
       </div>}
 
       {/* Input section (Import / From URL / Export) — surfaced here because
@@ -152,59 +172,23 @@ export default function LeftRail({
         </div>
       )}
 
-      {/* Groups from registry */}
-      {RAIL_GROUPS.map((group, gi) => {
-        const items = railModesForGroup(group.key);
-        if (items.length === 0) return null;
-        return (
-          <div key={group.key} className={`flex flex-col ${gi > 0 ? "border-t border-border/60" : ""}`}>
-            {!iconOnly && (
-              <div className="px-3 pt-3 pb-1 flex items-center gap-1.5 select-none">
-                <span className="text-[9px] font-semibold uppercase tracking-widest text-text3/60">
-                  {group.label}
-                </span>
-                <InfoHelp
-                  text={group.help}
-                  label={`About ${group.label}`}
-                  side="right"
-                  className="opacity-80"
-                />
-              </div>
-            )}
-            <div className={`flex flex-col ${iconOnly ? "items-center py-1.5 gap-1" : ""}`}>
-              {items.map((cfg) => {
-                const Icon = cfg.icon;
-                const isActive = mode === cfg.id;
-                return (
-                  <AppButton
-                    key={cfg.id}
-                    variant="rail"
-                    size={iconOnly ? "icon" : "sm"}
-                    active={isActive}
-                    onClick={() => onModeChange(cfg.id)}
-                    title={`${cfg.label}: ${cfg.help}${cfg.shortcut ? ` (${cfg.shortcut})` : ""}`}
-                    aria-label={cfg.label}
-                    leftIcon={<Icon className="w-[15px] h-[15px]" />}
-                    label={
-                      <span className="inline-flex items-center gap-1 min-w-0 text-xs">
-                        <span className="truncate">{cfg.label}</span>
-                      </span>
-                    }
-                    rightIcon={cfg.hint ? <span>{cfg.hint}</span> : undefined}
-                    shortcut={cfg.shortcut}
-                    iconOnly={iconOnly}
-                    className={iconOnly ? "justify-center w-9" : "px-3 py-2"}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+      <div className="flex flex-col px-2 pt-4 pb-3">
+        {!iconOnly && <div className="flex items-center gap-2 px-2 pb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Favourites <span>{favourites.length}</span></div>}
+        {favourites.map(slug => {
+          const tool = workspaceTool(slug);
+          const Icon = tool.icon;
+          return <div key={slug} className="flex items-center min-w-0">
+            <AppButton variant="rail" size={iconOnly ? "icon" : "sm"} active={mode === tool.mode} onClick={() => onSelectTool(slug)} title={tool.help} aria-label={tool.label} leftIcon={<Icon className="w-[15px] h-[15px]" />} label={tool.label} iconOnly={iconOnly} className="flex-1 min-w-0 px-2 py-2" />
+            {!iconOnly && <><InfoHelp text={tool.help} label={"About " + tool.label} side="right" /><button type="button" onClick={() => onToggleFavourite(slug)} aria-label={"Remove " + tool.label + " from favourites"} className="shrink-0 p-2 text-primary rounded-sm hover:bg-primary/10 focus-visible:ring-2 focus-visible:ring-ring"><Heart className="w-3 h-3 fill-current" /></button></>}
+          </div>;
+        })}
+        {!iconOnly && !favourites.length && <p className="mx-2 mt-1 p-3 border border-dashed border-border text-xs leading-relaxed text-muted-foreground">No favourites yet. Open All tools and use the heart to pin the ones you use.</p>}
+      </div>
 
       {/* Footer: legal links */}
       {!iconOnly && (
         <div className="mt-auto border-t border-border/60 p-2">
+          <p className="text-[10px] font-mono text-muted-foreground px-2 py-2">Editing stays in your browser</p>
           <div className="flex items-center justify-center gap-2 pb-1">
             <Link href="/privacy" className="text-[9px] text-muted-foreground/50 hover:text-muted-foreground transition-colors">Privacy</Link>
             <span className="text-[9px] text-muted-foreground/30">·</span>

@@ -1,11 +1,12 @@
 "use client";
 import { parseJsonSafe, formatJsonPrecisely } from "@/lib/precise-json";
+import { emptyHistory, recordChange, travelHistory } from "@/lib/json-history";
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check,
   Minimize2, Maximize2, ArrowUpDown, Sparkles, Wrench, Upload, MousePointerClick, Share2, X,
-  ChevronDown, Eye,
+  ChevronDown, Eye, Undo2, Redo2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
@@ -21,6 +22,11 @@ import JsonEditor from "@/components/JsonEditor";
 import JsonTabBar from "@/components/JsonTabBar";
 import OverlaySidebar from "@/components/OverlaySidebar";
 import AppHeader from "@/components/app/AppHeader";
+import ModeTabs from "@/components/app/ModeTabs";
+import ToolBrowser from "@/components/app/ToolBrowser";
+import { DEFAULT_FAVOURITES, FAVOURITES_KEY, parseFavourites } from "@/lib/workspace-tools";
+import { readPreference, writePreference } from "@/lib/local-preferences";
+import type { ToolSlug } from "@/lib/tool-links";
 import LeftRail from "@/components/app/LeftRail";
 import MobileHeader from "@/components/app/MobileHeader";
 import { AppButton } from "@/components/app/AppButton";
@@ -113,10 +119,15 @@ export default function JsonViewerClient() {
   const activeTab = tabsState.tabs.find((t) => t.id === tabsState.activeId) ?? tabsState.tabs[0];
   const json = activeTab?.json ?? "";
 
-  const syncTabJson = useCallback((value: string) => {
+  const syncTabJson = useCallback((value: string, typing = false) => {
+    const state = tabsStateRef.current;
+    const tab = state.tabs.find(tab => tab.id === state.activeId);
+    if (!tab || tab.json === value) return;
+    const history = recordChange(tab.history ?? emptyHistory(), tab.json, value, typing);
+    tabsStateRef.current = { ...state, tabs: state.tabs.map(t => t.id === tab.id ? { ...t, json: value, history } : t) };
     setTabsState((prev) => ({
       ...prev,
-      tabs: prev.tabs.map((t) => (t.id === prev.activeId ? { ...t, json: value } : t)),
+      tabs: prev.tabs.map((t) => (t.id === tab.id ? { ...t, json: value, history } : t)),
     }));
   }, []);
 
@@ -124,6 +135,15 @@ export default function JsonViewerClient() {
   const { dark, toggle } = useTheme();
   const { settings } = useSettings();
   const isMobile = useIsMobile();
+
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [favourites, setFavourites] = useState<ToolSlug[]>(DEFAULT_FAVOURITES);
+  useEffect(() => { setFavourites(parseFavourites(readPreference(FAVOURITES_KEY))); }, []);
+  const toggleFavourite = (slug: ToolSlug) => {
+    const next = favourites.includes(slug) ? favourites.filter(item => item !== slug) : [...favourites, slug];
+    setFavourites(next);
+    if (!writePreference(FAVOURITES_KEY, JSON.stringify(next))) toast.error("Favourites updated for this session only. Browser storage is unavailable.");
+  };
 
   const [mode, setMode] = useState<PanelMode>("tree");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -171,14 +191,43 @@ export default function JsonViewerClient() {
 
   const setJson = useCallback(
     (value: string) => {
-      setTabsState((prev) => ({
-        ...prev,
-        tabs: prev.tabs.map((t) => (t.id === prev.activeId ? { ...t, json: value } : t)),
-      }));
+      syncTabJson(value);
       setParserJson(value);
     },
-    [setParserJson]
+    [setParserJson, syncTabJson]
   );
+
+  const editJson = useCallback((value: string) => {
+    syncTabJson(value, true);
+    setParserJson(value);
+  }, [syncTabJson, setParserJson]);
+
+  const changeHistory = useCallback((direction: "undo" | "redo") => {
+    const state = tabsStateRef.current;
+    const tab = state.tabs.find(tab => tab.id === state.activeId);
+    if (!tab) return;
+    const result = travelHistory(tab.history ?? emptyHistory(), tab.json, direction);
+    if (result.value === tab.json) return;
+    const next = { ...state, tabs: state.tabs.map(t => t.id === tab.id ? { ...t, json: result.value, history: result.history } : t) };
+    tabsStateRef.current = next;
+    setTabsState(next);
+    setParserJson(result.value);
+  }, [setParserJson]);
+  const activeHistory = activeTab?.history;
+
+  // Capture the source editor shortcut before Monaco handles it. Other editors
+  // (notes, diff, schema, search fields) keep their own native undo behavior.
+  const handleHistoryKey: React.KeyboardEventHandler<HTMLDivElement> = event => {
+    if (!(event.ctrlKey || event.metaKey) || event.altKey) return;
+    const key = event.key.toLowerCase();
+    if (key !== "z" && key !== "y") return;
+    const target = event.target as HTMLElement;
+    const sourceEditor = target.closest("[data-source-json-editor]");
+    if (!sourceEditor && target.closest('input, textarea, [contenteditable="true"], .monaco-editor, [role="dialog"]')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    changeHistory(key === "y" || event.shiftKey ? "redo" : "undo");
+  };
 
   /** Applies a fix result (from the fast path or the preview dialog) and
    *  reports back exactly what changed, instead of a generic success toast. */
@@ -586,7 +635,10 @@ export default function JsonViewerClient() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (e.defaultPrevented) return;
       const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.shiftKey && e.key.toLowerCase() === "k") { e.preventDefault(); setToolsOpen(open => !open); return; }
+      if (toolsOpen) return;
       if (e.key === "Escape") {
         if (flowFullscreen) { setFlowFullscreen(false); return; }
         if (shareOpen) { setShareOpen(false); return; }
@@ -621,7 +673,7 @@ export default function JsonViewerClient() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [mode, searchOpen, shareOpen, settingsOpen, flowFullscreen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
+  }, [toolsOpen, mode, searchOpen, shareOpen, settingsOpen, flowFullscreen, format, minify, toggle, setQuery, settings.format.beautifyIndent, settings.format.sortKeysOnBeautify, addTab, closeTab, tabsState.tabs.length, tabsState.activeId]);
 
   const lineCount = json.split("\n").length;
   const modeCfg = MODES[mode];
@@ -644,7 +696,19 @@ export default function JsonViewerClient() {
     ? null
     : modeCfg.label;
 
+  const selectTool = (slug: ToolSlug) => {
+    const config = getToolLaunchConfig(slug)!;
+    setToolsOpen(false);
+    setMobileMenuOpen(false);
+    if (slug === "json-bundle-viewer") { window.open(config.appHref, "_blank", "noopener,noreferrer"); return; }
+    setLaunchConfig(config);
+    handleModeSelect(slug === "learn-json" ? "learn" : config.opensShare ? "share" : config.mode ?? "tree");
+  };
+  const documentTabs = <JsonTabBar tabs={tabsState.tabs} activeId={tabsState.activeId} onSwitch={switchTab} onClose={closeTab} onRename={renameTab} onAdd={addTab} />;
+
   const railProps = {
+    favourites, onToggleFavourite: toggleFavourite, onSelectTool: selectTool,
+    onOpenTools: () => { setMobileMenuOpen(false); setToolsOpen(true); },
     mode,
     onModeChange: handleModeSelect,
     hasJson,
@@ -654,6 +718,7 @@ export default function JsonViewerClient() {
   };
 
   const headerProps = {
+    documentTabs,
     mode,
     onModeChange: handleModeSelect,
     dark,
@@ -670,12 +735,12 @@ export default function JsonViewerClient() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-bg">
+    <div className="workspace flex flex-col h-dvh bg-bg" onKeyDownCapture={handleHistoryKey}>
       <div className="hidden md:contents">
         <AppHeader {...headerProps} />
       </div>
 
-      <div className="flex flex-1 min-h-0 bg-grad-hero bg-bg">
+      <div className="workspace-body flex flex-1 min-h-0 bg-bg">
         <div className="hidden md:contents">
           {!railCollapsed && <LeftRail {...railProps} collapsed={false} />}
         </div>
@@ -687,6 +752,91 @@ export default function JsonViewerClient() {
           </SheetContent>
         </Sheet>
 
+        <div className="workspace-main flex flex-col flex-1 min-w-0 min-h-0">
+          <div className="md:hidden shrink-0">{documentTabs}</div>
+          <div className="workspace-toolbar flex flex-wrap items-center gap-3 px-3 py-2 border-b border-border shrink-0">
+            <ModeTabs mode={mode} onChange={handleModeSelect} />
+            <div className="flex-1" />
+            <div className="workspace-actions flex items-center flex-wrap gap-1">                <div className="workspace-actions flex items-center gap-1 flex-wrap">
+                  <AppButton onClick={() => changeHistory("undo")} disabled={!activeHistory?.past.length} title="Undo (Ctrl/Cmd+Z)" aria-label="Undo JSON change" leftIcon={<Undo2 className="w-3.5 h-3.5" />} label="Undo" hideLabelOnMobile />
+                  <AppButton onClick={() => changeHistory("redo")} disabled={!activeHistory?.future.length} title="Redo (Ctrl/Cmd+Shift+Z or Ctrl+Y)" aria-label="Redo JSON change" leftIcon={<Redo2 className="w-3.5 h-3.5" />} label="Redo" hideLabelOnMobile />
+                  <AppButton
+                    onClick={() => format({ indent: settings.format.beautifyIndent, sortKeys: settings.format.sortKeysOnBeautify })}
+                    disabled={!hasJson}
+                    title="Beautify (⌘⇧F)"
+                    className="workspace-beautify"
+                    leftIcon={<Sparkles className="w-3.5 h-3.5" />}
+                    label="Beautify"
+                    hideLabelOnMobile
+                  />
+                  <AppButton
+                    onClick={minify}
+                    disabled={!hasJson}
+                    title="Minify (⌘M)"
+                    leftIcon={<Minimize2 className="w-3.5 h-3.5" />}
+                    label="Minify"
+                    hideLabelOnMobile
+                  />
+                  <AppButton
+                    onClick={sortKeys}
+                    disabled={!hasJson}
+                    title="Sort keys"
+                    leftIcon={<ArrowUpDown className="w-3.5 h-3.5" />}
+                    label="Sort keys"
+                    hideLabelOnMobile
+                  />
+                  <div className="flex items-center">
+                    <AppButton
+                      onClick={handleRepairJson}
+                      disabled={!hasJson || fixableIssues.length === 0}
+                      title="Fix invalid JSON (quotes, commas, brackets, etc.)"
+                      leftIcon={<Wrench className="w-3.5 h-3.5" />}
+                      label="Fix"
+                      hideLabelOnMobile
+                      className="rounded-r-none"
+                    />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <AppButton
+                          disabled={!hasJson || fixableIssues.length === 0}
+                          title="Fix options"
+                          iconOnly
+                          leftIcon={<ChevronDown className="w-3 h-3" />}
+                          className="rounded-l-none border-l border-border/50 px-1 w-5"
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuItem onClick={handleRepairJson} className="text-xs gap-2">
+                          <Wrench className="w-3.5 h-3.5" /> Fix automatically
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setFixPreviewOpen(true)} className="text-xs gap-2">
+                          <Eye className="w-3.5 h-3.5" /> Preview changes
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+
+                <AppButton onClick={handleCopy} disabled={!hasJson} title="Copy JSON" leftIcon={copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />} label={copied ? "Copied!" : "Copy"} hideLabelOnMobile />
+                <AppButton
+                  onClick={handleShareClick}
+                  disabled={!hasJson}
+                  title="Share & Export (⌘⇧S)"
+                  active={shareOpen}
+                  leftIcon={<Share2 className="w-3.5 h-3.5" />}
+                  label="Share"
+                  hideLabelOnMobile
+                />
+</div>
+          </div>
+                          <input
+                  ref={fileRef}
+                  type="file"
+                  accept=".json,.txt,application/json,text/plain"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
         {layout === "focused" && mode === "diff" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
             <div className="md:hidden">
@@ -784,96 +934,15 @@ export default function JsonViewerClient() {
                   </span>
                 </div>
               )}
-              <JsonTabBar
-                tabs={tabsState.tabs}
-                activeId={tabsState.activeId}
-                onSwitch={switchTab}
-                onClose={closeTab}
-                onRename={renameTab}
-                onAdd={addTab}
-              />
               <div className="pane-header flex items-center gap-2 flex-wrap">
                 <span className="inline-flex items-center gap-1 shrink-0">
-                  Editor
+                  Editor <span className="normal-case font-normal text-muted-foreground truncate max-w-[180px]">{activeTab?.name}</span>
                   <InfoHelp
                     text="Edit the active tab here. Beautify, minify, import files, drag JSON onto this column, or fetch from a URL. Tabs persist in this browser."
                     label="About the editor"
                     side="bottom"
                   />
                 </span>
-                <div className="flex items-center gap-0.5 bg-secondary/50 rounded-lg p-0.5 ml-1">
-                  <AppButton
-                    onClick={() => format({ indent: settings.format.beautifyIndent, sortKeys: settings.format.sortKeysOnBeautify })}
-                    disabled={!hasJson}
-                    title="Beautify (⌘⇧F)"
-                    leftIcon={<Sparkles className="w-3.5 h-3.5" />}
-                    label="Beautify"
-                    hideLabelOnMobile
-                  />
-                  <AppButton
-                    onClick={minify}
-                    disabled={!hasJson}
-                    title="Minify (⌘M)"
-                    leftIcon={<Minimize2 className="w-3.5 h-3.5" />}
-                    label="Minify"
-                    hideLabelOnMobile
-                  />
-                  <AppButton
-                    onClick={sortKeys}
-                    disabled={!hasJson}
-                    title="Sort keys"
-                    leftIcon={<ArrowUpDown className="w-3.5 h-3.5" />}
-                    label="Sort"
-                    hideLabelOnMobile
-                  />
-                  <div className="flex items-center">
-                    <AppButton
-                      onClick={handleRepairJson}
-                      disabled={!hasJson || fixableIssues.length === 0}
-                      title="Fix invalid JSON (quotes, commas, brackets, etc.)"
-                      leftIcon={<Wrench className="w-3.5 h-3.5" />}
-                      label="Fix"
-                      hideLabelOnMobile
-                      className="rounded-r-none"
-                    />
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <AppButton
-                          disabled={!hasJson || fixableIssues.length === 0}
-                          title="Fix options"
-                          iconOnly
-                          leftIcon={<ChevronDown className="w-3 h-3" />}
-                          className="rounded-l-none border-l border-border/50 px-1 w-5"
-                        />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start">
-                        <DropdownMenuItem onClick={handleRepairJson} className="text-xs gap-2">
-                          <Wrench className="w-3.5 h-3.5" /> Fix automatically
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setFixPreviewOpen(true)} className="text-xs gap-2">
-                          <Eye className="w-3.5 h-3.5" /> Preview changes
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept=".json,.txt,application/json,text/plain"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <AppButton
-                  onClick={handleShareClick}
-                  disabled={!hasJson}
-                  title="Share & Export (⌘⇧S)"
-                  active={shareOpen}
-                  leftIcon={<Share2 className="w-3.5 h-3.5" />}
-                  label="Share"
-                  hideLabelOnMobile
-                />
                 <span className="ml-auto text-[10px] font-normal normal-case tracking-normal opacity-60">{lineCount} lines</span>
               </div>
               {activeTab?.curlMeta && (
@@ -886,10 +955,10 @@ export default function JsonViewerClient() {
                 />
               )}
               {error && <p role="alert" className="px-3 py-2 text-xs text-destructive">{error}</p>}
-              <div className="flex-1 min-h-0 relative">
+              <div className="flex-1 min-h-0 relative" data-source-json-editor>
                 <JsonEditor
                   value={json}
-                  onChange={setJson}
+                  onChange={editJson}
                   error={error}
                   dark={dark}
                   editorSettings={settings.editor}
@@ -1030,7 +1099,7 @@ export default function JsonViewerClient() {
               {mode === "practices" && <JsonBestPractices parsed={parsed} />}
               {mode === "tokens" && <JsonTokenEstimator json={json} parsed={parsed} />}
               {mode === "schema" && <JsonSchemaValidator json={json} dark={dark} />}
-              {mode === "convert" && <JsonConvertPanel parsed={error || !hasJson ? undefined : parsed} dark={dark} initialFormat={launchConfig?.convertFormat} />}
+              {mode === "convert" && <JsonConvertPanel key={launchConfig?.slug ?? "convert"} parsed={error || !hasJson ? undefined : parsed} dark={dark} initialFormat={launchConfig?.convertFormat} />}
               {mode === "notes" && <JsonNoteEditor key={tabsState.activeId} content={activeTab?.notes} onChange={(notes) => {
                 setTabsState((prev) => ({ ...prev, tabs: prev.tabs.map((tab) => tab.id === tabsState.activeId ? { ...tab, notes } : tab) }));
               }} />}
@@ -1045,7 +1114,10 @@ export default function JsonViewerClient() {
             </section>
           </main>
         )}
+        </div>
       </div>
+
+      <ToolBrowser open={toolsOpen} onOpenChange={setToolsOpen} favourites={favourites} onToggleFavourite={toggleFavourite} onSelect={selectTool} />
 
       <OverlaySidebar
         open={shareOpen}
