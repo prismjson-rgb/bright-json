@@ -42,6 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: BASE + "/", lastModified: SITE_LASTMOD, changeFrequency: "weekly", priority: 1 },
     { url: BASE + "/tools/", lastModified: SITE_LASTMOD, changeFrequency: "weekly", priority: 0.9 },
     { url: BASE + "/learn/", lastModified: SITE_LASTMOD, changeFrequency: "monthly", priority: 0.9 },
+    { url: BASE + "/learn/errors/", lastModified: "2026-09-15", changeFrequency: "monthly", priority: 0.8 },
     ...learnArticles,
     { url: BASE + "/bundle/", lastModified: SITE_LASTMOD, changeFrequency: "monthly", priority: 0.7 },
     ...toolPages,

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { LEARN_LEVELS, getSectionsByLevel, getTutorialSections } from "@/lib/learn-content";
+import { LEARN_LEVELS, getTutorialSections } from "@/lib/learn-content";
 import { getLearnIndexContent } from "@/lib/site-content";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { LearnIndex } from "@/components/learn/LearnIndex";
 import { safeJsonLd } from "@/lib/json-ld";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
@@ -57,7 +57,7 @@ const breadcrumbLd = {
 
 export default function LearnIndexPage() {
   return (
-    <SiteLayout activeNav="learn">
+    <SiteLayout activeNav="learn" learnDesign>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(courseLd) }}
@@ -67,76 +67,7 @@ export default function LearnIndexPage() {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
       />
 
-      <main className="mx-auto max-w-4xl px-4 sm:px-6 py-12 sm:py-20">
-        {content.heroEyebrow && (
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
-            {content.heroEyebrow}
-          </p>
-        )}
-        <h1 className="mt-4 text-3xl sm:text-5xl font-semibold tracking-tight text-white">
-          {content.heroTitle || content.title}
-        </h1>
-        <p className="mt-6 max-w-2xl text-base sm:text-lg leading-8 text-slate-300">
-          {content.heroDescription}
-        </p>
-        {content.tags.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-2">
-            {content.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-medium text-cyan-100"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <nav aria-label="Tutorial index" className="mt-14 space-y-12">
-          {LEARN_LEVELS.map((level, levelIdx) => {
-            const sections = getSectionsByLevel(level.id);
-            if (sections.length === 0) return null;
-            return (
-              <section key={level.id}>
-                <h2 className="text-xl font-semibold text-white pb-3 border-b border-white/10">
-                  {levelIdx + 1}. {level.label}
-                </h2>
-                <p className="mt-2 mb-5 text-sm text-slate-400">{level.description}</p>
-                <ul className="space-y-3">
-                  {sections.map((s) => (
-                    <li key={s.id}>
-                      <Link
-                        href={`/learn/${s.id}/`}
-                        className="block rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-cyan-300/40 hover:bg-cyan-300/[0.05] group"
-                      >
-                        <span className="font-semibold text-white group-hover:text-cyan-200 transition-colors">
-                          {s.title}
-                        </span>
-                        {s.metaDescription && (
-                          <p className="text-sm text-slate-400 mt-1 line-clamp-2">
-                            {s.metaDescription}
-                          </p>
-                        )}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            );
-          })}
-        </nav>
-
-        {(content.whyTitle || content.whyBody) && (
-          <div className="mt-14 rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-            {content.whyTitle && (
-              <h3 className="text-sm font-semibold text-white mb-2">{content.whyTitle}</h3>
-            )}
-            {content.whyBody && (
-              <p className="text-sm text-slate-400">{content.whyBody}</p>
-            )}
-          </div>
-        )}
-      </main>
+      <LearnIndex sections={getTutorialSections()} levels={LEARN_LEVELS} heroDescription={content.heroDescription || DESCRIPTION} originalEyebrow={content.heroEyebrow} originalTitle={content.heroTitle || content.title} tags={content.tags} whyTitle={content.whyTitle} whyBody={content.whyBody} />
     </SiteLayout>
   );
 }

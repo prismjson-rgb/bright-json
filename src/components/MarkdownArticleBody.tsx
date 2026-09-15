@@ -13,7 +13,7 @@ interface MarkdownArticleBodyProps {
   keyTerms?: string[];
   tryExample?: string;
   onTryInEditor?: (json: string) => void;
-  variant?: "default" | "landing";
+  variant?: "default" | "landing" | "learn";
 }
 
 // Display labels for the code-block header, keyed by the fenced-block language.
@@ -117,11 +117,12 @@ export function MarkdownArticleBody({
   variant = "default",
 }: MarkdownArticleBodyProps) {
   const isLanding = variant === "landing";
+  const isLearn = variant === "learn";
 
   return (
     <section
       className={
-        isLanding
+        isLanding || isLearn
           ? "max-w-none space-y-7 text-slate-400 [overflow-wrap:break-word] [word-break:break-word]"
           : "prose prose-sm max-w-none space-y-4 text-muted-foreground [overflow-wrap:break-word] [word-break:break-word]"
       }
@@ -133,7 +134,7 @@ export function MarkdownArticleBody({
           p: ({ children }) => (
             <p
               className={
-                isLanding
+                isLanding || isLearn
                   ? "max-w-3xl text-[15px] leading-8 text-slate-400"
                   : "text-sm leading-relaxed"
               }
@@ -177,8 +178,9 @@ export function MarkdownArticleBody({
           h2: ({ children }) => (
             <div className={isLanding ? "pt-5 first:pt-0" : ""}>
               <h2
+                id={isLearn ? nodeToText(children).toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-") : undefined}
                 className={
-                  isLanding
+                  isLanding || isLearn
                     ? "relative mb-4 flex items-center gap-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl"
                     : "mt-6 mb-2 text-lg font-semibold text-foreground"
                 }
@@ -193,7 +195,7 @@ export function MarkdownArticleBody({
           h3: ({ children }) => (
             <h3
               className={
-                isLanding
+                isLanding || isLearn
                   ? "mt-5 text-lg font-semibold text-white"
                   : "mt-4 mb-2 text-base font-medium text-foreground"
               }
@@ -205,7 +207,7 @@ export function MarkdownArticleBody({
             <a
               href={href}
               className={
-                isLanding
+                isLanding || isLearn
                   ? "font-medium text-cyan-300 underline decoration-cyan-300/35 underline-offset-4 transition-colors hover:text-cyan-200"
                   : "text-primary underline underline-offset-2 hover:opacity-80"
               }
@@ -214,12 +216,12 @@ export function MarkdownArticleBody({
             </a>
           ),
           strong: ({ children }) => (
-            <strong className={isLanding ? "font-semibold text-white" : "font-semibold text-foreground"}>
+            <strong className={isLanding || isLearn ? "font-semibold text-white" : "font-semibold text-foreground"}>
               {children}
             </strong>
           ),
           em: ({ children }) => <em className="italic">{children}</em>,
-          hr: () => <hr className={isLanding ? "my-8 border-white/[0.08]" : "my-4 border-border"} />,
+          hr: () => <hr className={isLanding || isLearn ? "my-8 border-white/[0.08]" : "my-4 border-border"} />,
           table: ({ children }) => (
             <div className={isLanding ? "my-6 overflow-x-auto rounded-2xl border border-white/[0.08]" : "my-4 overflow-x-auto"}>
               <table className="w-full border-collapse text-sm">{children}</table>
@@ -237,12 +239,12 @@ export function MarkdownArticleBody({
             </tr>
           ),
           th: ({ children }) => (
-            <th className={isLanding ? "px-4 py-3 text-left font-semibold text-white" : "px-3 py-2 text-left font-semibold text-foreground"}>
+            <th className={isLanding || isLearn ? "px-4 py-3 text-left font-semibold text-white" : "px-3 py-2 text-left font-semibold text-foreground"}>
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className={isLanding ? "px-4 py-3 text-slate-400" : "px-3 py-2 text-muted-foreground"}>
+            <td className={isLanding || isLearn ? "px-4 py-3 text-slate-400" : "px-3 py-2 text-muted-foreground"}>
               {children}
             </td>
           ),
@@ -289,7 +291,7 @@ export function MarkdownArticleBody({
               return (
                 <code
                   className={
-                    isLanding
+                    isLanding || isLearn
                       ? "rounded-md border border-white/[0.08] bg-white/[0.07] px-1.5 py-0.5 font-mono text-xs text-slate-200"
                       : "rounded bg-surface2 px-1 py-0.5 font-mono text-xs"
                   }

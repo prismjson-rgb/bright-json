@@ -99,7 +99,7 @@ export default async function LearnArticleRoute({
   };
 
   return (
-    <SiteLayout activeNav="learn">
+    <SiteLayout activeNav="learn" learnDesign>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
@@ -109,18 +109,15 @@ export default async function LearnArticleRoute({
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
       />
 
-      <main className="mx-auto max-w-4xl px-4 sm:px-6 py-8 sm:py-12">
-        {levelInfo && (
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200 mb-6">
-            {levelInfo.label}
-          </p>
-        )}
+      <div className="learn-article-shell">
         <LearnArticlePage
           section={section}
+          levelLabel={levelInfo?.label}
+          sections={allSections}
           prev={prev ? { id: prev.id, title: prev.title } : undefined}
           next={next ? { id: next.id, title: next.title } : undefined}
         />
-      </main>
+      </div>
     </SiteLayout>
   );
 }

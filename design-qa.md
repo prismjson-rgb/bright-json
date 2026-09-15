@@ -25,3 +25,30 @@ Existing logo, Lucide icons, help descriptions, fonts, Monaco editor, tree contr
 - Coverage focuses on changed flows. Every existing tool permutation and browser engine was not manually retested; existing processing tests remain green. Browser quota/cleared site data can prevent or remove persistence; existing save-error feedback remains.
 
 final result: passed
+
+# Learn section redesign QA
+
+- Source: `C:/Users/ansi2/Downloads/JSONPrism workspace redesign (1)/JSON Prism Learn.dc.html` and its imported `support.js`.
+- Implementation: `http://127.0.0.1:3000/learn/`, `/learn/unexpected-token-in-json/`, and `/learn/errors/` from the production export.
+- Paired source and implementation captures were reviewed at 1280 × 720 desktop and 390 × 844 mobile in the same in-app browser. The source's sample content and logo were replaced with existing published lessons, original descriptions, actual article dates, and the existing JSON Prism logo.
+
+## Visual and functional review
+
+1. Learn index: shell, two-column desktop hero, diagnostic, path cards, search, filters, 56 lesson links, and mobile stack match the reference structure. The existing hero description, original course heading, and topic chips remain visible. Search for “trailing comma” returns five relevant lessons; “Error fixes” filters to three focused lessons.
+2. Lesson article: breadcrumb, title, date, quick answer, diagnostic, Markdown content, related links, table of contents, and adjacent-lesson navigation are present. All five table-of-contents links on the inspected parser lesson resolve to article headings. Original article Markdown and JSON examples remain intact.
+3. Error hub: ten parser-message rows and their lesson links render. On mobile, message, cause, and lesson stack without clipping; “unexpected end” search narrows to the expected existing lesson.
+4. A broken JSON fixture reports a local syntax issue and links to the existing lesson. The auto-fix action uses the workspace's existing repair function and produced valid JSON. Completion state survives refresh in browser localStorage; the test completion was cleared afterward.
+5. At 390px, the header's app button stays within the viewport and the error hub has no horizontal overflow. Fresh production tabs for the index, article, and error hub reported no console errors.
+
+## URL and search preservation
+
+- All 56 existing `/learn/[slug]/` paths remain in the static export and sitemap. `/learn/errors/` is a new path and does not replace an existing path.
+- Live-to-local comparison on the index and two representative articles found identical title, meta description, canonical URL, and two JSON-LD records per page. Existing lesson content, course schema, article schema, breadcrumb schema, and metadata generation remain in place.
+- The index's visible H1 follows the new reference. Search ranking or AI-answer placement cannot be guaranteed by a local check; the verified technical search signals above are unchanged.
+
+## Validation
+
+- Lint, TypeScript, 176 tests, production build, and static export checks pass. Export verification covers 90 routes, sitemap, 404, headers, robots, and manifest.
+- The UI uses the existing JSON analysis and repair libraries. Lesson progress is local to this browser. No deployment changes were made for this redesign.
+
+final result: passed

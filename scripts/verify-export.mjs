@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, existsSync } from "node:fs";
 
-const routes = ["", "app", "bundle", "tools", "learn"];
+const routes = ["", "app", "bundle", "tools", "learn", "learn/errors"];
 for (const [directory, prefix] of [["pages", ""], ["tools", "tools/"], ["learn", "learn/"]]) {
   for (const file of readdirSync(`content/${directory}`)) {
     if (file.endsWith(".md") && file !== "README.md") routes.push(prefix + file.slice(0, -3));
