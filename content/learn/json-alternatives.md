@@ -7,6 +7,7 @@ keyTerms: []
 relatedTools: [json-converter]
 relatedLearn: [json-vs-yaml, json-vs-protobuf, json-vs-toml]
 publishedAt: "2025-12-09"
+updatedAt: "2026-09-15"
 ---
 
 JSON is the right default for most situations. But there are legitimate cases where another format is a better fit. Understanding the alternatives - what they add, what they cost - helps you make an informed choice rather than a cargo-cult one.
@@ -80,7 +81,7 @@ notifications = false
 
 ## MessagePack - binary JSON
 
-MessagePack is a binary serialization format that encodes the same types as JSON but in a compact binary representation - typically 20–50% smaller than JSON with faster parsing.
+MessagePack is a binary serialization format for JSON-like data. It can reduce size in some workloads, but encoded size and parsing speed depend on the data and implementation.
 
 **Use when:** High-volume inter-service communication where bandwidth or latency matters and human readability is not needed. Common in game servers, IoT, and real-time systems.
 

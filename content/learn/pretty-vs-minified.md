@@ -7,6 +7,7 @@ keyTerms: []
 relatedTools: [json-formatter, json-trimmer]
 relatedLearn: [minify-json, parse-stringify]
 publishedAt: "2025-12-03"
+updatedAt: "2026-09-15"
 ---
 
 Pretty-printed JSON uses indentation and newlines for human readability. Minified JSON removes all unnecessary whitespace to reduce file size. The data is identical - only the formatting differs. Knowing when to use each form is a practical skill for any developer working with APIs or config files.
@@ -50,7 +51,7 @@ Use minified JSON for:
 
 ## How much size difference does minification make?
 
-For small documents the difference is trivial. For large API responses or files with many short keys, minification typically saves 15–30% of bytes. With gzip compression applied on top, the gap narrows further - but minifying before compressing still helps.
+The difference depends on the amount of whitespace in the original document. For large responses, measure both forms and their compressed transfer sizes before deciding whether minification matters for your workload.
 
 ## Does formatting change the data?
 

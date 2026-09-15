@@ -7,6 +7,7 @@ keyTerms: []
 relatedTools: [json-converter]
 relatedLearn: [what-is-json, json-vs-yaml, convert-json-to-csv]
 publishedAt: "2025-12-08"
+updatedAt: "2026-09-15"
 ---
 
 JSON, XML, and CSV are the three most common data interchange formats in software. Each has clear strengths and weaknesses. Choosing the right one for your use case saves integration headaches later.
@@ -49,11 +50,11 @@ Alice,30,alice@example.com
 Bob,25,bob@example.com
 ```
 
-JSON is typically 40–60% smaller than XML for the same data.
+JSON and XML represent data differently, so compare the size of your own payloads before choosing a format for bandwidth reasons.
 
 ## When to use JSON
 
-- REST APIs and web services - JSON is the universal default
+- REST APIs and web services - JSON is a common choice
 - Configuration files - readable and writable by humans and machines
 - Browser-side data storage - `localStorage`, `IndexedDB`
 - Nested or hierarchical data - JSON handles this naturally

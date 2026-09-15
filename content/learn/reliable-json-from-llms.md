@@ -1,25 +1,27 @@
 ---
 title: "Getting Reliable JSON from LLMs"
 metaTitle: "Get Reliable JSON from LLMs (Structured Output)"
-metaDescription: "Stop parsing LLM JSON with regex. Learn how JSON mode, structured outputs, and schema constraints make models return valid JSON every time."
+metaDescription: "Stop parsing LLM JSON with regex. Learn what JSON mode and schema-constrained outputs can guarantee, and how to handle refusals or incomplete replies."
 level: intermediate
 order: 36
 keyTerms: [structured output, json mode, llm json, schema, function calling]
 relatedTools: [ai-json-cleaner, json-validator]
 relatedLearn: [fixing-llm-json, validate-llm-json-schema, repair-truncated-llm-json]
 publishedAt: "2026-06-25"
-updatedAt: "2026-06-25"
+updatedAt: "2026-09-15"
 ---
 
-**Quick answer:** The reliable way to get JSON from an LLM is to **constrain the output at generation time** - use the provider's *structured output* or *JSON mode* with a schema, instead of asking nicely in the prompt and cleaning up afterward. Constrained generation masks invalid tokens as the model writes, so the result is guaranteed to be parseable JSON that matches your shape. For the inevitable legacy cases, the [AI JSON Cleaner](/tools/ai-json-cleaner/) repairs raw text.
+**Quick answer:** Use the provider's *schema-constrained structured output* when your application needs a specific JSON shape. JSON mode can help with syntax, but does not enforce a schema. Check whether the request completed, whether the model refused, and whether the returned value matches your schema before using it. For legacy prompt-only replies, the [AI JSON Cleaner](/tools/ai-json-cleaner/) can help repair raw text.
 
 ## Three levels of reliability
 
 **1. Prompt-only (least reliable).** You ask for JSON in plain English. It mostly works, but the model still adds [markdown fences](/learn/clean-chatgpt-json/), prose, or [trailing commas](/learn/fixing-trailing-commas/), and occasionally drifts from the shape you wanted. You're always one weird response away from a parse error.
 
-**2. JSON mode.** The model is told to emit syntactically valid JSON. This eliminates fences and chatter, so the output *parses* - but it doesn't guarantee the *shape*. You can still get unexpected keys, missing fields, or wrong types.
+**2. JSON mode.** The model is constrained toward syntactically valid JSON, but this does not guarantee the *shape*. An incomplete response can still fail to parse. You can also get unexpected keys, missing fields, or wrong types.
 
-**3. Structured output with a schema (most reliable).** You pass a JSON Schema, and the decoder is constrained to produce only output that conforms to it. Valid syntax *and* the right shape are guaranteed, because invalid tokens are masked during generation rather than rejected after the fact.
+**3. Structured output with a schema (most reliable).** You pass a supported JSON Schema, and the provider constrains completed, non-refusal responses to that shape. Check the provider's supported schema features: not every JSON Schema keyword may be available. Refusals and output cut off by token limits require separate handling.
+
+These distinctions follow the [OpenAI Structured Outputs guide](https://developers.openai.com/api/docs/guides/structured-outputs). Other providers can differ, so check their current documentation before relying on a particular guarantee.
 
 ## Define the schema once, reuse it
 
@@ -48,26 +50,26 @@ const Person = z.object({
 // Convert to JSON Schema for the request; parse the response with Person.
 ```
 
-This makes the schema the single source of truth: the model is constrained by it, and your code validates against the same definition. For the schema language itself, see [JSON Schema Basics](/learn/json-schema-basics/).
+This makes the schema the single source of truth: the provider constrains supported responses with it, and your code validates against the same definition. For the schema language itself, see [JSON Schema Basics](/learn/json-schema-basics/).
 
-## Always validate, even with guarantees
+## Validate the response before using it
 
 Constrained decoding is strong, but treat the response as untrusted input anyway:
 
 - Validate it against your schema before using it - see [Validating LLM JSON Against a Schema](/learn/validate-llm-json-schema/) and the [JSON Best Practices Checker](/tools/json-best-practices-checker/).
-- Handle truncation: a response cut off by the token limit is still incomplete even in JSON mode. See [Repairing Truncated LLM JSON](/learn/repair-truncated-llm-json/).
+- Check refusal and completion status before parsing. A response cut off by the token limit can be incomplete even in JSON mode. See [Repairing Truncated LLM JSON](/learn/repair-truncated-llm-json/).
 - Keep payloads lean to stay within context limits - [Counting JSON Tokens for LLMs](/learn/count-json-tokens-llm/).
 
 ## Frequently asked questions
 
 **What's the difference between JSON mode and structured output?**
-JSON mode guarantees the output is valid JSON syntax. Structured output (schema-constrained) additionally guarantees the JSON matches a specific shape - correct keys and types. Structured output is the stronger guarantee.
+JSON mode aims for valid JSON syntax without enforcing your fields. Schema-constrained structured output can enforce a supported shape for completed, non-refusal responses. Check status and validate either kind before using it.
 
 **Do I still need to validate if the model guarantees JSON?**
-Yes. Validate against your schema anyway to catch truncated responses, edge cases, and to keep a single source of truth. Constrained decoding reduces errors; it doesn't replace validation.
+Yes. Check refusals and incomplete responses, then validate against your schema. Constrained decoding reduces errors; it does not replace response checks.
 
 **Why not just clean the JSON with regex?**
 Regex extraction is brittle - it breaks on nested braces, strings containing `}`, and truncation. Constrained generation removes the problem at the source; cleaning is a fallback for output you don't control.
 
-**How do I guarantee the response matches my fields?**
-Pass a JSON Schema (often generated from a Pydantic or Zod model) to the provider's structured-output API, and validate the response against that same schema in your code.
+**How do I make the response match my fields?**
+Pass a schema supported by the provider's structured-output API (often generated from a Pydantic or Zod model), check completion and refusal status, and validate the response against the same schema in your code.
