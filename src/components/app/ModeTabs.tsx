@@ -13,7 +13,7 @@ export default function ModeTabs({ mode, onChange, className }: ModeTabsProps) {
     <nav
       role="tablist"
       aria-label="View modes"
-      className={`flex items-stretch gap-1 min-w-0 overflow-x-auto ${className ?? ""}`}
+      className={`workspace-view-tabs flex items-stretch gap-0.5 min-w-0 overflow-x-auto ${className ?? ""}`}
     >
       {VIEW_MODES.map((m) => {
         const cfg = MODES[m];
@@ -30,7 +30,7 @@ export default function ModeTabs({ mode, onChange, className }: ModeTabsProps) {
             onClick={() => onChange(m)}
             title={cfg.shortcut ? `${cfg.label} (${cfg.shortcut})` : cfg.label}
             leftIcon={<Icon className="w-4 h-4" />}
-            label={<span className="uppercase tracking-wider text-xs">{cfg.label}</span>}
+            label={<span className="text-xs">{cfg.label}</span>}
             hideLabelOnMobile
           />
         );

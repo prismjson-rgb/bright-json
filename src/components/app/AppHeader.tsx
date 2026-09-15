@@ -2,12 +2,13 @@
 import Link from "next/link";
 import { Menu, Moon, Search, Settings, Share2, Sun } from "lucide-react";
 import Logo from "./Logo";
-import ModeTabs from "./ModeTabs";
+import type { ReactNode } from "react";
 import { AppButton } from "./AppButton";
 import { InfoHelp } from "./InfoHelp";
 import type { PanelMode } from "@/lib/modes";
 
 interface AppHeaderProps {
+  documentTabs?: ReactNode;
   mode: PanelMode;
   onModeChange: (mode: PanelMode) => void;
   dark: boolean;
@@ -24,13 +25,14 @@ interface AppHeaderProps {
 }
 
 export default function AppHeader({
-  mode, onModeChange, dark, onToggleTheme,
+  documentTabs, dark, onToggleTheme,
   onOpenShare, onOpenSettings, searchOpen, onSearchToggle,
   shareActive, settingsActive, hasJson,
   railCollapsed, onToggleRail,
 }: AppHeaderProps) {
   return (
-    <header className="toolbar-header flex items-center h-12 border-b border-border bg-surface1 shrink-0 gap-3 px-4">
+    <header className="toolbar-header flex items-center h-[46px] border-b border-border bg-surface1 shrink-0">
+      <div className={`workspace-brand flex items-center gap-2 px-3 h-full shrink-0 border-r border-border ${railCollapsed ? "w-[210px]" : "w-[244px]"}`}>
       {onToggleRail && (
         <AppButton
           variant="icon"
@@ -49,10 +51,10 @@ export default function AppHeader({
       >
         <Logo />
       </Link>
-      <div className="h-6 w-px bg-border shrink-0" aria-hidden />
+      </div>
       <div className="flex items-center gap-3 flex-1 min-w-0">
 
-        <ModeTabs mode={mode} onChange={onModeChange} className="flex-1 min-w-0" />
+        {documentTabs}
 
       <div className="flex items-center shrink-0 gap-0.5 pl-2.5 ml-0.5 border-l border-border/70">
         <InfoHelp
