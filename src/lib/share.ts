@@ -67,13 +67,13 @@ export function safeDecodeJson(encoded: string): string | null {
 
 /* ── Async variants (deflate-raw primary, lz-string fallback) ─────────────── */
 // deflate-raw via browser CompressionStream produces links ~30–60% shorter than
-// lz-string on realistic JSON (measured — see scripts/compare-compression.mjs).
+// lz-string on realistic JSON (measured - see scripts/compare-compression.mjs).
 
 export async function encodeJsonAsync(json: string): Promise<string> {
   try {
     return V2_MARKER + (await compressToBase64Url(json));
   } catch {
-    // CompressionStream unavailable — fall back to worker-backed lz-string.
+    // CompressionStream unavailable - fall back to worker-backed lz-string.
     const viaWorker = await lzEncodeAsync(json).catch(() => null);
     return viaWorker ?? encodeJson(json);
   }

@@ -11,7 +11,7 @@ publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---
 
-**Quick answer:** Use **JSON** for data that machines exchange — APIs, message payloads, and anything generated programmatically — because it's strict, fast to parse, and supported everywhere. Use **YAML** for configuration that humans write and read by hand — CI pipelines, Kubernetes, Docker Compose — because it allows comments and avoids braces and quotes. Any valid JSON is also valid YAML, so you can convert JSON to YAML, but not always cleanly the other way.
+**Quick answer:** Use **JSON** for data that machines exchange - APIs, message payloads, and anything generated programmatically - because it's strict, fast to parse, and supported everywhere. Use **YAML** for configuration that humans write and read by hand - CI pipelines, Kubernetes, Docker Compose - because it allows comments and avoids braces and quotes. Any valid JSON is also valid YAML, so you can convert JSON to YAML, but not always cleanly the other way.
 
 ## The core difference
 
@@ -57,7 +57,7 @@ envs:
 ## When to choose JSON
 
 - **API requests and responses.** Every language parses JSON natively and it's the de facto standard for REST and most web APIs. See [JSON in APIs](/learn/json-in-apis/).
-- **Generated data.** When a program produces the output, JSON's strictness is a feature — there's no whitespace ambiguity to get wrong.
+- **Generated data.** When a program produces the output, JSON's strictness is a feature - there's no whitespace ambiguity to get wrong.
 - **Browser and JavaScript contexts.** `JSON.parse()` and `JSON.stringify()` are built in; no dependency needed.
 - **Performance-sensitive paths.** JSON parses faster than YAML, which matters at high volume.
 
@@ -71,7 +71,7 @@ The catch: YAML's whitespace sensitivity makes it easy to break with a stray spa
 
 ## Converting between them
 
-Because YAML 1.2 is a superset of JSON, every JSON document is already valid YAML. To go from JSON to a cleaner YAML form, paste your JSON into the [JSON Converter](/tools/json-converter/) and switch the output to YAML. For a broader look at other formats — TOML, MessagePack, Protobuf — see [JSON Alternatives](/learn/json-alternatives/), and for the XML/CSV comparison specifically, [JSON vs XML vs CSV](/learn/json-vs-xml-csv/).
+Because YAML 1.2 is a superset of JSON, every JSON document is already valid YAML. To go from JSON to a cleaner YAML form, paste your JSON into the [JSON Converter](/tools/json-converter/) and switch the output to YAML. For a broader look at other formats - TOML, MessagePack, Protobuf - see [JSON Alternatives](/learn/json-alternatives/), and for the XML/CSV comparison specifically, [JSON vs XML vs CSV](/learn/json-vs-xml-csv/).
 
 ## Frequently asked questions
 
@@ -79,7 +79,7 @@ Because YAML 1.2 is a superset of JSON, every JSON document is already valid YAM
 No. JSON parses faster because its grammar is simpler and stricter. YAML trades speed for human readability, which is why it's used for config rather than high-volume data exchange.
 
 **Can YAML do everything JSON can?**
-Yes for data representation — YAML is a superset, so any JSON is valid YAML. The reverse isn't guaranteed: YAML features like comments and anchors have no JSON equivalent.
+Yes for data representation - YAML is a superset, so any JSON is valid YAML. The reverse isn't guaranteed: YAML features like comments and anchors have no JSON equivalent.
 
 **Should I use JSON or YAML for an API?**
 JSON. It's the universal standard for APIs, parses natively in browsers, and avoids YAML's whitespace and type-coercion pitfalls in machine-generated data.

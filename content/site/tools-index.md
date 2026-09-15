@@ -2,5 +2,5 @@
 title: JSON Tools
 heroEyebrow: Tool directory
 heroTitle: Every JSON workflow has a dedicated page
-heroDescription: Browse {{toolCount}} purpose-built JSON tool pages. Each page targets a specific search intent and routes you directly into the right workspace feature — no hunting through menus.
+heroDescription: Browse {{toolCount}} purpose-built JSON tool pages. Each page targets a specific search intent and routes you directly into the right workspace feature - no hunting through menus.
 ---

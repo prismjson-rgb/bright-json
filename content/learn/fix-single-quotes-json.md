@@ -11,7 +11,7 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** JSON allows **double quotes only** — every key and every string value must be wrapped in `"`. Single quotes (`'`) are invalid, even though JavaScript and Python accept them, so `JSON.parse()` rejects them. To fix it, replace the single quotes with double quotes. The [JSON Trimmer](/tools/json-trimmer/) converts single-quoted JSON5-style input into strict JSON automatically.
+**Quick answer:** JSON allows **double quotes only** - every key and every string value must be wrapped in `"`. Single quotes (`'`) are invalid, even though JavaScript and Python accept them, so `JSON.parse()` rejects them. To fix it, replace the single quotes with double quotes. The [JSON Trimmer](/tools/json-trimmer/) converts single-quoted JSON5-style input into strict JSON automatically.
 
 ## What's invalid
 
@@ -51,7 +51,7 @@ data = {"name": "Dana", "role": "admin"}
 json.dumps(data)   # '{"name": "Dana", "role": "admin"}'
 ```
 
-- **In JavaScript:** generate JSON with `JSON.stringify()` rather than writing object literals by hand — it always double-quotes keys and strings. See [Parse and Stringify](/learn/parse-stringify/).
+- **In JavaScript:** generate JSON with `JSON.stringify()` rather than writing object literals by hand - it always double-quotes keys and strings. See [Parse and Stringify](/learn/parse-stringify/).
 
 ## What about apostrophes inside values?
 
@@ -72,7 +72,7 @@ No. JSON requires double quotes for all keys and string values. Single quotes al
 Printing a dict (`str(dict)`) uses single quotes and Python literals like `True`/`None`, which aren't valid JSON. Use `json.dumps()` to produce real JSON.
 
 **How do I convert single quotes to double quotes safely?**
-Don't do a blind find-and-replace — apostrophes inside values would break. Use a JSON5-aware tool like the [JSON Trimmer](/tools/json-trimmer/), or re-serialize the data with your language's JSON encoder.
+Don't do a blind find-and-replace - apostrophes inside values would break. Use a JSON5-aware tool like the [JSON Trimmer](/tools/json-trimmer/), or re-serialize the data with your language's JSON encoder.
 
 **Do I need to escape apostrophes in JSON?**
 No. An apostrophe inside a double-quoted string is just a normal character. Only the double quote and backslash need escaping inside a string.

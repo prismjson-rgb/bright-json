@@ -21,7 +21,7 @@ interface JsonEditorProps {
   dark: boolean;
   editorSettings?: EditorSettings;
   onFocusChange?: (focused: boolean) => void;
-  /** Rich diagnostics (analyzeJson output) — drives Monaco's error/warning markers. */
+  /** Rich diagnostics (analyzeJson output) - drives Monaco's error/warning markers. */
   issues?: DebugIssue[];
   /** Fires when the user clicks directly on a marked (issue) token in the editor. */
   onIssueFocus?: (issue: DebugIssue) => void;

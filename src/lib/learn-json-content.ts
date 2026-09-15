@@ -1,5 +1,5 @@
 /**
- * Comprehensive JSON Tutorial Content — Beginner to Advanced
+ * Comprehensive JSON Tutorial Content - Beginner to Advanced
  * SEO-friendly, structured for semantic HTML and discoverability
  */
 
@@ -39,7 +39,7 @@ export const TUTORIAL_SECTIONS: TutorialSection[] = [
     title: "What is JSON?",
     metaTitle: "What is JSON? A Complete Introduction for Beginners",
     metaDescription: "JSON (JavaScript Object Notation) is a lightweight data format used by 70%+ of APIs. Learn what JSON is, why it exists, and when to use it.",
-    content: "JSON stands for JavaScript Object Notation. It's a lightweight, text-based format for storing and exchanging data between systems. Created by Douglas Crockford in 2001 and standardized as ECMA-404 and RFC 8259, JSON has become the de facto standard for web APIs—over 70% of public APIs use JSON. Unlike XML, it's human-readable and easy for both humans and machines to parse.",
+    content: "JSON stands for JavaScript Object Notation. It's a lightweight, text-based format for storing and exchanging data between systems. Created by Douglas Crockford in 2001 and standardized as ECMA-404 and RFC 8259, JSON has become the de facto standard for web APIs - over 70% of public APIs use JSON. Unlike XML, it's human-readable and easy for both humans and machines to parse.",
     keyTerms: ["JSON", "data interchange", "API", "lightweight", "text-based"],
   },
   {
@@ -114,15 +114,15 @@ false`,
   {
     id: "syntax-rules",
     level: "beginner",
-    title: "JSON Syntax Rules — The Golden Rules",
+    title: "JSON Syntax Rules - The Golden Rules",
     metaTitle: "JSON Syntax Rules: Keys, Quotes, Commas, and More",
     metaDescription: "Master JSON syntax: double quotes for keys and strings, no trailing commas, no comments. Avoid common JSON mistakes.",
     content: "Follow these rules or your JSON will be invalid.",
     bullets: [
-      "Keys must be strings in double quotes — not single quotes",
-      "Strings must use double quotes — single quotes are invalid",
+      "Keys must be strings in double quotes - not single quotes",
+      "Strings must use double quotes - single quotes are invalid",
       "No trailing commas after the last item in objects or arrays",
-      "No comments allowed — JSON has no // or /* */ support",
+      "No comments allowed - JSON has no // or /* */ support",
       "true, false, and null must be lowercase",
       "Numbers have no quotes: use 42, not \"42\"",
       "Commas separate items; no comma after the last item",
@@ -184,7 +184,7 @@ false`,
     subSections: [
       {
         title: "List of Objects (API responses)",
-        content: "The most common pattern — an array of uniform objects. Used by almost every REST API.",
+        content: "The most common pattern - an array of uniform objects. Used by almost every REST API.",
         code: `[
   {"id": 1, "name": "Alice", "email": "alice@example.com"},
   {"id": 2, "name": "Bob", "email": "bob@example.com"}
@@ -246,7 +246,7 @@ false`,
     id: "json-in-apis",
     level: "practical",
     title: "JSON in REST APIs",
-    metaTitle: "How JSON is Used in REST APIs — Complete Guide",
+    metaTitle: "How JSON is Used in REST APIs - Complete Guide",
     metaDescription: "Learn how JSON powers REST APIs. Request and response examples, Content-Type headers, and parsing in JavaScript, Python, and more.",
     content: "REST APIs send and receive JSON. The client sends JSON in the request body (e.g., POST), and the server responds with JSON. Always set Content-Type: application/json.",
     code: `// Typical API response
@@ -267,7 +267,7 @@ false`,
     id: "parse-stringify",
     level: "practical",
     title: "Parsing and Stringifying",
-    metaTitle: "JSON.parse() and JSON.stringify() — Complete Guide",
+    metaTitle: "JSON.parse() and JSON.stringify() - Complete Guide",
     metaDescription: "Convert JSON text to objects with JSON.parse. Convert objects to JSON with JSON.stringify. Learn revivers, replacers, and pretty-printing.",
     content: "In JavaScript: JSON.parse() converts a JSON string into an object. JSON.stringify() does the opposite. Other languages have equivalents (json.loads/json.dumps in Python, json_decode/json_encode in PHP).",
     code: `// Parse: string → object
@@ -285,7 +285,7 @@ const pretty = JSON.stringify(obj, null, 2);`,
     id: "pretty-vs-minified",
     level: "practical",
     title: "Pretty Print vs Minified",
-    content: "Pretty-printed JSON uses indentation and newlines for readability—ideal for config files and debugging. Minified JSON removes whitespace to reduce size—ideal for APIs and network transfer. Same data, different formatting.",
+    content: "Pretty-printed JSON uses indentation and newlines for readability - ideal for config files and debugging. Minified JSON removes whitespace to reduce size - ideal for APIs and network transfer. Same data, different formatting.",
     code: `// Pretty (readable)
 {
   "name": "Alice",
@@ -302,7 +302,7 @@ const pretty = JSON.stringify(obj, null, 2);`,
   {
     id: "json-schema-basics",
     level: "intermediate",
-    title: "JSON Schema — Structure Your Data",
+    title: "JSON Schema - Structure Your Data",
     metaTitle: "JSON Schema Tutorial: Validate and Define JSON Structure",
     metaDescription: "JSON Schema defines and validates JSON structure. Learn type checking, required fields, patterns, and validation tools.",
     content: "JSON Schema is a vocabulary for annotating and validating JSON documents. It defines allowed types, required properties, formats (email, date), and custom rules. Tools like Ajv (JavaScript) and jsonschema (Python) validate data against schemas.",
@@ -340,7 +340,7 @@ const pretty = JSON.stringify(obj, null, 2);`,
       "Single quotes: Replace with double quotes",
       "Unquoted keys: Wrap all keys in double quotes",
       "undefined/NaN: Use null or omit the property",
-      "Comments: JSON doesn't support them—remove or use a separate config",
+      "Comments: JSON doesn't support them - remove or use a separate config",
     ],
   },
 
@@ -350,7 +350,7 @@ const pretty = JSON.stringify(obj, null, 2);`,
   {
     id: "jsonpath",
     level: "advanced",
-    title: "JSONPath — Query JSON Like SQL",
+    title: "JSONPath - Query JSON Like SQL",
     metaTitle: "JSONPath Tutorial: Query and Extract JSON Data",
     metaDescription: "JSONPath lets you query JSON like XPath for XML. Select nested values with $, ., .., and []. RFC 9535 standard.",
     content: "JSONPath is a query language for JSON. Use it to extract specific values from nested structures. $ is the root, . accesses children, .. does recursive descent, [] selects by index or condition.",
@@ -386,7 +386,7 @@ $.users[?(@.score > 90)].name → ["Alice"]`,
       "Validate with JSON Schema before trusting data",
       "Limit object depth to prevent stack overflow",
       "Sanitize output to prevent XSS when rendering",
-      "Use parameterized queries—never concatenate JSON into SQL",
+      "Use parameterized queries - never concatenate JSON into SQL",
     ],
   },
   {

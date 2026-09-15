@@ -38,7 +38,7 @@ export default function JsonStructureAnalyzer({ parsed }: { parsed: unknown }) {
     { label: "Arrays", value: stats.arrayCount.toLocaleString() },
     { label: "Null Values", value: stats.nullCount.toLocaleString() },
     { label: "Total Size", value: stats.totalSize > 1024 ? `${(stats.totalSize / 1024).toFixed(1)} KB` : `${stats.totalSize} B` },
-    { label: "Longest Key", value: stats.longestKey ? `"${stats.longestKey.slice(0, 20)}${stats.longestKey.length > 20 ? "\u2026" : ""}"` : "\u2014" },
+    { label: "Longest Key", value: stats.longestKey ? `"${stats.longestKey.slice(0, 20)}${stats.longestKey.length > 20 ? "\u2026" : ""}"` : "none" },
   ];
 
   return (

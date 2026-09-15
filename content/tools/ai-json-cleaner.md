@@ -1,7 +1,7 @@
 ---
 title: AI JSON Cleaner
 metaTitle: AI JSON Cleaner | Extract Clean JSON From LLM Output
-metaDescription: Pull valid JSON out of messy ChatGPT or Claude output in one paste. 100% private — runs in your browser, free.
+metaDescription: Pull valid JSON out of messy ChatGPT or Claude output in one paste. 100% private - runs in your browser, free.
 summary: Recover structured JSON from LLM output that is wrapped in commentary, markdown, or partial formatting.
 category: AI workflow
 appHref: /app/?tool=ai-json-cleaner
@@ -26,14 +26,14 @@ faqs:
   - question: "Can the AI cleaner fix truncated JSON?"
     answer: "Yes. For JSON truncated partway through (a common issue with LLM responses that hit token limits), the cleaner attempts to intelligently close all open brackets and braces to produce a valid, albeit incomplete, document."
   - question: "Is the AI cleaner the same as a JSON validator?"
-    answer: "No. A validator tells you whether JSON is valid. The AI cleaner attempts to repair invalid JSON so it becomes valid. Use the validator first — if it passes, no cleaning is needed. Use the cleaner when you have JSON that is too malformed for the validator to accept."
+    answer: "No. A validator tells you whether JSON is valid. The AI cleaner attempts to repair invalid JSON so it becomes valid. Use the validator first - if it passes, no cleaning is needed. Use the cleaner when you have JSON that is too malformed for the validator to accept."
 ---
-The AI JSON Cleaner extracts valid JSON from messy LLM output — the kind that comes wrapped in markdown fences, mixed with explanatory prose, or cut off mid-structure because the model hit a token limit. If your application parses structured output from a language model, this tool saves you the manual editing work of recovering usable JSON from what the model actually returned.
+The AI JSON Cleaner extracts valid JSON from messy LLM output - the kind that comes wrapped in markdown fences, mixed with explanatory prose, or cut off mid-structure because the model hit a token limit. If your application parses structured output from a language model, this tool saves you the manual editing work of recovering usable JSON from what the model actually returned.
 
 ## How to use the AI JSON Cleaner
 
 1. Open the [AI JSON Cleaner](/app/?tool=ai-json-cleaner) tool.
-2. Paste the raw LLM output into the input area — markdown, prose, partial fences, and all.
+2. Paste the raw LLM output into the input area - markdown, prose, partial fences, and all.
 3. Click "Clean". The tool strips surrounding text, removes markdown formatting, and reconstructs the JSON structure.
 4. Review the extracted JSON in the output editor. Check that the structure matches what you expected.
 5. If the extraction looks correct, copy the clean JSON for use in your pipeline.
@@ -84,10 +84,10 @@ The surrounding prose is removed and the trailing comma is corrected.
 
 ## When to use it
 
-- **Prompt engineering iteration** — You are testing different prompts and need to inspect the structured output from each run without manual cleanup every time.
-- **AI evaluation pipelines** — Your eval harness expects clean JSON from the model, but the model occasionally wraps its output in explanation. The cleaner normalizes the output before scoring.
-- **Internal AI tooling** — You built a feature that calls an LLM and needs to parse the response. The cleaner acts as a preprocessing step when the model is not perfectly consistent.
-- **One-off extractions** — You asked ChatGPT or another assistant to generate a JSON config, API response example, or data structure and want to use it directly without hand-editing.
-- **Debugging model output** — When a model response is causing a parse error downstream, paste it into the cleaner to see what is structurally wrong and what valid JSON was recoverable.
+- **Prompt engineering iteration** - You are testing different prompts and need to inspect the structured output from each run without manual cleanup every time.
+- **AI evaluation pipelines** - Your eval harness expects clean JSON from the model, but the model occasionally wraps its output in explanation. The cleaner normalizes the output before scoring.
+- **Internal AI tooling** - You built a feature that calls an LLM and needs to parse the response. The cleaner acts as a preprocessing step when the model is not perfectly consistent.
+- **One-off extractions** - You asked ChatGPT or another assistant to generate a JSON config, API response example, or data structure and want to use it directly without hand-editing.
+- **Debugging model output** - When a model response is causing a parse error downstream, paste it into the cleaner to see what is structurally wrong and what valid JSON was recoverable.
 
 After cleaning, validate the output with the [JSON Validator](/tools/json-validator/) to confirm it is fully correct. To estimate how much of your token budget the original LLM output used, use the [JSON Token Estimator](/tools/json-token-estimator/). For a reference on what makes JSON valid, see [Common JSON Mistakes](/learn/common-mistakes/).

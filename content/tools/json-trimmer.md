@@ -1,7 +1,7 @@
 ---
 title: JSON Trimmer
 metaTitle: JSON Trimmer | Strip Comments & Trailing Commas, Free
-metaDescription: Clean loose JSON-like input into strict JSON in seconds — no upload, no account, runs entirely in your browser.
+metaDescription: Clean loose JSON-like input into strict JSON in seconds - no upload, no account, runs entirely in your browser.
 summary: Clean permissive input so it becomes strict JSON ready for tooling and production systems.
 category: Cleanup
 appHref: /app/?tool=json-trimmer
@@ -35,7 +35,7 @@ The JSON Trimmer converts loose, permissive JSON-like input into strict, spec-co
 1. Paste your loose JSON, JSON5, or JSONC input into the editor.
 2. The trimmer scans for comments (`//` inline, `/* */` block), trailing commas, and other non-standard syntax.
 3. Review the cleaned output in the right panel.
-4. Confirm nothing meaningful was removed — comments that document intent are stripped; data values are untouched.
+4. Confirm nothing meaningful was removed - comments that document intent are stripped; data values are untouched.
 5. Copy the clean output and pass it to your validator, converter, or import pipeline.
 
 ## What it fixes
@@ -48,7 +48,7 @@ The JSON Trimmer converts loose, permissive JSON-like input into strict, spec-co
 
 ## JSON code example
 
-The following is a typical VS Code `settings.json` fragment — valid JSONC but invalid strict JSON:
+The following is a typical VS Code `settings.json` fragment - valid JSONC but invalid strict JSON:
 
 ```json
 {
@@ -74,6 +74,6 @@ After trimming, all comments and the trailing comma inside `files.exclude` are r
 
 ## Related tools and articles
 
-- [JSON Formatter](/tools/json-formatter/) — format the clean output for readability once the noise is gone
-- [JSON Minimal Mode](/tools/json-minimal-mode/) — reduce a trimmed payload further by keeping only the fields you need
-- [Pretty vs Minified JSON](/learn/pretty-vs-minified/) — understand the difference between readable and compact representations and when each is appropriate
+- [JSON Formatter](/tools/json-formatter/) - format the clean output for readability once the noise is gone
+- [JSON Minimal Mode](/tools/json-minimal-mode/) - reduce a trimmed payload further by keeping only the fields you need
+- [Pretty vs Minified JSON](/learn/pretty-vs-minified/) - understand the difference between readable and compact representations and when each is appropriate

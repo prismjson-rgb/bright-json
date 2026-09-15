@@ -10,7 +10,7 @@ relatedLearn: [fixing-trailing-commas, fix-single-quotes-json, fix-unquoted-keys
 publishedAt: "2025-12-05"
 ---
 
-Most JSON errors come from developers who know JavaScript well but mix up its object literal syntax with JSON's stricter rules. The fixes are always simple — once you know what to look for.
+Most JSON errors come from developers who know JavaScript well but mix up its object literal syntax with JSON's stricter rules. The fixes are always simple - once you know what to look for.
 
 ## Mistake 1: Trailing comma
 
@@ -34,7 +34,7 @@ Fixed:
 }
 ```
 
-The same rule applies inside arrays: `[1, 2, 3,]` is invalid — remove the last comma.
+The same rule applies inside arrays: `[1, 2, 3,]` is invalid - remove the last comma.
 
 ## Mistake 2: Single quotes
 
@@ -102,7 +102,7 @@ Invalid:
 }
 ```
 
-Fixed — remove the comment:
+Fixed - remove the comment:
 
 ```json
 {
@@ -131,7 +131,7 @@ Deep dive: [true vs "true": Booleans and Strings in JSON](/learn/json-true-vs-st
 
 ## Mistake 7: Duplicate keys
 
-JSON parsers handle duplicate keys inconsistently — some keep the first, some keep the last. Never use duplicate keys.
+JSON parsers handle duplicate keys inconsistently - some keep the first, some keep the last. Never use duplicate keys.
 
 ```json
 {
@@ -140,14 +140,14 @@ JSON parsers handle duplicate keys inconsistently — some keep the first, some 
 }
 ```
 
-Deep dive: [Duplicate Keys in JSON](/learn/json-duplicate-keys/) — why this is valid but dangerous.
+Deep dive: [Duplicate Keys in JSON](/learn/json-duplicate-keys/) - why this is valid but dangerous.
 
 ## How to find mistakes fast
 
-- Paste into a validator — it points to the exact line and character
+- Paste into a validator - it points to the exact line and character
 - Check the error message: "Unexpected token ," usually means trailing comma; "Unexpected token '" means single quotes
 - Decode a specific error: [Unexpected token < at position 0](/learn/unexpected-token-in-json/), [Unexpected end of JSON input](/learn/unexpected-end-of-json-input/), [missing comma](/learn/missing-comma-json/), or [what the position number means](/learn/json-parse-error-position/)
 
 ## Try it in JSON Prism
 
-The [JSON Debugger](/tools/json-debugger/) goes beyond syntax checking — it shows you exactly what went wrong and suggests fixes. For pure syntax validation with line-precise error reporting, use the [JSON Validator](/tools/json-validator/).
+The [JSON Debugger](/tools/json-debugger/) goes beyond syntax checking - it shows you exactly what went wrong and suggests fixes. For pure syntax validation with line-precise error reporting, use the [JSON Validator](/tools/json-validator/).

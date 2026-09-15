@@ -1,7 +1,7 @@
 ---
 title: JSON to XML Converter
 metaTitle: JSON to XML Converter | Convert JSON to XML Online, Free
-metaDescription: Convert JSON to well-formed XML in your browser, with a customizable root element. Arrays become repeated elements — nothing uploads to a server.
+metaDescription: Convert JSON to well-formed XML in your browser, with a customizable root element. Arrays become repeated elements - nothing uploads to a server.
 summary: Turn JSON into well-formed XML for legacy APIs, SOAP services, and XML-based pipelines.
 category: Convert
 appHref: /app/?tool=json-to-xml
@@ -24,13 +24,13 @@ faqs:
   - question: "What happens to arrays when converting JSON to XML?"
     answer: "Each item in an array becomes a repeated <item> element inside the parent tag, since XML has no native array type. A tags array like [\"a\",\"b\"] becomes two <item> elements inside a <tags> wrapper."
   - question: "Can I change the root element name?"
-    answer: "Yes — the top-level wrapper defaults to <root>, and it's configurable so the output matches the element name your target API or schema expects."
+    answer: "Yes - the top-level wrapper defaults to <root>, and it's configurable so the output matches the element name your target API or schema expects."
   - question: "What if a JSON key isn't a valid XML tag name?"
-    answer: "Keys with spaces or characters XML doesn't allow in tag names (like @ or %) are sanitized — invalid characters become underscores, and a tag that would start with a digit gets an underscore prefix — so the output is always well-formed XML."
+    answer: "Keys with spaces or characters XML doesn't allow in tag names (like @ or %) are sanitized - invalid characters become underscores, and a tag that would start with a digit gets an underscore prefix - so the output is always well-formed XML."
   - question: "How are null values represented in the XML output?"
     answer: "A null value becomes a self-closing element with an explicit nil marker, e.g. <field xsi:nil=\"true\" />, rather than an empty tag, so it's unambiguous that the value is null and not an empty string."
 ---
-The JSON to XML Converter turns a JSON object or array into well-formed XML. Object keys become element names, values become element content or nested elements, and arrays become a sequence of repeated elements — the structural conversion XML requires since it has no native array type.
+The JSON to XML Converter turns a JSON object or array into well-formed XML. Object keys become element names, values become element content or nested elements, and arrays become a sequence of repeated elements - the structural conversion XML requires since it has no native array type.
 
 ## How to use the JSON to XML Converter
 
@@ -42,7 +42,7 @@ The JSON to XML Converter turns a JSON object or array into well-formed XML. Obj
 ## What it handles
 
 - Arrays converted into repeated `<item>` elements, since XML has no native list type
-- Object keys sanitized into valid XML tag names — invalid characters become underscores, and a tag starting with a digit gets an underscore prefix
+- Object keys sanitized into valid XML tag names - invalid characters become underscores, and a tag starting with a digit gets an underscore prefix
 - Special characters in string values (`&`, `<`, `>`, `"`, `'`) escaped automatically so the output is well-formed
 - `null` values represented as a self-closing element with an explicit nil marker, distinguishing them from empty strings
 - A customizable root element, defaulting to `<root>`
@@ -84,10 +84,10 @@ converts to:
 
 ## Related tools and articles
 
-- [JSON Converter](/tools/json-converter/) — convert the same JSON into YAML, CSV, TOON, or an escaped string instead
-- [JSON Formatter](/tools/json-formatter/) — validate and pretty-print your JSON before converting it
-- [JSON to CSV Converter](/tools/json-to-csv/) — for when the destination is a spreadsheet instead of an XML document
-- [JSON vs XML vs CSV](/learn/json-vs-xml-csv/) — how the three formats differ and when to reach for each
+- [JSON Converter](/tools/json-converter/) - convert the same JSON into YAML, CSV, TOON, or an escaped string instead
+- [JSON Formatter](/tools/json-formatter/) - validate and pretty-print your JSON before converting it
+- [JSON to CSV Converter](/tools/json-to-csv/) - for when the destination is a spreadsheet instead of an XML document
+- [JSON vs XML vs CSV](/learn/json-vs-xml-csv/) - how the three formats differ and when to reach for each
 
 ## XML names and characters
 

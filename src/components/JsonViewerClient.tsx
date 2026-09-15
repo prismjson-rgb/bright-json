@@ -234,7 +234,7 @@ export default function JsonViewerClient() {
   const applyFixResult = useCallback((fixedJson: string, summaryLines: string[]) => {
     setJson(fixedJson);
     if (summaryLines.length > 0) {
-      toast.success("Fixed JSON", { description: `${summaryLines.join(" · ")} — JSON is now valid.` });
+      toast.success("Fixed JSON", { description: `${summaryLines.join(" · ")} - JSON is now valid.` });
     } else {
       toast.success("JSON repaired");
     }
@@ -250,11 +250,11 @@ export default function JsonViewerClient() {
       const out = JSON.stringify(obj, null, indent);
       applyFixResult(out, summarizeFixes(issues));
     } catch {
-      toast.error("Could not repair JSON — structure may need manual edits");
+      toast.error("Could not repair JSON - structure may need manual edits");
     }
   }, [json, issues, applyFixResult, settings.format.beautifyIndent]);
 
-  // Sync parser when switching tabs (not on json edit — only when activeId changes)
+  // Sync parser when switching tabs (not on json edit - only when activeId changes)
   useEffect(() => {
     setParserJson(activeTab?.json ?? "");
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -291,7 +291,7 @@ export default function JsonViewerClient() {
     if (config.opensShare) setShareOpen(true);
   }, []);
 
-  // Debounced persist — avoids blocking the main thread on every keystroke
+  // Debounced persist - avoids blocking the main thread on every keystroke
   useEffect(() => {
     if (!tabsHydrated || !storageReady) return;
     setSaveStatus("Unsaved changes…");

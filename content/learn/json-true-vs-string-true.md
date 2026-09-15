@@ -11,7 +11,7 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** In JSON, `true` is a **boolean** and `"true"` is a **string** — different types entirely. The same goes for `5` (number) vs `"5"` (string). The quotes are not decoration; they change the type. Mixing them up causes silent bugs, because `"false"` is a non-empty string and therefore *truthy*. Confirm the actual types of a payload in the [JSON Structure Analyzer](/tools/json-structure-analyzer/).
+**Quick answer:** In JSON, `true` is a **boolean** and `"true"` is a **string** - different types entirely. The same goes for `5` (number) vs `"5"` (string). The quotes are not decoration; they change the type. Mixing them up causes silent bugs, because `"false"` is a non-empty string and therefore *truthy*. Confirm the actual types of a payload in the [JSON Structure Analyzer](/tools/json-structure-analyzer/).
 
 ## The quotes decide the type
 
@@ -36,7 +36,7 @@ The nastiest case is a boolean accidentally serialized as a string:
 ```js
 const flag = JSON.parse('{"enabled": "false"}').enabled;
 if (flag) {
-  // THIS RUNS — "false" is a non-empty string, which is truthy!
+  // THIS RUNS - "false" is a non-empty string, which is truthy!
 }
 ```
 
@@ -51,7 +51,7 @@ These usually come from:
 
 ## How to do it right
 
-- **Keep the real type in JSON.** Emit `true`/`false` and numbers without quotes. Generating JSON with `JSON.stringify()` from real booleans and numbers does this automatically — see [Parse and Stringify](/learn/parse-stringify/).
+- **Keep the real type in JSON.** Emit `true`/`false` and numbers without quotes. Generating JSON with `JSON.stringify()` from real booleans and numbers does this automatically - see [Parse and Stringify](/learn/parse-stringify/).
 - **Convert at the boundary** when input is unavoidably stringy:
 
 ```js
@@ -61,7 +61,7 @@ const count = Number(rawCount);                          // not "5" forever
 
 - **Validate types with a schema.** `{"type": "boolean"}` rejects `"true"`; `{"type": "integer"}` rejects `"5"`. See [JSON Schema Basics](/learn/json-schema-basics/) and the [JSON Best Practices Checker](/tools/json-best-practices-checker/).
 
-Never test a stringified boolean with a bare truthiness check — compare explicitly.
+Never test a stringified boolean with a bare truthiness check - compare explicitly.
 
 ## Frequently asked questions
 

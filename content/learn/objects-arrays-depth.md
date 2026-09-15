@@ -9,7 +9,7 @@ relatedLearn: [common-patterns, flatten-nested-json, performance-large-files]
 publishedAt: "2025-12-02"
 ---
 
-Objects group related data under named keys. Arrays hold ordered lists. The real power of JSON comes from combining them — objects inside arrays, arrays inside objects, objects inside objects. There is no hard limit to nesting depth, but readability and performance degrade after 3–4 levels.
+Objects group related data under named keys. Arrays hold ordered lists. The real power of JSON comes from combining them - objects inside arrays, arrays inside objects, objects inside objects. There is no hard limit to nesting depth, but readability and performance degrade after 3–4 levels.
 
 ## Objects: named properties
 
@@ -24,7 +24,7 @@ An object is a set of key-value pairs. Use objects when your data has named fiel
 }
 ```
 
-Keys must be unique strings. If the same key appears twice, behavior is parser-dependent — most parsers keep the last occurrence, but never rely on this.
+Keys must be unique strings. If the same key appears twice, behavior is parser-dependent - most parsers keep the last occurrence, but never rely on this.
 
 ## Arrays: ordered lists
 
@@ -44,7 +44,7 @@ An array is a sequence of values. Use arrays when order matters or when you have
 
 ## Nesting objects inside arrays
 
-This is the most common real-world JSON pattern — an array of objects. Every REST API list endpoint returns this shape:
+This is the most common real-world JSON pattern - an array of objects. Every REST API list endpoint returns this shape:
 
 ```json
 {
@@ -89,7 +89,7 @@ Object nesting groups logically related fields without mixing them into one flat
 
 Beyond 3–4 levels, JSON becomes hard to read and hard to query with tools like JSONPath. Common guidelines:
 
-- Prefer flat structures when possible — avoid nesting just for nesting's sake
+- Prefer flat structures when possible - avoid nesting just for nesting's sake
 - Extract repeated sub-structures into a top-level array and reference by ID
 - Split very large documents into multiple smaller ones
 

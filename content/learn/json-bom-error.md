@@ -21,7 +21,7 @@ The BOM is genuinely invisible in most editors. You see:
 {"ok": true}
 ```
 
-…but the bytes on disk are `EF BB BF 7B 22 6F ...`. Your parser reads the `﻿` first, which isn't a valid start to a JSON document, and throws at position 0. This is maddening precisely because nothing is visibly wrong — copying the text into a fresh file (which drops the BOM) often "fixes" it, hiding the real cause.
+…but the bytes on disk are `EF BB BF 7B 22 6F ...`. Your parser reads the `﻿` first, which isn't a valid start to a JSON document, and throws at position 0. This is maddening precisely because nothing is visibly wrong - copying the text into a fresh file (which drops the BOM) often "fixes" it, hiding the real cause.
 
 The JSON spec ([RFC 8259, §8.1](https://www.rfc-editor.org/rfc/rfc8259#section-8.1)) is explicit: implementations **must not** add a BOM, and parsers *may* reject one. `JSON.parse()` rejects it.
 
@@ -34,7 +34,7 @@ head -c 3 data.json | xxd
 # 00000000: efbb bf                                  ...
 ```
 
-`ef bb bf` confirms a UTF-8 BOM. You can also paste the file into the [JSON Debugger](/tools/json-debugger/) — it flags an unexpected character at the very start when a BOM is present.
+`ef bb bf` confirms a UTF-8 BOM. You can also paste the file into the [JSON Debugger](/tools/json-debugger/) - it flags an unexpected character at the very start when a BOM is present.
 
 ## How to fix it
 
@@ -57,7 +57,7 @@ Python's `utf-8-sig` codec transparently removes a leading BOM, which is the cle
 
 - In **VS Code**, click the encoding in the status bar → *Save with Encoding* → *UTF-8* (not *UTF-8 with BOM*).
 - In **Notepad / Notepad++**, choose *UTF-8 without BOM* when saving.
-- In build pipelines, ensure tools emit BOM-less UTF-8 — it's the standard encoding for JSON.
+- In build pipelines, ensure tools emit BOM-less UTF-8 - it's the standard encoding for JSON.
 
 After cleaning, confirm with the [JSON Validator](/tools/json-validator/).
 

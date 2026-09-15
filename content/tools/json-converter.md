@@ -26,9 +26,9 @@ faqs:
   - question: "How do I convert JSON to XML?"
     answer: "The JSON Converter supports JSON-to-XML conversion. JSON objects become XML elements, arrays become repeated elements with the same tag name, and string values become text content. You can customize the root element name."
   - question: "Why does my JSON-to-CSV conversion lose nested data?"
-    answer: "CSV is a flat format — it cannot represent nested objects or arrays natively. When converting, nested objects are either flattened (e.g., address.city becomes a column) or serialized as a JSON string in the cell. Choose the strategy that fits how you plan to use the CSV."
+    answer: "CSV is a flat format - it cannot represent nested objects or arrays natively. When converting, nested objects are either flattened (e.g., address.city becomes a column) or serialized as a JSON string in the cell. Choose the strategy that fits how you plan to use the CSV."
 ---
-The JSON Converter transforms JSON into YAML, XML, or CSV without leaving your browser. When you are moving data between systems — an API response into an infrastructure file, a config export into a spreadsheet, or a document payload into an XML feed — switching formats manually by hand introduces errors and wastes time. Converting inside one workspace keeps the original alongside the output so you can verify the result immediately.
+The JSON Converter transforms JSON into YAML, XML, or CSV without leaving your browser. When you are moving data between systems - an API response into an infrastructure file, a config export into a spreadsheet, or a document payload into an XML feed - switching formats manually by hand introduces errors and wastes time. Converting inside one workspace keeps the original alongside the output so you can verify the result immediately.
 
 ## How to use the JSON Converter
 
@@ -75,8 +75,8 @@ The nested `items` array is the kind of structure that requires attention when t
 
 ## Related tools and articles
 
-- [JSON Formatter](/tools/json-formatter/) — pretty-print and validate before converting to avoid producing malformed output in the target format
-- [JSON Trimmer](/tools/json-trimmer/) — strip trailing commas and comments from loose JSON so it converts cleanly
-- [JSON to String](/tools/json-to-string/) — escape JSON into a quoted string literal for embedding in code or config values
-- [JSON vs XML and CSV](/learn/json-vs-xml-csv/) — understand the structural trade-offs before choosing a target format
-- [JSON Alternatives](/learn/json-alternatives/) — broader overview of when YAML, TOML, or other formats are a better fit than JSON
+- [JSON Formatter](/tools/json-formatter/) - pretty-print and validate before converting to avoid producing malformed output in the target format
+- [JSON Trimmer](/tools/json-trimmer/) - strip trailing commas and comments from loose JSON so it converts cleanly
+- [JSON to String](/tools/json-to-string/) - escape JSON into a quoted string literal for embedding in code or config values
+- [JSON vs XML and CSV](/learn/json-vs-xml-csv/) - understand the structural trade-offs before choosing a target format
+- [JSON Alternatives](/learn/json-alternatives/) - broader overview of when YAML, TOML, or other formats are a better fit than JSON

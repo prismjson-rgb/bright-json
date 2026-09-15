@@ -1,5 +1,5 @@
 ---
-title: JSON Schema — Structure Your Data
+title: JSON Schema - Structure Your Data
 level: intermediate
 order: 12
 metaTitle: "JSON Schema Tutorial: Validate and Define JSON Structure"
@@ -10,11 +10,11 @@ relatedLearn: [validate-llm-json-schema, common-patterns, valid-vs-invalid]
 publishedAt: "2025-12-10"
 ---
 
-JSON Schema is a vocabulary for annotating and validating JSON documents. It lets you define the exact structure your JSON must follow — which properties are required, what types they must be, what values are valid — and then automatically validate data against those rules. Think of it as a type system for JSON that works across every programming language.
+JSON Schema is a vocabulary for annotating and validating JSON documents. It lets you define the exact structure your JSON must follow - which properties are required, what types they must be, what values are valid - and then automatically validate data against those rules. Think of it as a type system for JSON that works across every programming language.
 
 ## Why use JSON Schema?
 
-Without a schema, you discover data problems at runtime — a missing field causes a null pointer exception, an unexpected string breaks a calculation. JSON Schema moves this check earlier:
+Without a schema, you discover data problems at runtime - a missing field causes a null pointer exception, an unexpected string breaks a calculation. JSON Schema moves this check earlier:
 
 - Validate API request bodies before processing them
 - Validate API responses in tests to catch schema drift
@@ -76,7 +76,7 @@ This schema says: the data must be an object, it must have `name` (string) and `
 }
 ```
 
-`additionalProperties: false` means any key not listed in `properties` will cause a validation failure — useful for strict API contracts.
+`additionalProperties: false` means any key not listed in `properties` will cause a validation failure - useful for strict API contracts.
 
 ## Validating data against a schema in JavaScript
 
@@ -105,4 +105,4 @@ if (!valid) {
 
 ## Try it in JSON Prism
 
-The [JSON Best Practices Checker](/tools/json-best-practices-checker/) analyzes your JSON for structural problems without requiring you to write a schema. For a visual breakdown of your JSON's structure — types, depths, key frequency — use the [JSON Structure Analyzer](/tools/json-structure-analyzer/).
+The [JSON Best Practices Checker](/tools/json-best-practices-checker/) analyzes your JSON for structural problems without requiring you to write a schema. For a visual breakdown of your JSON's structure - types, depths, key frequency - use the [JSON Structure Analyzer](/tools/json-structure-analyzer/).

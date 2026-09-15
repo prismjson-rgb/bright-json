@@ -49,7 +49,7 @@ export function diffLines(a: string, b: string): DiffLine[] {
 export type CompactDiffRow = DiffLine | { type: "gap" };
 
 /** Collapses long unchanged runs down to `context` lines around each change,
- *  inserting a "gap" marker for anything hidden — keeps the preview short for
+ *  inserting a "gap" marker for anything hidden - keeps the preview short for
  *  large documents where only a couple of lines actually changed. */
 export function compactDiff(lines: DiffLine[], context = 1): CompactDiffRow[] {
   const keep = new Array(lines.length).fill(false);

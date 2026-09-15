@@ -28,10 +28,10 @@ export function DonatePromptModal({ open, onDismiss }: Props) {
           <DialogTitle className="mt-3 text-xl">Still here? That means a lot.</DialogTitle>
           <DialogDescription className="mt-2 text-sm leading-6">
             You&apos;ve spent a good while with JSON Prism today. No ads, no account, nothing you paste
-            ever leaves your browser — it stays that way because it&apos;s a labor of love, not a business.
+            ever leaves your browser - it stays that way because it&apos;s a labor of love, not a business.
             <br />
             <br />
-            If it saved you a headache, a small donation helps keep it free and maintained. Never required — always appreciated.
+            If it saved you a headache, a small donation helps keep it free and maintained. Never required - always appreciated.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-2 flex-col gap-2 sm:flex-col sm:space-x-0">

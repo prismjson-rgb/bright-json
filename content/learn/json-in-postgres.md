@@ -11,7 +11,7 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** PostgreSQL has two JSON column types: **`json`** stores the exact text, while **`jsonb`** stores a parsed binary form. Use **`jsonb`** almost always — it's faster to query and can be indexed, at the cost of slightly slower writes. Query it with the `->`, `->>`, and `@>` operators, and index it with **GIN**. To validate a document before storing it, use the [JSON Validator](/tools/json-validator/).
+**Quick answer:** PostgreSQL has two JSON column types: **`json`** stores the exact text, while **`jsonb`** stores a parsed binary form. Use **`jsonb`** almost always - it's faster to query and can be indexed, at the cost of slightly slower writes. Query it with the `->`, `->>`, and `@>` operators, and index it with **GIN**. To validate a document before storing it, use the [JSON Validator](/tools/json-validator/).
 
 ## json vs jsonb
 
@@ -24,7 +24,7 @@ updatedAt: "2026-06-25"
 | Indexable (GIN) | No | Yes |
 | Write speed | Faster | Slightly slower |
 
-`json` only makes sense when you need to store and return the *exact original text* byte-for-byte. For anything you'll **query**, `jsonb` wins. Note that `jsonb` drops insignificant whitespace and de-duplicates keys (keeping the last) — see [Duplicate Keys in JSON](/learn/json-duplicate-keys/).
+`json` only makes sense when you need to store and return the *exact original text* byte-for-byte. For anything you'll **query**, `jsonb` wins. Note that `jsonb` drops insignificant whitespace and de-duplicates keys (keeping the last) - see [Duplicate Keys in JSON](/learn/json-duplicate-keys/).
 
 ## Querying jsonb
 
@@ -68,12 +68,12 @@ CREATE INDEX idx_events_status ON events ((data ->> 'status'));
 
 ## When to use jsonb (and when not to)
 
-`jsonb` is great for **semi-structured or variable** data: event payloads, settings, third-party API blobs. It is **not** a replacement for normalized columns — fields you filter, join, and constrain on belong in real columns with their own types and indexes. A common pattern is a hybrid: structured columns for the core fields, a `jsonb` column for the flexible extras. To explore an unfamiliar payload's shape before deciding what to promote to columns, use the [JSON Structure Analyzer](/tools/json-structure-analyzer/).
+`jsonb` is great for **semi-structured or variable** data: event payloads, settings, third-party API blobs. It is **not** a replacement for normalized columns - fields you filter, join, and constrain on belong in real columns with their own types and indexes. A common pattern is a hybrid: structured columns for the core fields, a `jsonb` column for the flexible extras. To explore an unfamiliar payload's shape before deciding what to promote to columns, use the [JSON Structure Analyzer](/tools/json-structure-analyzer/).
 
 ## Frequently asked questions
 
 **Should I use json or jsonb in PostgreSQL?**
-Use `jsonb` in almost all cases — it's faster to query and supports indexing. Only use `json` if you must preserve the exact original text, key order, and whitespace.
+Use `jsonb` in almost all cases - it's faster to query and supports indexing. Only use `json` if you must preserve the exact original text, key order, and whitespace.
 
 **How do I query a JSON field in Postgres?**
 Use `->` to get a JSON value, `->>` to get text, and `#>`/`#>>` for deep paths. Use `@>` for containment and `?` for key existence. Cast extracted text for typed comparisons, e.g. `(data->>'age')::int`.

@@ -57,17 +57,17 @@ Two things to watch: JSON object **keys are always strings**, so `json.loads('{"
 json.dumps(data, indent=2)            # pretty-print
 json.dumps(data, sort_keys=True)      # deterministic key order
 json.dumps(data, ensure_ascii=False)  # keep é, 你好, emoji as-is (not \uXXXX)
-json.dumps(data, separators=(",", ":"))  # minify — no spaces
+json.dumps(data, separators=(",", ":"))  # minify - no spaces
 ```
 
-`ensure_ascii=True` (the default) escapes non-ASCII characters as `\uXXXX`. Setting it `False` writes real UTF-8, which is usually what you want for readable output — see [Escaping Special Characters](/learn/escaping-special-chars/).
+`ensure_ascii=True` (the default) escapes non-ASCII characters as `\uXXXX`. Setting it `False` writes real UTF-8, which is usually what you want for readable output - see [Escaping Special Characters](/learn/escaping-special-chars/).
 
 ## Common gotchas
 
-- **Printing a dict isn't JSON.** `print(d)` and `str(d)` use single quotes and `True`/`None` — invalid JSON. Always use `json.dumps()`. See [Single Quotes in JSON](/learn/fix-single-quotes-json/).
-- **Non-serializable types raise `TypeError`.** `datetime`, `set`, `Decimal`, and `bytes` aren't JSON types. Convert first (e.g. `dt.isoformat()` — see [Dates in JSON](/learn/json-dates/)) or pass a `default=` function to `dumps`.
-- **Big integers are fine in Python** (arbitrary precision) but may lose precision once a JavaScript client parses them — see [Big Numbers in JSON](/learn/json-big-numbers/).
-- **`json.loads` raises `json.JSONDecodeError`** with a line, column, and position on invalid input — catch it and inspect with the [JSON Debugger](/tools/json-debugger/).
+- **Printing a dict isn't JSON.** `print(d)` and `str(d)` use single quotes and `True`/`None` - invalid JSON. Always use `json.dumps()`. See [Single Quotes in JSON](/learn/fix-single-quotes-json/).
+- **Non-serializable types raise `TypeError`.** `datetime`, `set`, `Decimal`, and `bytes` aren't JSON types. Convert first (e.g. `dt.isoformat()` - see [Dates in JSON](/learn/json-dates/)) or pass a `default=` function to `dumps`.
+- **Big integers are fine in Python** (arbitrary precision) but may lose precision once a JavaScript client parses them - see [Big Numbers in JSON](/learn/json-big-numbers/).
+- **`json.loads` raises `json.JSONDecodeError`** with a line, column, and position on invalid input - catch it and inspect with the [JSON Debugger](/tools/json-debugger/).
 
 ## Frequently asked questions
 
@@ -75,7 +75,7 @@ json.dumps(data, separators=(",", ":"))  # minify — no spaces
 `loads` parses a JSON **string**; `load` reads from a **file** object. The same pattern applies to `dumps` (to string) and `dump` (to file).
 
 **How do I convert a Python dict to JSON?**
-Use `json.dumps(my_dict)` for a string, or `json.dump(my_dict, file)` to write to a file. Never use `str(dict)` — it produces invalid JSON with single quotes.
+Use `json.dumps(my_dict)` for a string, or `json.dump(my_dict, file)` to write to a file. Never use `str(dict)` - it produces invalid JSON with single quotes.
 
 **Why do my JSON number keys become strings?**
 JSON object keys must be strings, so `json.dumps` converts dict keys to strings and `json.loads` always returns string keys. Convert them back to `int` in your code if needed.

@@ -11,7 +11,7 @@ publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---
 
-**Quick answer:** A **tree view** shows JSON as a collapsible, indented hierarchy — best for reading, navigating, and editing data whose shape you already understand. A **graph view** renders the same data as connected nodes you can pan and zoom — best for understanding the *shape* of large or unfamiliar JSON and seeing how nested objects relate. Use the tree to work *in* the data; use the graph to understand it *at a glance*.
+**Quick answer:** A **tree view** shows JSON as a collapsible, indented hierarchy - best for reading, navigating, and editing data whose shape you already understand. A **graph view** renders the same data as connected nodes you can pan and zoom - best for understanding the *shape* of large or unfamiliar JSON and seeing how nested objects relate. Use the tree to work *in* the data; use the graph to understand it *at a glance*.
 
 ## What each view is good at
 
@@ -56,7 +56,7 @@ Graphs scale spatially. Depth and breadth become a picture instead of indentatio
 
 The two views are complementary, not competing. A common pattern when you receive an unfamiliar API response:
 
-1. Open it in the **graph view** first to understand the overall shape — how deep it goes, where the arrays are, which objects repeat.
+1. Open it in the **graph view** first to understand the overall shape - how deep it goes, where the arrays are, which objects repeat.
 2. Switch to the **tree view** to drill into the specific branch you care about and read or edit exact values.
 3. If you're comparing two versions of the response, move to the [JSON Diff Viewer](/tools/json-diff-viewer/) to see what changed.
 
@@ -64,7 +64,7 @@ Because JSON Prism keeps all views in sync against the same document, you can mo
 
 ## When neither is enough
 
-For very large documents, even a graph gets crowded. In that case, reach for the [Structure Analyzer](/tools/json-structure-analyzer/) to get key counts, type distribution, and maximum nesting depth as plain numbers — a faster way to size up complexity than scanning any visual. To learn how nesting and arrays are structured in the first place, see [Objects, Arrays, and Depth](/learn/objects-arrays-depth/).
+For very large documents, even a graph gets crowded. In that case, reach for the [Structure Analyzer](/tools/json-structure-analyzer/) to get key counts, type distribution, and maximum nesting depth as plain numbers - a faster way to size up complexity than scanning any visual. To learn how nesting and arrays are structured in the first place, see [Objects, Arrays, and Depth](/learn/objects-arrays-depth/).
 
 ## Frequently asked questions
 

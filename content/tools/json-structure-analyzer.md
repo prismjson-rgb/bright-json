@@ -1,7 +1,7 @@
 ---
 title: JSON Structure Analyzer
 metaTitle: JSON Structure Analyzer | Free Complexity & Depth Report
-metaDescription: Instantly see depth, type mix, and complexity for any JSON payload. Private and browser-based — nothing is uploaded.
+metaDescription: Instantly see depth, type mix, and complexity for any JSON payload. Private and browser-based - nothing is uploaded.
 summary: Get high-level metrics that explain the structure and size of a JSON document.
 category: Analyze
 appHref: /app/?tool=json-structure-analyzer
@@ -24,7 +24,7 @@ faqs:
   - question: "How do I know if my JSON array has a consistent shape?"
     answer: "Paste your JSON into the Structure Analyzer. It will compare each object in the array and report which keys are present in all objects (consistent), which appear in some but not all (optional), and which are only in one object (unique). This is essential before mapping JSON to a database schema or TypeScript type."
   - question: "Can the Structure Analyzer help me write a JSON Schema?"
-    answer: "Yes. The analyzer infers types and shapes from your actual data, which gives you the information needed to write a JSON Schema manually — or it can generate a draft schema from the inferred structure that you can then refine."
+    answer: "Yes. The analyzer infers types and shapes from your actual data, which gives you the information needed to write a JSON Schema manually - or it can generate a draft schema from the inferred structure that you can then refine."
   - question: "What is the maximum depth of a JSON document?"
     answer: "The JSON specification does not define a maximum depth, but parsers and runtime stacks impose practical limits. Most parsers handle up to a few hundred levels before hitting a stack overflow. The Structure Analyzer reports the actual maximum depth of your document so you can identify problematic nesting early."
 ---
@@ -41,9 +41,9 @@ The JSON Structure Analyzer measures the shape and complexity of a JSON document
 ## What it fixes
 
 - Blind spots when inheriting a payload with no schema or documentation
-- Underestimating complexity before refactoring — depth of 12 is a different problem than depth of 3
+- Underestimating complexity before refactoring - depth of 12 is a different problem than depth of 3
 - Missing type inconsistencies where a field is a string in some records and a number in others
-- Lack of data for LLM token cost estimates — the analyzer gives you size and structure signals before you run the [JSON Token Estimator](/tools/json-token-estimator/)
+- Lack of data for LLM token cost estimates - the analyzer gives you size and structure signals before you run the [JSON Token Estimator](/tools/json-token-estimator/)
 - Vague conversations in API design reviews where "this payload seems large" needs actual numbers
 
 ## JSON code example
@@ -85,7 +85,7 @@ The analyzer would report a maximum depth of 5, a mix of string, number, boolean
 
 ## Related tools and articles
 
-- [JSON Tree View](/tools/json-tree-view/) — navigate the structure visually after reviewing the metrics to explore specific branches
-- [JSON Best Practices Checker](/tools/json-best-practices-checker/) — follow up the structural analysis with a quality pass for naming conventions and maintainability patterns
-- [JSON Schema Basics](/learn/json-schema-basics/) — learn how to formalize the structure you have analyzed into a schema for validation
-- [Objects and Arrays in Depth](/learn/objects-arrays-depth/) — deeper reference on how JSON objects and arrays behave at scale
+- [JSON Tree View](/tools/json-tree-view/) - navigate the structure visually after reviewing the metrics to explore specific branches
+- [JSON Best Practices Checker](/tools/json-best-practices-checker/) - follow up the structural analysis with a quality pass for naming conventions and maintainability patterns
+- [JSON Schema Basics](/learn/json-schema-basics/) - learn how to formalize the structure you have analyzed into a schema for validation
+- [Objects and Arrays in Depth](/learn/objects-arrays-depth/) - deeper reference on how JSON objects and arrays behave at scale

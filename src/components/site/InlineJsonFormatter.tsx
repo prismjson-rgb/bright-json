@@ -15,7 +15,7 @@ interface InlineJsonFormatterProps {
 
 /**
  * Lightweight paste-and-format widget for tool landing pages. Deliberately
- * plain textarea/pre (no Monaco) so the marketing page stays fast — the full
+ * plain textarea/pre (no Monaco) so the marketing page stays fast - the full
  * editor experience lives behind "Open in full editor", one click away.
  */
 export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps) {
@@ -36,7 +36,7 @@ export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps
     try {
       setInput(JSON.stringify(parseJsonSafe(input)));
     } catch {
-      /* leave input untouched — the error banner already explains why */
+      /* leave input untouched - the error banner already explains why */
     }
   };
 
@@ -49,7 +49,7 @@ export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      /* clipboard permissions denied — button just won't confirm */
+      /* clipboard permissions denied - button just won't confirm */
     }
   };
 
@@ -70,7 +70,7 @@ export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps
             <span className="h-3 w-3 rounded-full bg-[#febc2e] opacity-90" />
             <span className="h-3 w-3 rounded-full bg-[#28c840] opacity-90" />
           </div>
-          <span className="truncate font-mono text-[11px] text-slate-500">{title} — try it live</span>
+          <span className="truncate font-mono text-[11px] text-slate-500">{title} - try it live</span>
 
           <div className="ml-auto flex flex-wrap items-center gap-2">
             <button

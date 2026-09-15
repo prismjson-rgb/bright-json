@@ -22,7 +22,7 @@ type User struct {
     ID     int    `json:"id"`
     Name   string `json:"name"`
     Email  string `json:"email,omitempty"`
-    active bool   // unexported — ignored by JSON
+    active bool   // unexported - ignored by JSON
 }
 
 // Go → JSON
@@ -36,7 +36,7 @@ json.Unmarshal([]byte(`{"id":1,"name":"Ada"}`), &u)
 
 Two rules trip up newcomers immediately:
 
-- **Only exported fields are (un)marshaled.** `active` (lowercase) is invisible to `encoding/json` — it's never written and never filled. If a field isn't appearing in your JSON, check its capitalization first.
+- **Only exported fields are (un)marshaled.** `active` (lowercase) is invisible to `encoding/json` - it's never written and never filled. If a field isn't appearing in your JSON, check its capitalization first.
 - **Unmarshal needs a pointer** (`&u`), so it can write into your value.
 
 ## Struct tags in detail
@@ -50,7 +50,7 @@ Temp  string `json:"-"`               // never marshal this field
 Count int    `json:"count,string"`    // encode the number as a JSON string
 ```
 
-`omitempty` drops the field when it holds its **zero value** (`0`, `""`, `false`, `nil`, empty slice/map). This is handy but sharp-edged: a real `false` or `0` you *wanted* to send will silently vanish. When the difference between "absent" and "zero" matters — see [null vs missing](/learn/json-null-vs-missing/) — use a pointer (`*bool`) so `nil` means absent and `&false` means a real false.
+`omitempty` drops the field when it holds its **zero value** (`0`, `""`, `false`, `nil`, empty slice/map). This is handy but sharp-edged: a real `false` or `0` you *wanted* to send will silently vanish. When the difference between "absent" and "zero" matters - see [null vs missing](/learn/json-null-vs-missing/) - use a pointer (`*bool`) so `nil` means absent and `&false` means a real false.
 
 ## Handling unknown or dynamic shapes
 
@@ -61,7 +61,7 @@ var data map[string]interface{}
 json.Unmarshal(raw, &data)
 ```
 
-Numbers then arrive as `float64` (Go's default for JSON numbers), which can lose precision on large integers — see [Big Numbers in JSON](/learn/json-big-numbers/). To keep big integers exact, use a `json.Decoder` with `UseNumber()`, which yields a `json.Number` you can convert deliberately:
+Numbers then arrive as `float64` (Go's default for JSON numbers), which can lose precision on large integers - see [Big Numbers in JSON](/learn/json-big-numbers/). To keep big integers exact, use a `json.Decoder` with `UseNumber()`, which yields a `json.Number` you can convert deliberately:
 
 ```go
 dec := json.NewDecoder(bytes.NewReader(raw))

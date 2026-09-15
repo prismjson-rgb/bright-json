@@ -24,7 +24,7 @@ faqs:
   - question: "Is the best practices checker the same as a validator?"
     answer: "No. The validator checks whether JSON is syntactically correct. The best practices checker assumes the JSON is valid and then analyzes whether its structure follows conventions that lead to maintainable, interoperable APIs. It catches issues that will not cause a parse error but will cause problems downstream."
   - question: "Should all JSON follow the same naming convention?"
-    answer: "Within a single API or project, yes. camelCase (userName) is conventional for JavaScript and JSON APIs. snake_case (user_name) is conventional in Python and Ruby. PascalCase (UserName) appears in some .NET APIs. The key is consistency — mixing conventions within one document makes code harder to work with."
+    answer: "Within a single API or project, yes. camelCase (userName) is conventional for JavaScript and JSON APIs. snake_case (user_name) is conventional in Python and Ruby. PascalCase (UserName) appears in some .NET APIs. The key is consistency - mixing conventions within one document makes code harder to work with."
   - question: "How deep is too deep for JSON nesting?"
     answer: "There is no universal rule, but beyond 4–5 levels of nesting, JSON becomes hard to query, hard to display, and hard to map to database schemas. The best practices checker flags documents with nesting deeper than a configurable threshold so you can consider restructuring."
 ---
@@ -35,7 +35,7 @@ The JSON Best Practices Checker reviews a JSON payload for maintainability risks
 1. Paste your JSON payload into the input panel.
 2. The checker runs a set of heuristics covering naming conventions, nesting depth, structural consistency, and array type uniformity.
 3. Review each flagged item: every finding includes what was detected and why it matters.
-4. Prioritize fixes by severity — deep nesting and mixed naming conventions compound across a codebase, while single oversized objects are easier to isolate.
+4. Prioritize fixes by severity - deep nesting and mixed naming conventions compound across a codebase, while single oversized objects are easier to isolate.
 5. Apply corrections in your source schema or generation code, then paste the updated payload to re-check.
 
 ## Problems it solves
@@ -81,7 +81,7 @@ The checker would flag: three different key naming styles (`userId`, `user_name`
 
 ## Related tools and articles
 
-- [JSON Validator](/tools/json-validator/) — validate syntax first; the best practices checker assumes the input is already valid JSON
-- [JSON Structure Analyzer](/tools/json-structure-analyzer/) — get objective depth and key-count metrics to supplement the qualitative findings from the checker
-- [Common JSON Mistakes](/learn/common-mistakes/) — reference for the specific errors and patterns the checker is designed to catch
-- [JSON Schema Basics](/learn/json-schema-basics/) — formalize the conventions you want to enforce after identifying problems with the checker
+- [JSON Validator](/tools/json-validator/) - validate syntax first; the best practices checker assumes the input is already valid JSON
+- [JSON Structure Analyzer](/tools/json-structure-analyzer/) - get objective depth and key-count metrics to supplement the qualitative findings from the checker
+- [Common JSON Mistakes](/learn/common-mistakes/) - reference for the specific errors and patterns the checker is designed to catch
+- [JSON Schema Basics](/learn/json-schema-basics/) - formalize the conventions you want to enforce after identifying problems with the checker

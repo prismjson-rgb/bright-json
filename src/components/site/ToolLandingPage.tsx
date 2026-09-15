@@ -21,7 +21,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Large display heading — first part white, last word(s) in cyan gradient */
+/** Large display heading - first part white, last word(s) in cyan gradient */
 function DisplayHeading({
   prefix,
   accent,
@@ -113,7 +113,7 @@ const TOOL_PREVIEW_CONTENT: Record<string, React.ReactNode> = {
 };
 
 // Tools that get a real, working widget instead of the static code preview.
-// Kept to a short allowlist deliberately — this is a heavier, more involved
+// Kept to a short allowlist deliberately - this is a heavier, more involved
 // section, so it's opt-in per tool rather than default behavior.
 const LIVE_WIDGET_TOOLS = new Set(["json-formatter"]);
 
@@ -147,7 +147,7 @@ function ToolPreview({ appHref, title }: { appHref?: string; title: string }) {
             <span className="h-3 w-3 rounded-full bg-[#febc2e] opacity-90" />
             <span className="h-3 w-3 rounded-full bg-[#28c840] opacity-90" />
           </div>
-          <span className="truncate font-mono text-[11px] text-slate-500">{title} — JSON Prism</span>
+          <span className="truncate font-mono text-[11px] text-slate-500">{title} - JSON Prism</span>
         </div>
         <div className="min-h-[180px] p-5">{content}</div>
         <div className="flex items-center gap-3 border-t border-white/[0.06] bg-white/[0.01] px-4 py-2">
@@ -251,7 +251,7 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
             )}
           </div>
 
-          {/* Live widget — full width, visible at every breakpoint, replaces the
+          {/* Live widget - full width, visible at every breakpoint, replaces the
               static code preview for tools worth trying inline. */}
           {hasLiveWidget && (
             <div className="mt-14">

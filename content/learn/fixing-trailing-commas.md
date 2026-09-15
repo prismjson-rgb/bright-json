@@ -11,7 +11,7 @@ publishedAt: "2026-06-16"
 updatedAt: "2026-06-16"
 ---
 
-**Quick answer:** A trailing comma is a comma after the last item in an object or array — like `{"a": 1, "b": 2,}`. JavaScript allows it, but the JSON specification does not, so `JSON.parse()` throws an error. To fix it, remove the comma before the closing `}` or `]`. The [JSON Trimmer](/tools/json-trimmer/) strips trailing commas (and comments) automatically and returns strict JSON.
+**Quick answer:** A trailing comma is a comma after the last item in an object or array - like `{"a": 1, "b": 2,}`. JavaScript allows it, but the JSON specification does not, so `JSON.parse()` throws an error. To fix it, remove the comma before the closing `}` or `]`. The [JSON Trimmer](/tools/json-trimmer/) strips trailing commas (and comments) automatically and returns strict JSON.
 
 ## What a trailing comma looks like
 
@@ -55,7 +55,7 @@ The position points at (or just after) the offending comma.
 ## How to fix it
 
 - **One file, quickly:** paste it into the [JSON Trimmer](/tools/json-trimmer/). It removes trailing commas, comments, and other JSON5-style extras, returning spec-compliant JSON you can copy back.
-- **Find the exact spot:** the [JSON Debugger](/tools/json-debugger/) jumps to the failing position so you can see which comma broke parsing — useful in large documents where the error position alone isn't obvious.
+- **Find the exact spot:** the [JSON Debugger](/tools/json-debugger/) jumps to the failing position so you can see which comma broke parsing - useful in large documents where the error position alone isn't obvious.
 - **Validate after:** run the result through the [JSON Validator](/tools/json-validator/) to confirm nothing else is wrong.
 
 ## How to avoid it
@@ -64,7 +64,7 @@ The position points at (or just after) the offending comma.
 - **Use JSON5 or JSONC on purpose,** not by accident. If you genuinely want comments and trailing commas in a config file, use a parser that supports them (and a `.json5`/`.jsonc` extension) rather than relying on `JSON.parse()`.
 - **Serialize, don't type.** `JSON.stringify()` never produces trailing commas. Generating JSON from data beats writing it by hand. See [Parse and Stringify](/learn/parse-stringify/).
 
-For the other frequent syntax slip-ups — unquoted keys, single quotes, missing commas — see [Common JSON Mistakes](/learn/common-mistakes/).
+For the other frequent syntax slip-ups - unquoted keys, single quotes, missing commas - see [Common JSON Mistakes](/learn/common-mistakes/).
 
 ## Frequently asked questions
 

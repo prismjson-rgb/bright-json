@@ -12,11 +12,11 @@
 
   <!-- safe zone -->
   <rect x="40" y="106" width="390" height="28" fill="rgba(110,231,183,0.10)"/>
-  <text x="60" y="162" fill="#6ee7b7" font-size="12.5" font-weight="600">SAFE — exact integers</text>
+  <text x="60" y="162" fill="#6ee7b7" font-size="12.5" font-weight="600">SAFE - exact integers</text>
 
   <!-- unsafe zone -->
   <rect x="430" y="106" width="290" height="28" fill="rgba(251,113,133,0.10)"/>
-  <text x="560" y="162" fill="#fb7185" font-size="12.5" font-weight="600" text-anchor="middle">UNSAFE — precision lost</text>
+  <text x="560" y="162" fill="#fb7185" font-size="12.5" font-weight="600" text-anchor="middle">UNSAFE - precision lost</text>
 
   <!-- example -->
   <g font-size="15">
@@ -24,5 +24,5 @@
     <text x="40" y="252"><tspan fill="#64748b">parsed:  </tspan><tspan fill="#fb7185">12345678901234568</tspan>  <tspan fill="#fb7185" font-size="12">← last digit changed</tspan></text>
   </g>
 
-  <text x="40" y="296" fill="#6ee7b7" font-size="12.5">Fix: send large IDs as strings — "id": "12345678901234567" — or use BigInt</text>
+  <text x="40" y="296" fill="#6ee7b7" font-size="12.5">Fix: send large IDs as strings - "id": "12345678901234567" - or use BigInt</text>
 </svg>

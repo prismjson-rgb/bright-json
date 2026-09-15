@@ -11,7 +11,7 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** In JSON, every property name must be a **double-quoted string** — `{"name": "Dana"}`, never `{name: "Dana"}`. Unquoted keys are valid JavaScript but invalid JSON, so `JSON.parse()` throws. The fix is to wrap every key in double quotes. The [JSON Trimmer](/tools/json-trimmer/) adds the missing quotes and returns strict JSON.
+**Quick answer:** In JSON, every property name must be a **double-quoted string** - `{"name": "Dana"}`, never `{name: "Dana"}`. Unquoted keys are valid JavaScript but invalid JSON, so `JSON.parse()` throws. The fix is to wrap every key in double quotes. The [JSON Trimmer](/tools/json-trimmer/) adds the missing quotes and returns strict JSON.
 
 ## What's invalid
 
@@ -29,7 +29,7 @@ That's fine in a `.js` file but not in JSON. The error is usually `Expected prop
 
 ## Why JSON requires quoted keys
 
-JSON treats keys as plain strings, full stop. JavaScript identifiers have rules (no spaces, can't start with a digit, reserved words, etc.), and JSON deliberately avoids importing any of that complexity. Requiring quotes means a key can be *any* string — `"first name"`, `"123"`, `"@type"` — and every parser handles it identically. This is the same design philosophy behind [single double-quotes only](/learn/fix-single-quotes-json/) and no [trailing commas](/learn/fixing-trailing-commas/).
+JSON treats keys as plain strings, full stop. JavaScript identifiers have rules (no spaces, can't start with a digit, reserved words, etc.), and JSON deliberately avoids importing any of that complexity. Requiring quotes means a key can be *any* string - `"first name"`, `"123"`, `"@type"` - and every parser handles it identically. This is the same design philosophy behind [single double-quotes only](/learn/fix-single-quotes-json/) and no [trailing commas](/learn/fixing-trailing-commas/).
 
 It also means keys that *aren't* legal identifiers are perfectly legal JSON keys:
 
@@ -49,11 +49,11 @@ const obj = { name: "Dana", role: "admin" };
 JSON.stringify(obj);   // {"name":"Dana","role":"admin"}
 ```
 
-`JSON.stringify()` always double-quotes keys, so generating JSON from objects sidesteps the problem entirely — see [Parse and Stringify](/learn/parse-stringify/).
+`JSON.stringify()` always double-quotes keys, so generating JSON from objects sidesteps the problem entirely - see [Parse and Stringify](/learn/parse-stringify/).
 
 ## Config files are the usual source
 
-Unquoted keys most often sneak in from config files written in relaxed dialects. If you genuinely want bare keys, comments, and trailing commas, use **JSON5** or **JSONC** *on purpose* with a parser that supports them — not `JSON.parse()`. See [JSON5 vs JSONC](/learn/json5-vs-jsonc/) for when each is appropriate. When you need strict JSON, validate the result with the [JSON Validator](/tools/json-validator/).
+Unquoted keys most often sneak in from config files written in relaxed dialects. If you genuinely want bare keys, comments, and trailing commas, use **JSON5** or **JSONC** *on purpose* with a parser that supports them - not `JSON.parse()`. See [JSON5 vs JSONC](/learn/json5-vs-jsonc/) for when each is appropriate. When you need strict JSON, validate the result with the [JSON Validator](/tools/json-validator/).
 
 ## Frequently asked questions
 
@@ -67,4 +67,4 @@ JavaScript object literals allow unquoted keys that are valid identifiers. JSON 
 Use a JSON5-aware cleaner like the [JSON Trimmer](/tools/json-trimmer/), or re-serialize the data with `JSON.stringify()` (JS) or `json.dumps()` (Python), which quote keys automatically.
 
 **Can a JSON key contain spaces or start with a number?**
-Yes — as long as it's quoted. `"first name"` and `"2fa"` are valid JSON keys even though they couldn't be unquoted JavaScript identifiers.
+Yes - as long as it's quoted. `"first name"` and `"2fa"` are valid JSON keys even though they couldn't be unquoted JavaScript identifiers.

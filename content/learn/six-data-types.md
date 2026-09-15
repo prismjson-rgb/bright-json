@@ -3,25 +3,25 @@ title: The Six JSON Data Types
 level: beginner
 order: 3
 metaTitle: "The 6 JSON Data Types, Explained With Examples"
-metaDescription: "String, number, boolean, null, object, array — JSON's six data types explained clearly, with real examples for each."
+metaDescription: "String, number, boolean, null, object, array - JSON's six data types explained clearly, with real examples for each."
 keyTerms: [string, number, boolean, null, object, array]
 relatedTools: [json-validator, json-tree-view]
 relatedLearn: [what-is-json, syntax-rules, json-null-vs-missing]
 publishedAt: "2025-12-02"
 ---
 
-JSON has exactly six data types. Understanding these is the foundation of working with JSON. Every value in every JSON document is one of: string, number, boolean, null, object, or array. There are no dates, no functions, no undefined — if you need those, you represent them as strings or omit them entirely.
+JSON has exactly six data types. Understanding these is the foundation of working with JSON. Every value in every JSON document is one of: string, number, boolean, null, object, or array. There are no dates, no functions, no undefined - if you need those, you represent them as strings or omit them entirely.
 
 ## String
 
 A sequence of Unicode characters wrapped in double quotes. Single quotes are not allowed. Use a backslash to escape special characters inside strings.
 
 Common escape sequences:
-- `\"` — double quote
-- `\\` — backslash
-- `\n` — newline
-- `\t` — tab
-- `\uXXXX` — any Unicode character
+- `\"` - double quote
+- `\\` - backslash
+- `\n` - newline
+- `\t` - tab
+- `\uXXXX` - any Unicode character
 
 ```json
 "Hello, World!"
@@ -39,7 +39,7 @@ Common escape sequences:
 
 ## Number
 
-An integer or floating-point number. No quotes. Scientific notation is valid. There is no separate integer vs float type in JSON — it is all just "number."
+An integer or floating-point number. No quotes. Scientific notation is valid. There is no separate integer vs float type in JSON - it is all just "number."
 
 ```json
 42
@@ -61,7 +61,7 @@ An integer or floating-point number. No quotes. Scientific notation is valid. Th
 
 ## Boolean
 
-Exactly two values: `true` or `false`. Both must be lowercase — `True` or `TRUE` are not valid JSON.
+Exactly two values: `true` or `false`. Both must be lowercase - `True` or `TRUE` are not valid JSON.
 
 ```json
 true
@@ -83,7 +83,7 @@ Use `null` when a property exists but has no meaningful value, such as `"deleted
 
 ## Object
 
-An unordered collection of key-value pairs enclosed in curly braces `{}`. Keys must be strings. Values can be any of the six types, including other objects — enabling nested structures.
+An unordered collection of key-value pairs enclosed in curly braces `{}`. Keys must be strings. Values can be any of the six types, including other objects - enabling nested structures.
 
 ```json
 {
@@ -137,7 +137,7 @@ An ordered list of values enclosed in square brackets `[]`. Array elements can b
 ## Frequently asked questions
 
 **Does JSON support boolean values?**
-Yes. Boolean is one of JSON's six data types, with exactly two valid values: `true` and `false`, always lowercase. The boolean `true` is not the same as the string `"true"` — see [true vs "true"](/learn/json-true-vs-string-true/) for how that distinction causes bugs.
+Yes. Boolean is one of JSON's six data types, with exactly two valid values: `true` and `false`, always lowercase. The boolean `true` is not the same as the string `"true"` - see [true vs "true"](/learn/json-true-vs-string-true/) for how that distinction causes bugs.
 
 ## Try it in JSON Prism
 

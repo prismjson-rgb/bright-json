@@ -21,7 +21,7 @@ export function stringToJson(input: string): { json: string | null; error: strin
     }
   }
 
-  // Not an escaped string literal at all — maybe it's already plain JSON.
+  // Not an escaped string literal at all - maybe it's already plain JSON.
   try {
     return { json: formatJsonPrecisely(trimmed), error: null };
   } catch {

@@ -4,7 +4,7 @@ import { MAX_INPUT_CHARS } from "./input-limits";
  * so large JSON payloads don't block the main thread.
  *
  * Falls back silently (returns null) if workers aren't available (SSR, Safari
- * with disabled module workers, etc.) — callers handle the sync fallback.
+ * with disabled module workers, etc.) - callers handle the sync fallback.
  */
 
 type Op = "encode-uri-component" | "decompress-uri-component";

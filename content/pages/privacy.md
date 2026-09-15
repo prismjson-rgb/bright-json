@@ -1,10 +1,10 @@
 ---
 title: "Privacy Policy"
-metaTitle: "Privacy Policy — JSON Prism"
+metaTitle: "Privacy Policy - JSON Prism"
 metaDescription: "JSON Prism runs locally in your browser. No JSON is transmitted or stored on any server by default. Short links are strictly opt-in."
 ---
 
-JSON Prism ("we", "our", or "the app") is a fully client-side, browser-based JSON utility. We are committed to your privacy. This policy explains what data is — and is not — collected when you use JSON Prism.
+JSON Prism ("we", "our", or "the app") is a fully client-side, browser-based JSON utility. We are committed to your privacy. This policy explains what data is - and is not - collected when you use JSON Prism.
 
 ## Data we do not collect
 
@@ -20,16 +20,16 @@ Formatting, validation and conversion run in your browser. The optional network 
 
 JSON Prism stores data only on your device using `localStorage` for theme preference and `IndexedDB` for tabs, editor content, settings, notes, and saved JSON (larger payloads use async storage so the page stays responsive).
 
-- **Theme preference** (light or dark) — key: `json-viewer-theme`
-- **Tabs and editor content** — stored in IndexedDB under the app's origin
-- **Settings** (editor, tree, formatting preferences) — stored in IndexedDB
-- **Notes** (rich-text annotations beside your session) — stored in IndexedDB
+- **Theme preference** (light or dark) - key: `json-viewer-theme`
+- **Tabs and editor content** - stored in IndexedDB under the app's origin
+- **Settings** (editor, tree, formatting preferences) - stored in IndexedDB
+- **Notes** (rich-text annotations beside your session) - stored in IndexedDB
 
 This data never leaves your device and can be cleared at any time by clearing site data from your browser.
 
 ## Share links
 
-When you use the Share feature, your JSON is compressed and encoded directly into the URL fragment (the portion after `#`). Browsers **do not send URL fragments to servers**, so the payload never reaches any server — the link is decoded locally by whoever opens it.
+When you use the Share feature, your JSON is compressed and encoded directly into the URL fragment (the portion after `#`). Browsers **do not send URL fragments to servers**, so the payload never reaches any server - the link is decoded locally by whoever opens it.
 
 ## Optional short links
 

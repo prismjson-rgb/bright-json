@@ -1,7 +1,7 @@
 ---
 title: JSON Tutorial
 heroEyebrow: Learning cluster
-heroTitle: Complete JSON Tutorial — Beginner to Expert
+heroTitle: Complete JSON Tutorial - Beginner to Expert
 heroDescription: 56 free, hands-on JSON lessons covering syntax, APIs, schema, security, and LLM/ChatGPT JSON. Every lesson links to a live tool.
 tags:
   - JSON basics

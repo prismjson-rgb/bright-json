@@ -30,8 +30,8 @@ export default function JsonTokenEstimator({ json, parsed }: { json: string; par
     const depth = JSON.stringify(parsed).split("{").length - 1;
     if (depth > 4) tips.push("Consider flattening nested structures to reduce tokens");
   }
-  if (jsonTokens > 10000) tips.push("Large payload — consider sending only the fields you need");
-  if (parsed && Array.isArray(parsed) && (parsed as unknown[]).length > 50) tips.push("Paginate large arrays — send only what's needed per request");
+  if (jsonTokens > 10000) tips.push("Large payload - consider sending only the fields you need");
+  if (parsed && Array.isArray(parsed) && (parsed as unknown[]).length > 50) tips.push("Paginate large arrays - send only what's needed per request");
 
   return (
     <div className="flex flex-col h-full">

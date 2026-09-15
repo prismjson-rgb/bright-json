@@ -2,7 +2,7 @@
 title: JSON in REST APIs
 level: practical
 order: 9
-metaTitle: "How JSON is Used in REST APIs — Complete Guide"
+metaTitle: "How JSON is Used in REST APIs - Complete Guide"
 metaDescription: "Learn how JSON powers REST APIs. Request and response examples, Content-Type headers, and parsing in JavaScript, Python, and more."
 keyTerms: []
 relatedTools: [json-formatter, json-validator]
@@ -10,15 +10,15 @@ relatedLearn: [common-patterns, validate-webhook-payloads, parse-stringify]
 publishedAt: "2025-12-09"
 ---
 
-JSON is the lingua franca of REST APIs. When a client and server communicate over HTTP, JSON is almost always the format for both request bodies and response bodies. Understanding how JSON flows through an API makes you a more effective developer — whether you are building an API or consuming one.
+JSON is the lingua franca of REST APIs. When a client and server communicate over HTTP, JSON is almost always the format for both request bodies and response bodies. Understanding how JSON flows through an API makes you a more effective developer - whether you are building an API or consuming one.
 
 ## How JSON flows through a REST API
 
-- `GET /users` — server responds with a JSON body (no request body sent)
-- `POST /users` — client sends a JSON body; server responds with JSON
-- `PUT /users/1` — client sends a full replacement JSON body
-- `PATCH /users/1` — client sends a partial JSON body with only changed fields
-- `DELETE /users/1` — usually no body; server may return a JSON confirmation
+- `GET /users` - server responds with a JSON body (no request body sent)
+- `POST /users` - client sends a JSON body; server responds with JSON
+- `PUT /users/1` - client sends a full replacement JSON body
+- `PATCH /users/1` - client sends a partial JSON body with only changed fields
+- `DELETE /users/1` - usually no body; server may return a JSON confirmation
 
 ## The Content-Type header
 
@@ -77,14 +77,14 @@ Good APIs return JSON for errors too, not just success:
 ```
 
 Common HTTP status codes to know:
-- `200 OK` — success
-- `201 Created` — resource created
-- `204 No Content` — success, no body (common for DELETE)
-- `400 Bad Request` — invalid JSON or missing fields
-- `401 Unauthorized` — missing or invalid credentials
-- `404 Not Found` — resource does not exist
-- `422 Unprocessable Entity` — valid JSON, but data fails validation
-- `500 Internal Server Error` — server-side problem
+- `200 OK` - success
+- `201 Created` - resource created
+- `204 No Content` - success, no body (common for DELETE)
+- `400 Bad Request` - invalid JSON or missing fields
+- `401 Unauthorized` - missing or invalid credentials
+- `404 Not Found` - resource does not exist
+- `422 Unprocessable Entity` - valid JSON, but data fails validation
+- `500 Internal Server Error` - server-side problem
 
 ## Fetching JSON in JavaScript
 
@@ -126,7 +126,7 @@ console.log(created.id); // e.g., 42
 
 ## JSON in GraphQL
 
-GraphQL also uses JSON — both the query response and the error format are JSON. The shape differs from REST but the format is the same:
+GraphQL also uses JSON - both the query response and the error format are JSON. The shape differs from REST but the format is the same:
 
 ```json
 {

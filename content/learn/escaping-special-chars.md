@@ -45,7 +45,7 @@ A tab-separated value:
 "Name\tAge\tCity"
 ```
 
-A multi-line string (literal newlines are not allowed — use `\n`):
+A multi-line string (literal newlines are not allowed - use `\n`):
 
 ```json
 "Line one\nLine two\nLine three"
@@ -98,8 +98,8 @@ Some older JSON generators escape forward slashes by default. Both forms parse i
 
 ## Escaping in practice
 
-Most programming languages and JSON libraries handle escaping automatically when you serialize data. You only need to think about escaping when you are writing raw JSON by hand or building JSON strings through string concatenation (which you should avoid — use a serializer instead).
+Most programming languages and JSON libraries handle escaping automatically when you serialize data. You only need to think about escaping when you are writing raw JSON by hand or building JSON strings through string concatenation (which you should avoid - use a serializer instead).
 
 ## Try it in JSON Prism
 
-If your JSON contains escaped characters and you are unsure whether they are correct, paste it into the [JSON Formatter](/tools/json-formatter/) — it will display the actual decoded values clearly. For the underlying rules that govern all JSON strings, see [JSON Syntax Rules](/learn/syntax-rules/).
+If your JSON contains escaped characters and you are unsure whether they are correct, paste it into the [JSON Formatter](/tools/json-formatter/) - it will display the actual decoded values clearly. For the underlying rules that govern all JSON strings, see [JSON Syntax Rules](/learn/syntax-rules/).

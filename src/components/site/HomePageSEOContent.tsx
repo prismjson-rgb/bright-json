@@ -119,7 +119,7 @@ export function HomePageSEOContent() {
             <div>
               <Eyebrow>{tools.length} JSON tools, one workspace</Eyebrow>
               <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                The free, all-in-one JSON toolkit — everything in one workspace.
+                The free, all-in-one JSON toolkit - everything in one workspace.
               </h1>
               <p className="mt-5 max-w-xl text-base leading-8 text-slate-400">
                 JSON Prism is a free browser-based JSON toolkit for developers working with
@@ -225,7 +225,7 @@ export function HomePageSEOContent() {
           </Link>
         </div>
 
-        {/* Editorial list — separator lines, no heavy card borders */}
+        {/* Editorial list - separator lines, no heavy card borders */}
         <div className="divide-y divide-white/[0.06]">
           {tools.map((tool) => (
             <Link

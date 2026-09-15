@@ -20,13 +20,13 @@ useCases:
   - Privacy-minded exports
 faqs:
   - question: "What is JSON minimal mode?"
-    answer: "Minimal mode strips the JSON editor down to just the raw text — no tree panel, no toolbar, no decorations. It is designed for contexts where you want to copy, read, or paste JSON without the surrounding UI, or for embedding a clean JSON view in a presentation or screenshot."
+    answer: "Minimal mode strips the JSON editor down to just the raw text - no tree panel, no toolbar, no decorations. It is designed for contexts where you want to copy, read, or paste JSON without the surrounding UI, or for embedding a clean JSON view in a presentation or screenshot."
   - question: "When should I use minimal mode?"
     answer: "Use minimal mode when you need a distraction-free editing experience, when you are screenshotting JSON for documentation, or when you want to quickly paste and copy JSON without any extra interactions. All formatting and validation still works in minimal mode."
   - question: "Does minimal mode still validate JSON?"
-    answer: "Yes. Validation runs on the content regardless of the UI mode. Syntax errors are still highlighted in the editor. The difference is purely cosmetic — the surrounding interface is simplified, not the underlying functionality."
+    answer: "Yes. Validation runs on the content regardless of the UI mode. Syntax errors are still highlighted in the editor. The difference is purely cosmetic - the surrounding interface is simplified, not the underlying functionality."
   - question: "Can I switch between minimal mode and full mode?"
-    answer: "Yes. The mode toggle is accessible from the toolbar. Your JSON content is preserved when switching modes — you do not lose any data or formatting when changing the display mode."
+    answer: "Yes. The mode toggle is accessible from the toolbar. Your JSON content is preserved when switching modes - you do not lose any data or formatting when changing the display mode."
 ---
 JSON Minimal Mode reduces a large JSON document to only the fields your current task requires. Rather than reformatting whitespace like a minifier, it restructurally filters: you include the paths you want or exclude the paths you do not, and the result is a smaller, task-focused payload. When you are sending JSON to an LLM, sharing a subset with a third party, or pulling metrics from a deeply nested response, minimal mode removes everything irrelevant without touching the data you need.
 
@@ -34,7 +34,7 @@ JSON Minimal Mode reduces a large JSON document to only the fields your current 
 
 1. Paste your full JSON document into the input panel.
 2. Choose whether to work with an include list (keep only these paths) or an exclude list (remove these paths).
-3. Enter the dot-notation paths for the fields you want to keep or remove — for example, `user.id`, `user.email`, `meta`.
+3. Enter the dot-notation paths for the fields you want to keep or remove - for example, `user.id`, `user.email`, `meta`.
 4. Review the filtered output to confirm the right fields survived.
 5. Copy or download the minimal payload for use in your prompt, export, or downstream tool.
 
@@ -82,6 +82,6 @@ Including only `user.id`, `user.name`, and `user.email` produces a three-field o
 
 ## Related tools and articles
 
-- [JSON Trimmer](/tools/json-trimmer/) — use first if the payload contains comments or trailing commas that would prevent clean parsing
-- [JSON Formatter](/tools/json-formatter/) — reformat the filtered output for readability if you are using it for documentation or review
-- [Pretty vs Minified JSON](/learn/pretty-vs-minified/) — understand the difference between structural reduction and whitespace compression
+- [JSON Trimmer](/tools/json-trimmer/) - use first if the payload contains comments or trailing commas that would prevent clean parsing
+- [JSON Formatter](/tools/json-formatter/) - reformat the filtered output for readability if you are using it for documentation or review
+- [Pretty vs Minified JSON](/learn/pretty-vs-minified/) - understand the difference between structural reduction and whitespace compression

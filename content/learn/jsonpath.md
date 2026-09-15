@@ -1,5 +1,5 @@
 ---
-title: JSONPath — Query JSON Like SQL
+title: JSONPath - Query JSON Like SQL
 level: advanced
 order: 15
 metaTitle: "JSONPath Tutorial: Query and Extract JSON Data"
@@ -18,7 +18,7 @@ JSONPath is a query language for extracting values from JSON documents, much lik
 |--------|---------|
 | `$` | Root of the document |
 | `.key` | Child property named `key` |
-| `..key` | Recursive descent — find `key` anywhere in the tree |
+| `..key` | Recursive descent - find `key` anywhere in the tree |
 | `[n]` | Array element at index `n` (zero-based) |
 | `[*]` | All elements of an array |
 | `[start:end]` | Array slice |
@@ -53,10 +53,10 @@ Queries against this document:
 
 Filter expressions use `?()` with `@` representing the current node:
 
-- `?(@.active == true)` — boolean equality
-- `?(@.price > 30)` — numeric comparison
-- `?(@.name != "Bob")` — inequality
-- `?(@.tags)` — existence check (node has the key)
+- `?(@.active == true)` - boolean equality
+- `?(@.price > 30)` - numeric comparison
+- `?(@.name != "Bob")` - inequality
+- `?(@.tags)` - existence check (node has the key)
 
 ```json
 {
@@ -92,9 +92,9 @@ matches = [m.value for m in expr.find(data)]
 
 ## JSONPath vs. other approaches
 
-- **vs. hand-written traversal** — JSONPath is declarative and much shorter for complex paths
-- **vs. jq** — jq is more powerful but requires a separate tool; JSONPath runs inside your app
-- **vs. XPath** — same concept, but for JSON instead of XML
+- **vs. hand-written traversal** - JSONPath is declarative and much shorter for complex paths
+- **vs. jq** - jq is more powerful but requires a separate tool; JSONPath runs inside your app
+- **vs. XPath** - same concept, but for JSON instead of XML
 
 ## Try it in JSON Prism
 

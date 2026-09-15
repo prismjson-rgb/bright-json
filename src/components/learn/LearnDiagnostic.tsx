@@ -45,7 +45,7 @@ export function LearnDiagnostic({ lessons, compact = false }: { lessons: Tutoria
       <div className="learn-card-heading"><span className="learn-accent-dot" />{compact ? "Check your own payload" : "Diagnose first, read second"}<span className="learn-local-note">runs locally · nothing uploaded</span></div>
       <div className="learn-diagnostic-body">
         <label className="sr-only" htmlFor={compact ? "article-json-probe" : "learn-json-probe"}>Paste JSON or an error response</label>
-        <textarea id={compact ? "article-json-probe" : "learn-json-probe"} spellCheck={false} value={value} onChange={(event) => { setValue(event.target.value); setFixError(""); }} placeholder={compact ? "Paste the exact response you tried to parse…" : "Paste broken JSON or a response — we'll point you at the right lesson."} />
+        <textarea id={compact ? "article-json-probe" : "learn-json-probe"} spellCheck={false} value={value} onChange={(event) => { setValue(event.target.value); setFixError(""); }} placeholder={compact ? "Paste the exact response you tried to parse…" : "Paste broken JSON or a response - we'll point you at the right lesson."} />
         {diagnosis && <div className="learn-diagnostic-result" role="status"><span className="learn-eyebrow">{diagnosis.position}</span><strong>{diagnosis.title}</strong><p>{diagnosis.message}</p><div className="learn-result-actions">{lesson && <Link href={`/learn/${lesson.id}/`}>Read: {lesson.title} →</Link>}{diagnosis.fixable && <button type="button" onClick={handleFix}>Auto-fix here</button>}</div></div>}
         {fixError && <p className="learn-error">{fixError}</p>}
       </div>

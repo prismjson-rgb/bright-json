@@ -27,6 +27,6 @@
   <line x1="204" y1="174" x2="204" y2="200" stroke="#fb7185" stroke-width="1.5"/>
   <text x="40" y="218" fill="#fb7185" font-size="13">"Unexpected string in JSON at position 6" → a comma is missing before "b"</text>
 
-  <text x="40" y="262" fill="#94a3b8" font-size="12.5">Count characters from 0. The break is usually at — or one before — the reported index.</text>
+  <text x="40" y="262" fill="#94a3b8" font-size="12.5">Count characters from 0. The break is usually at - or one before - the reported index.</text>
   <text x="40" y="282" fill="#94a3b8" font-size="12.5">Newlines count as one character too.</text>
 </svg>

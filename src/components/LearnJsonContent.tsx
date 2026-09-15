@@ -17,7 +17,7 @@ export function LearnJsonContent({ standalone, onTryInEditor }: LearnJsonContent
     <>
       <header className="mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight mb-4">
-          Complete JSON Tutorial — From Beginner to Expert
+          Complete JSON Tutorial - From Beginner to Expert
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
           Master JSON (JavaScript Object Notation) from the ground up. Learn data types, syntax

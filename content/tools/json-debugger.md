@@ -1,7 +1,7 @@
 ---
 title: JSON Debugger
 metaTitle: JSON Debugger | Instantly Fix Parse Errors, Free
-metaDescription: Find and fix broken JSON in seconds with exact error locations. Runs 100% in your browser — no upload, no signup.
+metaDescription: Find and fix broken JSON in seconds with exact error locations. Runs 100% in your browser - no upload, no signup.
 summary: Find and fix JSON syntax problems without guessing where the payload broke.
 category: Debug
 appHref: /app/?tool=json-debugger
@@ -20,28 +20,28 @@ useCases:
   - Import troubleshooting
 faqs:
   - question: "How do I debug JSON parsing failures in workflows?"
-    answer: "Paste the exact payload that failed — from a webhook, API response, or pipeline step — into the JSON Debugger instead of guessing from a log message. It flags the specific parse failure with line context, and separately catches causes that don't show up as clean syntax errors in most workflow logs: invisible characters, output truncated by an upstream timeout, or a non-standard JSON variant. Fixing it here is faster than re-running the whole workflow to reproduce the failure."
+    answer: "Paste the exact payload that failed - from a webhook, API response, or pipeline step - into the JSON Debugger instead of guessing from a log message. It flags the specific parse failure with line context, and separately catches causes that don't show up as clean syntax errors in most workflow logs: invisible characters, output truncated by an upstream timeout, or a non-standard JSON variant. Fixing it here is faster than re-running the whole workflow to reproduce the failure."
   - question: "What does a JSON debugger do that a validator does not?"
-    answer: "A validator tells you whether JSON is valid or not, and where the syntax error is. A debugger goes further — it suggests likely fixes, explains what the error means in plain language, and can auto-correct common mistakes like trailing commas or single quotes."
+    answer: "A validator tells you whether JSON is valid or not, and where the syntax error is. A debugger goes further - it suggests likely fixes, explains what the error means in plain language, and can auto-correct common mistakes like trailing commas or single quotes."
   - question: "How do I find why my JSON is not parsing?"
-    answer: "Paste the JSON into the debugger. It will pinpoint the exact location of the error and explain the problem — for example 'Unexpected comma after line 12, key age'. Common causes include trailing commas, single quotes, unquoted keys, and comments left in from a JSONC source."
+    answer: "Paste the JSON into the debugger. It will pinpoint the exact location of the error and explain the problem - for example 'Unexpected comma after line 12, key age'. Common causes include trailing commas, single quotes, unquoted keys, and comments left in from a JSONC source."
   - question: "Can the debugger fix my JSON automatically?"
-    answer: "For common mistakes like trailing commas, single quotes, unquoted keys, and JSON wrapped in a markdown code fence or extra text, the debugger can apply automatic fixes — and shows you a before/after preview of exactly what will change before you apply it. More complex structural problems require manual editing, but the debugger will tell you exactly what needs to change."
-  - question: "My JSON looks right but still fails — why?"
+    answer: "For common mistakes like trailing commas, single quotes, unquoted keys, and JSON wrapped in a markdown code fence or extra text, the debugger can apply automatic fixes - and shows you a before/after preview of exactly what will change before you apply it. More complex structural problems require manual editing, but the debugger will tell you exactly what needs to change."
+  - question: "My JSON looks right but still fails - why?"
     answer: "Invisible characters are a common culprit: zero-width spaces, non-breaking spaces, or byte-order marks (BOM) copied from a Word document or certain editors can appear invisible but break parsers. The debugger detects and highlights these hidden characters."
   - question: "Can it clean up JSON that an LLM wrapped in a code block or extra text?"
-    answer: "Yes — paste the raw response as-is. If it's wrapped in a ```json code fence, or has explanatory text before or after the JSON block ('Here is your JSON:' is a common one), the debugger detects the wrapper and extracts just the JSON automatically, then runs the normal repair pass on what's inside."
+    answer: "Yes - paste the raw response as-is. If it's wrapped in a ```json code fence, or has explanatory text before or after the JSON block ('Here is your JSON:' is a common one), the debugger detects the wrapper and extracts just the JSON automatically, then runs the normal repair pass on what's inside."
   - question: "Does the debugger catch duplicate keys?"
-    answer: "Yes. Duplicate keys are technically valid JSON syntax, so JSON.parse won't warn you about them — but the later value silently overwrites the earlier one. The debugger flags every repeated key with its exact line number so you catch a bug a validator would let sail straight through."
+    answer: "Yes. Duplicate keys are technically valid JSON syntax, so JSON.parse won't warn you about them - but the later value silently overwrites the earlier one. The debugger flags every repeated key with its exact line number so you catch a bug a validator would let sail straight through."
 ---
-The JSON Debugger is a repair-oriented tool that pinpoints exactly why a JSON payload fails to parse and guides you through fixing it. A validator tells you something is broken. The JSON Debugger tells you where the break is, what kind of error it is, and what a corrected version would look like. For long payloads with compounding syntax mistakes — common in LLM output, hand-edited configs, and pasted API responses — that distinction matters.
+The JSON Debugger is a repair-oriented tool that pinpoints exactly why a JSON payload fails to parse and guides you through fixing it. A validator tells you something is broken. The JSON Debugger tells you where the break is, what kind of error it is, and what a corrected version would look like. For long payloads with compounding syntax mistakes - common in LLM output, hand-edited configs, and pasted API responses - that distinction matters.
 
 ## How to use the JSON Debugger
 
 1. Paste the broken JSON into the input panel.
 2. Read the error message: the debugger surfaces the line number, character position, and error type.
 3. Locate the highlighted problem area in the editor.
-4. Apply the suggested fix — remove the trailing comma, close the bracket, or add the missing quote.
+4. Apply the suggested fix - remove the trailing comma, close the bracket, or add the missing quote.
 5. Repeat until the parser accepts the input, then copy the valid result.
 
 ## What it fixes
@@ -54,11 +54,11 @@ The JSON Debugger is a repair-oriented tool that pinpoints exactly why a JSON pa
 - Comment syntax (`//` or `/* */`) left in after editing a JSON5 or JSONC file
 - Markdown code fences left around JSON copied from an LLM response (` ```json ... ``` `)
 - Extra prose surrounding the JSON block, like "Here is your JSON:" before it or "Hope this helps!" after
-- Duplicate object keys — flagged with their line number, since this is valid syntax that a parser won't warn you about but silently drops the earlier value
+- Duplicate object keys - flagged with their line number, since this is valid syntax that a parser won't warn you about but silently drops the earlier value
 
 ## JSON code example
 
-This payload has two common issues — a trailing comma and an unquoted key:
+This payload has two common issues - a trailing comma and an unquoted key:
 
 ```json
 {
@@ -82,7 +82,7 @@ The JSON Debugger flags the trailing comma in `roles` and the unquoted `active` 
 
 ## Related tools and articles
 
-- [JSON Validator](/tools/json-validator/) — use after debugging to confirm the fixed payload fully passes strict validation
-- [JSON Formatter](/tools/json-formatter/) — reformat once the payload is valid so it is readable before you pass it downstream
-- [Common JSON Mistakes](/learn/common-mistakes/) — reference for the errors developers make most often and how to avoid them
-- [Valid vs Invalid JSON](/learn/valid-vs-invalid/) — understand the exact rules that separate valid JSON from everything else
+- [JSON Validator](/tools/json-validator/) - use after debugging to confirm the fixed payload fully passes strict validation
+- [JSON Formatter](/tools/json-formatter/) - reformat once the payload is valid so it is readable before you pass it downstream
+- [Common JSON Mistakes](/learn/common-mistakes/) - reference for the errors developers make most often and how to avoid them
+- [Valid vs Invalid JSON](/learn/valid-vs-invalid/) - understand the exact rules that separate valid JSON from everything else

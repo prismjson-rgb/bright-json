@@ -177,7 +177,7 @@ function detectUnquotedKeys(json: string, masked: string): DebugIssue[] {
       severity: "error",
       type: "unquoted-key",
       title: "Unquoted property name",
-      message: `"${m[2]}" must be wrapped in double quotes — JSON property names always need quotes.`,
+      message: `"${m[2]}" must be wrapped in double quotes - JSON property names always need quotes.`,
       autoFixable: true,
     });
   }
@@ -271,13 +271,13 @@ export function analyzeJson(json: string): DebugIssue[] {
 
   try {
     JSON.parse(json);
-    return duplicateKeyIssues; // valid JSON — only duplicate-key warnings (if any) apply
+    return duplicateKeyIssues; // valid JSON - only duplicate-key warnings (if any) apply
   } catch (e: unknown) {
     const issues: DebugIssue[] = [...duplicateKeyIssues];
     const trimmed = json.trim();
 
     // Wrapper problems (markdown fence / prose around the JSON) are diagnosed on
-    // their own — fixing them is a single extraction step, and re-running the
+    // their own - fixing them is a single extraction step, and re-running the
     // debugger afterward will surface anything still wrong with the inner JSON.
     if (FENCE_RE.test(trimmed)) {
       issues.unshift({
@@ -424,9 +424,9 @@ function humanizeError(msg: string): string {
   if (msg.includes("Unexpected token")) {
     const tokenMatch = msg.match(/Unexpected token ['"]?(.+?)['"]?\s/);
     const token = tokenMatch ? `'${tokenMatch[1]}'` : "an unexpected character";
-    return `Unexpected token ${token} — likely a missing comma, quote, or bracket`;
+    return `Unexpected token ${token} - likely a missing comma, quote, or bracket`;
   }
-  if (msg.includes("Unexpected end")) return "JSON ends prematurely — check for unclosed brackets or missing values";
+  if (msg.includes("Unexpected end")) return "JSON ends prematurely - check for unclosed brackets or missing values";
   if (msg.includes("Expected")) return msg.replace(/JSON\.parse:|at position \d+/g, "").trim();
   return msg;
 }
@@ -434,7 +434,7 @@ function humanizeError(msg: string): string {
 /**
  * Repair invalid JSON. Delegates to the `jsonrepair` library for most cases
  * (missing brackets, commas, colons, quotes, comments, NDJSON→array, etc.),
- * but handles "JSON embedded in surrounding prose" itself first — jsonrepair
+ * but handles "JSON embedded in surrounding prose" itself first - jsonrepair
  * treats stray text as string content and wraps everything in an array
  * instead of discarding it.
  * @see https://github.com/josdejong/jsonrepair
