@@ -22,18 +22,18 @@ faqs:
   - question: "Why do I need to count tokens in my JSON?"
     answer: "When sending JSON to a large language model API (OpenAI, Anthropic, Gemini), you pay per token and are limited by a context window. A large JSON payload can consume thousands of tokens, reducing the space for your prompt and response. Estimating token count before sending helps you stay within limits and control costs."
   - question: "How many tokens does a typical JSON object use?"
-    answer: 'Token counts vary by tokenizer, but rough estimates: a short key-value pair like "name": "Alice" is about 5–7 tokens. Whitespace, brackets, and punctuation each count as tokens. A 1KB minified JSON is typically 200–400 tokens depending on content. The estimator gives you an exact count for your specific JSON.'
+    answer: 'Token counts vary by tokenizer, but rough estimates: a short key-value pair like "name": "Alice" is about 5–7 tokens. Whitespace, brackets, and punctuation each count as tokens. A 1KB minified JSON is typically 200–400 tokens depending on content. The estimator gives an approximate count; use your provider’s tokenizer for an exact count.'
   - question: "Does minifying JSON reduce token count?"
     answer: "Yes, significantly. Whitespace characters (spaces, newlines, indentation) count as tokens. Minifying a 2-space indented JSON can reduce token count by 15–25% for typical documents. The estimator shows token counts for both pretty and minified versions."
   - question: "Which tokenizer does the JSON Token Estimator use?"
-    answer: "JSON Prism's token estimator uses tiktoken-compatible tokenization that matches OpenAI's GPT models (cl100k_base encoding). Token counts for other models (Claude, Gemini, Llama) may differ slightly, but tiktoken provides a close approximation for most transformer-based models."
+    answer: "It uses a rough character-based estimate: 3.8 characters per token. It does not run a model tokenizer. Use your provider's tokenizer for exact counts and enter current provider rates for cost estimates."
 ---
 The JSON Token Estimator approximates how many LLM tokens a JSON payload will consume before you send it to a model. Token cost is not obvious from file size alone — whitespace, key repetition, and verbose string values all inflate the count in ways that differ from what the byte count suggests. When you are managing a context window budget, comparing compressed versus pretty-printed formats, or trying to fit structured data into a prompt without hitting limits, the estimator gives you a fast, concrete estimate to work from.
 
 ## How to use the JSON Token Estimator
 
 1. Paste your JSON payload into the input panel.
-2. The estimator applies a tokenization approximation aligned with common LLM tokenizers (GPT-family and similar).
+2. The estimator divides character count by 3.8; it does not run a model tokenizer.
 3. Read the estimated token count for the current format.
 4. Toggle to a minified version of the payload and compare — whitespace adds tokens, and the difference is often larger than expected.
 5. If the count is too high, use [JSON Minimal Mode](/tools/json-minimal-mode/) to filter fields, then re-estimate.
@@ -90,3 +90,7 @@ The pretty-printed version of a full page with 20 records may consume 1,200–1,
 - [AI JSON Cleaner](/tools/ai-json-cleaner/) — clean up raw LLM output before estimating its token cost for a subsequent request
 - [JSON Trimmer](/tools/json-trimmer/) — remove comments and non-standard syntax that add tokens without adding meaning
 - [Performance and Large Files](/learn/performance-large-files/) — techniques for handling large JSON payloads efficiently across parsing, storage, and model contexts
+
+## Pricing estimates
+
+Updated 15 September 2026: enter your provider’s current input and output rates in USD per million tokens. Model prices are no longer bundled. Counts use a character-based approximation (3.8 characters per token), not a model tokenizer. Costs exclude caching, batch discounts and taxes. Verify rates and exact token counts with your provider before budgeting.

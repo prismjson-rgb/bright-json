@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getAllTools } from "@/lib/tool-content";
 import { ToolIndexPage } from "@/components/site/ToolIndexPage";
 import { safeJsonLd } from "@/lib/json-ld";
 
@@ -6,7 +7,7 @@ const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
 const TITLE = "JSON Tools — Formatter, Validator, Diff & More | JSON Prism";
 const DESCRIPTION =
-  "Free online JSON tools: format, validate, diff, convert, and debug JSON in your browser. No install, no sign-up. 19 tools in one workspace.";
+  `Free online JSON tools: format, validate, diff, convert, and debug JSON in your browser. No install, no sign-up. ${getAllTools().length} tools in one workspace.`;
 
 export const metadata: Metadata = {
   title: TITLE,

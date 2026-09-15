@@ -3,7 +3,7 @@ import { parseCurl, labelFromCurlRequest, type CurlRequest } from "./curl-parser
 export type { CurlRequest } from "./curl-parser";
 export { parseCurl, labelFromCurlRequest };
 
-const MAX_BODY_CHARS = 12_000_000;
+import { readBoundedText } from "./input-limits";
 
 export interface CurlResponse {
   status: number;
@@ -15,6 +15,7 @@ export interface CurlResponse {
 
 export async function executeCurl(req: CurlRequest, signal?: AbortSignal): Promise<CurlResponse> {
   const t0 = Date.now();
+  signal = signal ? AbortSignal.any([signal, AbortSignal.timeout(30_000)]) : AbortSignal.timeout(30_000);
   const res = await fetch(req.url, {
     method: req.method,
     headers: req.headers,
@@ -25,12 +26,9 @@ export async function executeCurl(req: CurlRequest, signal?: AbortSignal): Promi
     signal,
   });
 
-  const body = await res.text();
+  const body = await readBoundedText(res.body, signal);
   const timing = Date.now() - t0;
 
-  if (body.length > MAX_BODY_CHARS) {
-    throw new Error(`Response too large (max ${Math.round(MAX_BODY_CHARS / 1e6)} MB)`);
-  }
 
   const headers: Record<string, string> = {};
   res.headers.forEach((value, key) => { headers[key] = value; });

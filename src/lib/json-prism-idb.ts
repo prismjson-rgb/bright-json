@@ -13,13 +13,20 @@ let dbPromise: Promise<IDBPDatabase> | null = null;
 
 function getDb(): Promise<IDBPDatabase> {
   if (!dbPromise) {
-    dbPromise = openDB(DB_NAME, DB_VERSION, {
+    const opening = openDB(DB_NAME, DB_VERSION, {
       upgrade(db) {
         if (!db.objectStoreNames.contains(STORE)) {
           db.createObjectStore(STORE);
         }
       },
+      terminated() { dbPromise = null; },
+      blocking(_current, _blocked, event) { (event.target as IDBDatabase).close(); dbPromise = null; },
     });
+    dbPromise = new Promise<IDBPDatabase>((resolve, reject) => {
+      let expired = false;
+      const timer = setTimeout(() => { expired = true; reject(new Error("Browser storage did not respond.")); }, 5000);
+      opening.then((db) => { clearTimeout(timer); if (expired) db.close(); else resolve(db); }, (error) => { clearTimeout(timer); reject(error); });
+    }).catch((error) => { dbPromise = null; throw error; });
   }
   return dbPromise;
 }

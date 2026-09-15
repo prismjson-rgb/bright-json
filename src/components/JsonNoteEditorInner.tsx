@@ -39,6 +39,8 @@ function ToolBtn({
       type="button"
       onClick={onClick}
       title={title}
+      aria-label={title}
+      aria-pressed={active}
       className={`p-1.5 rounded transition-colors ${
         active
           ? "bg-primary/10 text-primary"
@@ -50,7 +52,12 @@ function ToolBtn({
   );
 }
 
-export default function JsonNoteEditorInner() {
+export interface NotesProps {
+  content?: import("@tiptap/react").JSONContent;
+  onChange: (content: import("@tiptap/react").JSONContent) => void;
+}
+
+export default function JsonNoteEditorInner({ content, onChange }: NotesProps) {
   const [previewMode, setPreviewMode] = useState(false);
   const [previewText, setPreviewText] = useState("");
   const [copied, setCopied] = useState(false);
@@ -67,10 +74,12 @@ export default function JsonNoteEditorInner() {
           "Add notes, annotations, and documentation about this JSON…\n\nTip: You can format text, add code blocks, headings, and lists.",
       }),
     ],
-    content: "",
+    content: content ?? "",
+    onUpdate: ({ editor }) => onChange(editor.getJSON()),
     editorProps: {
       attributes: {
         class: "outline-none min-h-full",
+        "aria-label": "Notes for this tab",
       },
     },
   });

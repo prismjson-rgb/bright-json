@@ -1,24 +1,8 @@
-import Ajv, { type ErrorObject } from "ajv";
-
-const ajv = new Ajv({ allErrors: true, strict: false, validateSchema: false });
-
-export type ValidationStatus = "idle" | "valid" | "invalid" | "schema-error" | "json-error";
-
-export interface ValidationResult {
-  status: ValidationStatus;
-  errors: ErrorObject[];
-  schemaErrorMsg?: string;
-}
-
-/** Derives a human-readable JSON path from an ajv ErrorObject. */
-export function errorPath(e: ErrorObject): string {
-  const path = e.instancePath || "(root)";
-  if (e.keyword === "required") {
-    const missing = (e.params as { missingProperty?: string }).missingProperty ?? "";
-    return path === "(root)" ? `/${missing}` : `${path}/${missing}`;
-  }
-  return path;
-}
+import Ajv from "ajv";
+import Ajv2020 from "ajv/dist/2020";
+import { parseJsonSafe } from "./precise-json";
+import type { ValidationResult } from "./schema-result";
+export { errorPath, type ValidationResult, type ValidationStatus } from "./schema-result";
 
 /** Validates jsonStr against schemaStr. Both must be non-empty strings. */
 export function validateJsonAgainstSchema(jsonStr: string, schemaStr: string): ValidationResult {
@@ -28,22 +12,26 @@ export function validateJsonAgainstSchema(jsonStr: string, schemaStr: string): V
 
   let schema: unknown;
   try {
-    schema = JSON.parse(schemaStr);
+    if (schemaStr.length > 100_000) throw new Error("Schema exceeds the 100,000 character limit.");
+    schema = parseJsonSafe(schemaStr);
   } catch (e) {
     return { status: "schema-error", errors: [], schemaErrorMsg: (e as Error).message };
   }
 
   let data: unknown;
   try {
-    data = JSON.parse(jsonStr);
+    data = parseJsonSafe(jsonStr);
   } catch {
     return { status: "json-error", errors: [] };
   }
 
   try {
+    const dialect = schema && typeof schema === "object" ? (schema as Record<string, unknown>).$schema : undefined;
+    const Validator = dialect === "https://json-schema.org/draft/2020-12/schema" ? Ajv2020 : Ajv;
+    const ajv = new Validator({ allErrors: true, strict: false, validateSchema: true });
     const validate = ajv.compile(schema as object);
     const valid = validate(data);
-    return { status: valid ? "valid" : "invalid", errors: validate.errors ?? [] };
+    return { status: valid ? "valid" : "invalid", errors: (validate.errors ?? []).slice(0, 100) };
   } catch (e) {
     return { status: "schema-error", errors: [], schemaErrorMsg: (e as Error).message };
   }

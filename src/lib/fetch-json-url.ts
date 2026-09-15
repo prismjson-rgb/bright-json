@@ -1,5 +1,5 @@
 /** Max response body size when loading JSON from a URL (characters). */
-const MAX_CHARS = 12_000_000;
+import { readBoundedText } from "./input-limits";
 
 export function parseHttpUrlOrThrow(input: string): URL {
   const raw = input.trim();
@@ -31,6 +31,7 @@ export async function fetchTextViaGet(
   signal?: AbortSignal,
 ): Promise<{ text: string; label: string }> {
   const url = parseHttpUrlOrThrow(urlInput);
+  signal = signal ? AbortSignal.any([signal, AbortSignal.timeout(30_000)]) : AbortSignal.timeout(30_000);
   const res = await fetch(url.href, {
     method: "GET",
     mode: "cors",
@@ -42,9 +43,6 @@ export async function fetchTextViaGet(
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}${res.statusText ? ` ${res.statusText}` : ""}`);
   }
-  const text = await res.text();
-  if (text.length > MAX_CHARS) {
-    throw new Error(`Response too large (max ${Math.round(MAX_CHARS / 1e6)} MB)`);
-  }
+  const text = await readBoundedText(res.body, signal);
   return { text, label: tabLabelFromFetchedUrl(url) };
 }

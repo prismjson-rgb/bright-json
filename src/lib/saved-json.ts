@@ -46,8 +46,8 @@ export async function loadSavedJson(): Promise<string | null> {
       /* ignore */
     }
     return raw;
-  } catch {
-    return null;
+  } catch (error) {
+    throw new Error("Saved JSON could not be restored.", { cause: error });
   }
 }
 
@@ -66,8 +66,8 @@ export async function clearSavedJson(): Promise<void> {
   if (typeof window === "undefined") return;
   try {
     await idbDelete(IDB_KEY);
-  } catch {
-    /* ignore */
+  } catch (error) {
+    throw new Error("Saved JSON could not be cleared.", { cause: error });
   }
   try {
     localStorage.removeItem(LEGACY_LS_KEY);

@@ -1,9 +1,9 @@
-"use client";
+
 
 import { MarkdownArticleBody } from "./MarkdownArticleBody";
 import { RelatedLinks } from "./site/RelatedLinks";
 import type { TutorialSection } from "@/lib/learn-content";
-import { encodeJson, isTooLarge } from "@/lib/share";
+
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -14,14 +14,6 @@ interface LearnArticlePageProps {
 }
 
 export function LearnArticlePage({ section, prev, next }: LearnArticlePageProps) {
-  const handleTryInEditor = (json: string) => {
-    if (typeof window === "undefined") return;
-    const encoded = encodeJson(json);
-    const url = window.location.origin + "/#json=" + encoded;
-    if (!isTooLarge(url)) {
-      window.location.href = url;
-    }
-  };
 
   return (
     <article className="max-w-3xl mx-auto">
@@ -42,7 +34,6 @@ export function LearnArticlePage({ section, prev, next }: LearnArticlePageProps)
         content={section.contentMarkdown}
         keyTerms={section.keyTerms}
         tryExample={section.tryExample}
-        onTryInEditor={handleTryInEditor}
       />
 
       <RelatedLinks relatedTools={section.relatedTools} relatedLearn={section.relatedLearn} variant="light" />

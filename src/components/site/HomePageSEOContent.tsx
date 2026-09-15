@@ -117,7 +117,7 @@ export function HomePageSEOContent() {
         <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             <div>
-              <Eyebrow>19 JSON tools, one workspace</Eyebrow>
+              <Eyebrow>{tools.length} JSON tools, one workspace</Eyebrow>
               <h1 className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
                 The free, all-in-one JSON toolkit — everything in one workspace.
               </h1>

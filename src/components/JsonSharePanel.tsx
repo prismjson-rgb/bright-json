@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { encodeJsonAsync, encodeBundleAsync, encodeCurlShare, type BundleEntry } from "@/lib/share";
 import { generateHtml } from "@/lib/html-export";
+import { toast } from "sonner";
 import type { TabData, CurlMeta } from "@/lib/tabs-storage";
 import { TerminalSquare } from "lucide-react";
 import { AppButton } from "@/components/app/AppButton";
@@ -320,7 +321,9 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
   const handleHtmlExport = () => {
     const { json: toExport } = getExportData();
     if (!toExport.trim()) return;
-    const html = generateHtml(toExport);
+    let html: string;
+    try { html = generateHtml(toExport); }
+    catch (error) { toast.error(error instanceof Error ? error.message : "HTML export failed. Download JSON instead."); return; }
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const url  = URL.createObjectURL(blob);
     Object.assign(document.createElement("a"), { href: url, download: "json-export.html" }).click();

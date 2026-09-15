@@ -31,7 +31,7 @@ interface JsonConvertPanelProps {
 }
 
 export default function JsonConvertPanel({ parsed, dark, initialFormat }: JsonConvertPanelProps) {
-  const { format, setFormat, output, fileExtension, mimeType } = useJsonConvert(parsed, initialFormat);
+  const { format, setFormat, output, error, fileExtension, mimeType, spreadsheetSafe, setSpreadsheetSafe } = useJsonConvert(parsed, initialFormat);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -73,6 +73,7 @@ export default function JsonConvertPanel({ parsed, dark, initialFormat }: JsonCo
         <div className="flex-1" />
         <AppButton
           onClick={handleCopy}
+          disabled={!output || !!error}
           title="Copy output"
           leftIcon={copied ? <Check className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
           label={copied ? "Copied!" : "Copy"}
@@ -80,6 +81,7 @@ export default function JsonConvertPanel({ parsed, dark, initialFormat }: JsonCo
         />
         <AppButton
           onClick={handleDownload}
+          disabled={!output || !!error}
           title={`Download .${fileExtension}`}
           leftIcon={<Download className="w-3.5 h-3.5" />}
           label={`Download .${fileExtension}`}
@@ -87,9 +89,11 @@ export default function JsonConvertPanel({ parsed, dark, initialFormat }: JsonCo
         />
       </div>
 
+      {format === "csv" && <label className="text-xs p-3 flex gap-2 items-center"><input type="checkbox" checked={spreadsheetSafe} onChange={(event) => setSpreadsheetSafe(event.target.checked)} />Spreadsheet-safe CSV: prefix formula-like text with an apostrophe. Turn off only for trusted data.</label>}
+      {error && <p role="alert" className="p-3 text-sm text-destructive">{error}</p>}
       {/* Output */}
       <div className="flex-1 min-h-0">
-        {!parsed ? (
+        {parsed === undefined ? (
           <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
             Paste valid JSON in the editor to convert
           </div>

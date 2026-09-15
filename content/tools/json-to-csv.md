@@ -80,3 +80,7 @@ id,name,address.city,tags
 - [JSON Validator](/tools/json-validator/) — confirm the array is syntactically valid JSON first
 - [Converting JSON to CSV](/learn/convert-json-to-csv/) — a deeper walkthrough of the flattening rules and edge cases
 - [JSON vs XML vs CSV](/learn/json-vs-xml-csv/) — when CSV is (and isn't) the right format for your data
+
+## Spreadsheet safety
+
+Spreadsheet-safe export is on by default. It prefixes formula-like text (including column names) with an apostrophe before CSV quoting. This changes those text values so spreadsheet apps treat them as text. Turn it off only for trusted data or machine-to-machine interchange. CSV export is limited to 100,000 cells.

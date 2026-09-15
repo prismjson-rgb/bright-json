@@ -1,3 +1,4 @@
+import { MAX_INPUT_CHARS } from "./input-limits";
 /**
  * Client for the lz-string Web Worker. Provides async compress/decompress
  * so large JSON payloads don't block the main thread.
@@ -55,11 +56,17 @@ function getWorker(): Worker | null {
 }
 
 function post(op: Op, payload: string): Promise<string | null> {
+  if (payload.length > MAX_INPUT_CHARS * (op === "encode-uri-component" ? 1 : 2)) return Promise.reject(new Error("Share exceeds the input limit."));
   const w = getWorker();
   if (!w) return Promise.resolve(null);
   const id = nextId++;
   return new Promise<string | null>((resolve, reject) => {
-    pending.set(id, { resolve, reject });
+    const timeout = setTimeout(() => {
+      w.terminate(); workerInstance = null;
+      for (const handler of pending.values()) handler.reject(new Error("Share processing timed out."));
+      pending.clear();
+    }, 5000);
+    pending.set(id, { resolve: (value) => { clearTimeout(timeout); resolve(value); }, reject: (error) => { clearTimeout(timeout); reject(error); } });
     w.postMessage({ id, op, payload });
   });
 }

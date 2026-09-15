@@ -1,4 +1,6 @@
 "use client";
+import { assertInputBudget } from "@/lib/input-limits";
+import { parseJsonSafe } from "@/lib/precise-json";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Eraser, ArrowRight, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -12,7 +14,7 @@ function extractJson(text: string): { result: string | null; method: string } {
   const codeBlockMatch = text.match(/```(?:json)?\s*\n?([\s\S]+?)\n?```/);
   if (codeBlockMatch) {
     const candidate = codeBlockMatch[1].trim();
-    try { JSON.parse(candidate); return { result: candidate, method: "Extracted from markdown code block" }; } catch {}
+    try { parseJsonSafe(candidate); return { result: candidate, method: "Extracted from markdown code block" }; } catch {}
   }
 
   // 2. Find first balanced { } or [ ]
@@ -33,14 +35,14 @@ function extractJson(text: string): { result: string | null; method: string } {
       if (ch === open) depth++;
       else if (ch === close) { depth--; if (depth === 0) {
         const candidate = cleaned.slice(start, i + 1);
-        try { JSON.parse(candidate); return { result: candidate, method: `Found ${open}...${close} block in text` }; } catch {}
+        try { parseJsonSafe(candidate); return { result: candidate, method: `Found ${open}...${close} block in text` }; } catch {}
       }}
     }
   }
 
   // 3. Try entire text after cleaning
   const stripped = cleaned.replace(/^[^{\[]+/, "").replace(/[^}\]]+$/, "");
-  try { JSON.parse(stripped); return { result: stripped, method: "Stripped surrounding text" }; } catch {}
+  try { parseJsonSafe(stripped); return { result: stripped, method: "Stripped surrounding text" }; } catch {}
 
   return { result: null, method: "" };
 }
@@ -53,10 +55,11 @@ export default function JsonAiCleaner({ onUseJson, dark }: { onUseJson: (j: stri
 
   useEffect(() => {
     if (!input.trim()) { setResult(null); setError(""); return; }
+    try { assertInputBudget(input); } catch (error) { setResult(null); setError((error as Error).message); return; }
     const { result: r, method: m } = extractJson(input);
     if (r) {
       try {
-        const pretty = JSON.stringify(JSON.parse(r), null, 2);
+        const pretty = JSON.stringify(parseJsonSafe(r), null, 2);
         setResult(pretty); setMethod(m); setError("");
       } catch { setResult(null); setError("Found JSON-like structure but it's still invalid"); }
     } else {

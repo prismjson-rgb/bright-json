@@ -1,3 +1,4 @@
+import { parseJsonSafe } from "@/lib/precise-json";
 // Lightweight fake data generator — no external dependencies
 
 const firstNames = ["Alice","Bob","Carlos","Diana","Eve","Frank","Grace","Henry","Isabel","Jack","Karen","Liam","Maya","Noah","Olivia","Peter","Quinn","Rachel","Sam","Tara","Uma","Victor","Wendy","Xander","Yara","Zoe"];
@@ -60,7 +61,7 @@ export function inferType(value: unknown): CustomField["type"] | null {
 
 export function inferFieldsFromJson(jsonStr: string): CustomField[] | null {
   try {
-    let parsed = JSON.parse(jsonStr);
+    let parsed = parseJsonSafe(jsonStr);
     if (Array.isArray(parsed)) parsed = parsed[0];
     if (!parsed || typeof parsed !== "object") return null;
     const fields: CustomField[] = [];

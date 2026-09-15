@@ -26,7 +26,7 @@ JSON Prism is a free, browser-based tool that provides the following functionali
 - Share via URL fragment or optional 30-day short link
 - Optional, voluntary one-time donation via a third-party payment processor
 
-All processing occurs locally in your browser. JSON content is never sent to any server except when you explicitly opt in to short links, or choose to make a donation — see the Privacy Policy for details.
+All processing occurs locally in your browser. JSON content is never sent to any server except when you explicitly opt in to short links, send a URL/cURL request to a destination service, or choose to make a donation — see the Privacy Policy for details.
 
 ## Use license
 

@@ -56,7 +56,7 @@ export default function JsonEditor({ value, onChange, error, dark, editorSetting
 
   const handleMount = useCallback((editor: any, _monaco: any) => {
     editorRef.current = editor;
-    editor.focus();
+    // Do not steal focus when the deferred editor mounts.
 
     // Editor owns Cmd+F while it has focus (Monaco's native find/replace widget).
     // The app-level search (right-side tree view) only takes over Cmd+F when
@@ -144,6 +144,8 @@ export default function JsonEditor({ value, onChange, error, dark, editorSetting
         onChange={(v) => onChange(v || "")}
         onMount={handleMount}
         options={{
+          ariaLabel: "JSON editor. Press Control M to toggle Tab moving focus.",
+          tabFocusMode: true,
           fontSize: opts.fontSize,
           fontFamily: opts.fontFamily,
           minimap: { enabled: opts.minimap },

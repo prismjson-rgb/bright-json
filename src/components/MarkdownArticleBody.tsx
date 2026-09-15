@@ -1,6 +1,7 @@
-"use client";
+
 
 import React from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -73,19 +74,7 @@ function CodeBlock({
   const isJson = lang === "json" || (!lang && looksLikeJson);
   const label = lang ? LANG_LABELS[lang] ?? lang.toUpperCase() : isJson ? "JSON" : "TEXT";
 
-  const handleTry = () => {
-    if (onTry) {
-      onTry(code);
-      return;
-    }
-    if (typeof window !== "undefined") {
-      const encoded = encodeJson(code);
-      const url = window.location.origin + "/app/#json=" + encoded;
-      if (!isTooLarge(url)) {
-        window.location.href = url;
-      }
-    }
-  };
+  const tryHref = "/#json=" + encodeJson(code);
 
   return (
     <div className="group my-6 overflow-hidden rounded-2xl border border-white/[0.1] bg-[#090d17] shadow-[0_24px_80px_-32px_rgba(34,211,238,0.45)]">
@@ -106,14 +95,14 @@ function CodeBlock({
       </pre>
       {isJson && (
         <div className="border-t border-white/[0.07] bg-white/[0.03] px-4 py-3">
-          <button
-            type="button"
-            onClick={handleTry}
+          <a
+            href={isTooLarge(tryHref) ? "/" : tryHref}
+            onClick={onTry ? (event) => { event.preventDefault(); onTry(code); } : undefined}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-300 transition-colors hover:text-cyan-200"
           >
             Try in JSON Prism
             <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          </a>
         </div>
       )}
     </div>
@@ -259,7 +248,10 @@ export function MarkdownArticleBody({
           ),
           img: ({ src, alt }) => (
             <figure className="my-7">
-              <img
+              <Image
+                width={1200}
+                height={800}
+                unoptimized
                 src={typeof src === "string" ? src : ""}
                 alt={alt ?? ""}
                 loading="lazy"

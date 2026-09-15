@@ -9,6 +9,7 @@ import {
   useEffect,
 } from "react";
 import type { AppSettings } from "@/lib/settings";
+import { toast } from "sonner";
 import { DEFAULT_SETTINGS, loadSettings, saveSettings as persistSettings } from "@/lib/settings";
 
 interface SettingsContextValue {
@@ -26,7 +27,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     void loadSettings().then((s) => {
       if (!cancelled) setSettings(s);
-    });
+    }).catch(() => toast.error("Settings could not be restored. Changes may not persist on this device."));
     return () => {
       cancelled = true;
     };
@@ -35,14 +36,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const updateSettings = useCallback((update: Partial<AppSettings>) => {
     setSettings((prev) => {
       const next = merge(prev, update);
-      void persistSettings(next);
+      void persistSettings(next).catch(() => toast.error("Settings not saved: browser storage is blocked or full."));
       return next;
     });
   }, []);
 
   const resetSettings = useCallback(() => {
     setSettings(DEFAULT_SETTINGS);
-    void persistSettings(DEFAULT_SETTINGS);
+    void persistSettings(DEFAULT_SETTINGS).catch(() => toast.error("Settings not saved: browser storage is blocked or full."));
   }, []);
 
   const value = useMemo(
