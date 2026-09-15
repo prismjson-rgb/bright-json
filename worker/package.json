@@ -5,13 +5,15 @@
   "description": "JSON Prism short-link service — POST /s to store, GET /<slug> to redirect.",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
-    "tail": "wrangler tail",
-    "typecheck": "tsc --noEmit"
+    "deploy": "wrangler deploy --env production",
+    "tail": "wrangler tail --env production",
+    "typecheck": "npm run types && tsc --noEmit",
+    "deploy:production": "wrangler deploy --env production",
+    "deploy:check": "wrangler deploy --env production --dry-run",
+    "types": "wrangler types --strict-vars=false"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250204.0",
     "typescript": "^5.8.3",
-    "wrangler": "^3.100.0"
+    "wrangler": "^4.131.2"
   }
 }

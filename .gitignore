@@ -35,3 +35,12 @@ tsconfig.tsbuildinfo
 
 # Generated content — do not commit, run npm run generate:content
 src/lib/*.generated.ts
+
+# Cloudflare state and credentials
+.wrangler/
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+worker/worker-configuration.d.ts
+*.cpuprofile

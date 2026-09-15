@@ -26,7 +26,7 @@ export function removeKeys(parsed: unknown, keys: string[]): unknown {
   if (keys.length === 0) return parsed;
   if (Array.isArray(parsed)) return parsed.map(item => removeKeys(item, keys));
   if (parsed && typeof parsed === "object" && parsed !== null) {
-    const result: Record<string, unknown> = {};
+    const result: Record<string, unknown> = Object.create(null);
     for (const [k, v] of Object.entries(parsed as object)) {
       if (!keys.includes(k)) result[k] = removeKeys(v, keys);
     }
@@ -43,7 +43,7 @@ export function collapseDepth(parsed: unknown, maxDepth: number, current = 0): u
   }
   if (Array.isArray(parsed)) return parsed.map(item => collapseDepth(item, maxDepth, current + 1));
   if (parsed && typeof parsed === "object") {
-    const result: Record<string, unknown> = {};
+    const result: Record<string, unknown> = Object.create(null);
     for (const [k, v] of Object.entries(parsed as object)) {
       result[k] = collapseDepth(v, maxDepth, current + 1);
     }

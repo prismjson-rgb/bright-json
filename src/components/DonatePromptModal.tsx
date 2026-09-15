@@ -1,5 +1,6 @@
 "use client";
 import { HandHeart } from "lucide-react";
+import { DONATE_URL } from "@/lib/deployment";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function DonatePromptModal({ open, onDismiss }: Props) {
+  if (!DONATE_URL) return null;
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onDismiss(); }}>
       <DialogContent className="max-w-sm">
@@ -34,7 +36,7 @@ export function DonatePromptModal({ open, onDismiss }: Props) {
         </DialogHeader>
         <DialogFooter className="mt-2 flex-col gap-2 sm:flex-col sm:space-x-0">
           <a
-            href="https://s.jsonprism.com/donate"
+            href={DONATE_URL}
             target="_blank"
             rel="noopener noreferrer"
             onClick={onDismiss}

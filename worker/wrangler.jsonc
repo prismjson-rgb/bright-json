@@ -1,0 +1,82 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "prism-short-local",
+  "account_id": "8294e44ced7d8f156440f89cc13b1bd4",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-15",
+  "workers_dev": true,
+  "observability": {
+    "enabled": false
+  },
+  "vars": {
+    "SITE_URL": "http://localhost:3000",
+    "ALLOWED_ORIGIN": "http://localhost:3000",
+    "DODO_ENVIRONMENT": "test_mode",
+    "DODO_DONATE_PRODUCT_ID": ""
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SHORT_LINKS"
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "SHORT_LINK_RATE_LIMITER",
+      "namespace_id": "31001",
+      "simple": {
+        "limit": 10,
+        "period": 60
+      }
+    },
+    {
+      "name": "DONATE_RATE_LIMITER",
+      "namespace_id": "31002",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ],
+  "env": {
+    "production": {
+      "name": "prism-short",
+      "workers_dev": false,
+      "routes": [
+        {
+          "pattern": "s.jsonprism.com",
+          "custom_domain": true
+        }
+      ],
+      "vars": {
+        "SITE_URL": "https://jsonprism.com",
+        "ALLOWED_ORIGIN": "https://jsonprism.com",
+        "DODO_ENVIRONMENT": "live_mode",
+        "DODO_DONATE_PRODUCT_ID": "pdt_0Nn1NzRGNxaV1e9XQbkfl"
+      },
+      "kv_namespaces": [
+        {
+          "binding": "SHORT_LINKS",
+          "id": "4c864c997c894ae8bbf2547253fb0d47"
+        }
+      ],
+      "ratelimits": [
+        {
+          "name": "SHORT_LINK_RATE_LIMITER",
+          "namespace_id": "31005",
+          "simple": {
+            "limit": 10,
+            "period": 60
+          }
+        },
+        {
+          "name": "DONATE_RATE_LIMITER",
+          "namespace_id": "31006",
+          "simple": {
+            "limit": 5,
+            "period": 60
+          }
+        }
+      ]
+    }
+  }
+}

@@ -22,6 +22,12 @@ export interface BundleEntry {
   json: string;
 }
 
+function parseBundle(raw: string): BundleEntry[] {
+  const value: unknown = JSON.parse(raw);
+  if (!Array.isArray(value) || !value.every((entry) => entry && typeof entry === "object" && typeof entry.title === "string" && typeof entry.json === "string")) return [];
+  return value;
+}
+
 export function encodeBundle(entries: BundleEntry[]): string {
   return LZString.compressToEncodedURIComponent(JSON.stringify(entries));
 }
@@ -30,7 +36,7 @@ export function decodeBundle(encoded: string): BundleEntry[] {
   try {
     const raw = LZString.decompressFromEncodedURIComponent(encoded);
     if (!raw) return [];
-    return JSON.parse(raw);
+    return parseBundle(raw);
   } catch {
     return [];
   }
@@ -82,7 +88,7 @@ export async function decodeBundleAsync(encoded: string): Promise<BundleEntry[]>
   try {
     const raw = await decodeAnyAsync(encoded);
     if (!raw) return [];
-    return JSON.parse(raw);
+    return parseBundle(raw);
   } catch {
     return [];
   }
@@ -121,7 +127,13 @@ export async function decodeCurlShare(encoded: string): Promise<CurlSharePayload
   try {
     const raw = await decodeAnyAsync(encoded);
     if (!raw) return null;
-    return JSON.parse(raw) as CurlSharePayload;
+    const value = JSON.parse(raw);
+    if (!value || typeof value !== "object" || typeof value.curl !== "string" || typeof value.json !== "string" ||
+      !value.meta || typeof value.meta !== "object" || typeof value.meta.method !== "string" || typeof value.meta.url !== "string" ||
+      typeof value.meta.status !== "number" || typeof value.meta.statusText !== "string" || typeof value.meta.timing !== "number" ||
+      !value.meta.responseHeaders || typeof value.meta.responseHeaders !== "object" || Array.isArray(value.meta.responseHeaders) ||
+      !Object.values(value.meta.responseHeaders).every((header) => typeof header === "string")) return null;
+    return value as CurlSharePayload;
   } catch {
     return null;
   }

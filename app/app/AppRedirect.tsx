@@ -9,7 +9,7 @@ export function AppRedirect() {
 
   useEffect(() => {
     const qs = searchParams.toString();
-    router.replace(qs ? `/?${qs}` : "/");
+    router.replace(`${qs ? `/?${qs}` : "/"}${window.location.hash}`);
   }, [router, searchParams]);
 
   return null;

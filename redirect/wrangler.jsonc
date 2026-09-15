@@ -1,0 +1,14 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "json-prism-www-local",
+  "account_id": "8294e44ced7d8f156440f89cc13b1bd4",
+  "main": "index.mjs",
+  "compatibility_date": "2026-09-15",
+  "workers_dev": false,
+  "env": {
+    "production": {
+      "name": "json-prism-www",
+      "routes": [{ "pattern": "www.jsonprism.com", "custom_domain": true }]
+    }
+  }
+}

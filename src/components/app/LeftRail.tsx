@@ -1,6 +1,7 @@
 "use client";
 import { Download, HandHeart, TerminalSquare, Upload, X } from "lucide-react";
 import Link from "next/link";
+import { DONATE_URL } from "@/lib/deployment";
 import Logo from "./Logo";
 import { AppButton } from "./AppButton";
 import { InfoHelp } from "./InfoHelp";
@@ -55,9 +56,9 @@ export default function LeftRail({
 
       {/* Donate — placed ahead of Import so it's the first thing a returning
        *  user sees, not buried at the bottom where it reads like a footer link. */}
-      <div className={`border-b border-border/60 ${iconOnly ? "flex justify-center py-1.5" : "p-2"}`}>
+      {DONATE_URL && <div className={`border-b border-border/60 ${iconOnly ? "flex justify-center py-1.5" : "p-2"}`}>
         <a
-          href="https://s.jsonprism.com/donate"
+          href={DONATE_URL}
           target="_blank"
           rel="noopener noreferrer"
           title="Support JSON Prism"
@@ -79,7 +80,7 @@ export default function LeftRail({
             </span>
           )}
         </a>
-      </div>
+      </div>}
 
       {/* Input section (Import / From URL / Export) — surfaced here because
        *  users kept missing these buried in the editor toolbar, especially

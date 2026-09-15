@@ -1,69 +1,51 @@
-## Bright JSON – Static Next.js App with Base Theme Kit
+# JSON Prism
 
-This repo is a static Next.js app for working with JSON (format, validate, diff, convert) plus a **modular Base Theme Kit** you can reuse across B2B technical SaaS projects.
+A browser-based JSON workspace with a static Next.js frontend, Markdown tutorials, and a Cloudflare KV short-link service.
 
-The theme kit provides:
+## Architecture
 
-- **Semantic design tokens** for surfaces, text, accents, status, gradients, and code/diff states (light + dark).
-- **Tailwind configuration** wired to CSS variables for easy theming.
-- **Typography helpers** and a small component starter set (Button, Card, Input, Badge, Table, CodePanel, DiffLine).
+- `app/`: static routes, metadata, and sitemap.
+- `src/`: React workspace, JSON utilities, IndexedDB, and browser compression worker.
+- `content/`: tutorials, tool pages, and informational pages; generated TypeScript is not committed.
+- `worker/`: short links and donations; production retains the existing Worker and KV namespace.
+- `redirect/`: canonical redirect from `www.jsonprism.com` to `jsonprism.com`.
+- `theme-kit/`: shared design tokens and components.
 
-The JSON tooling UI is built with React, Tailwind CSS, and shadcn-ui primitives on top of this design system.
+Build output is **`out/`**. The frontend needs no Next.js server or server-rendering adapter on Cloudflare.
 
-## Tech stack
-
-- Next.js (App Router, static export)
-- React 18
-- TypeScript
-- Tailwind CSS (+ `tailwindcss-animate`)
-- shadcn-ui primitives
-
-## Theme kit structure
-
-The design system lives in `/theme-kit`:
-
-- `tokens/palette.base.ts` – raw color palette (slate, blue, copper, purple).
-- `tokens/theme.semantic.ts` – semantic token helpers (bg, surface, text, status, gradients).
-- `tailwind.config.ts` – example Tailwind `extend` config using semantic tokens.
-- `globals.css` – light/dark CSS variables, gradients, code/diff tokens, base typography.
-- `typography.ts` – ergonomic text-style helpers.
-
-Core starter components using these tokens live in `src/components/theme-kit`.
-
-## Content (no database)
-
-All content lives in markdown files under `content/`:
-
-- `content/learn/` — tutorial articles → `/learn/*`
-- `content/pages/` — static pages → `/about`, `/privacy`, etc.
-
-Add or remove `.md` files and run `npm run generate:content`. Editable via IDE or GitHub.
-
-See `content/README.md` for authoring details.
-
-## Running locally
+## Development (Node.js 22)
 
 ```sh
-npm install
+npm ci
+npm ci --prefix worker
 npm run dev
 ```
 
-Then open `http://localhost:3000`.
+For local short links, copy `.env.example` to `.env.local`, then run `npm run dev --prefix worker` in another terminal. Frontend: port 3000; API: port 8787. Donations default to disabled locally.
 
-## Building a static site
-
-This project is configured for static export via `next.config.ts`:
+## Validation and preview
 
 ```sh
-npm run build
-npm run start           # serves the built app
+npm run check
+npm run typecheck --prefix worker
+npm run build:production
+npm run verify:export
+npm start
 ```
 
-Or export static assets:
+`npm start` serves the static export in Cloudflare's local runtime. `next start` is incompatible with static export. Use `npm run build:production` for production. Deployment builds derive frontend URLs from `worker/wrangler.jsonc` so API URLs and CORS stay aligned.
+
+## Deployment
+
+Read [the Cloudflare runbook](docs/cloudflare-deployment.md) and [codebase review](docs/codebase-review.md).
 
 ```sh
-npm run build
+npm run deploy:production --prefix worker
+npm run deploy:production
+npx wrangler deploy --config redirect/wrangler.jsonc --env production
+node scripts/verify-deployment.mjs
 ```
 
-The output is in `.next` and can be deployed to any static host (e.g. Vercel static export, Netlify, GitHub Pages behind a Node adapter, etc.).
+GitHub Actions validates pull requests. A merge into `main` validates the merged code, then automatically deploys the API, frontend, and canonical redirect to production and checks the live commit. There is no staging environment. The `Production` GitHub environment holds the scoped Cloudflare deployment secret.
 
+Edit Markdown in `content/`; builds regenerate it automatically. See [content authoring](content/README.md) and [theme kit](theme-kit/README.md).

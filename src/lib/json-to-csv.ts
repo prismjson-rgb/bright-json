@@ -11,7 +11,7 @@ function flattenObject(
   obj: Record<string, unknown>,
   prefix = ""
 ): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
+  const result: Record<string, unknown> = Object.create(null);
   for (const [key, val] of Object.entries(obj)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
     if (val !== null && typeof val === "object" && !Array.isArray(val)) {

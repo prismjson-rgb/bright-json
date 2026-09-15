@@ -6,7 +6,7 @@
  * self-hosters who don't want any server-side storage get a clean build.
  */
 
-const SHORTENER_URL = process.env.NEXT_PUBLIC_SHORTENER_URL;
+const SHORTENER_URL = process.env.NEXT_PUBLIC_SHORTENER_URL?.replace(/\/+$/, "");
 
 export type ShortKind = "json" | "bundle" | "curl" | "curlcmd";
 
@@ -85,11 +85,10 @@ export async function createShortLink(
     return { ok: false, code: "server", status: res.status };
   }
 
-  const body = (await res.json()) as {
-    slug: string;
-    url: string;
-    expiresInSeconds: number;
-  };
+  const body = await res.json().catch(() => null);
+  if (!body || typeof body.slug !== "string" || typeof body.url !== "string" || typeof body.expiresInSeconds !== "number") {
+    return { ok: false, code: "server", status: res.status };
+  }
   return {
     ok: true,
     slug: body.slug,

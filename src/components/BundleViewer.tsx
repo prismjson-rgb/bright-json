@@ -172,7 +172,9 @@ export default function BundleViewer() {
                             {isValid
                               ? Array.isArray(parsed[i])
                                 ? `Array · ${(parsed[i] as unknown[]).length} items`
-                                : `Object · ${Object.keys(parsed[i] as object).length} keys`
+                                : parsed[i] !== null && typeof parsed[i] === "object"
+                                  ? `Object · ${Object.keys(parsed[i] as object).length} keys`
+                                  : parsed[i] === null ? "null" : typeof parsed[i]
                               : "Could not parse JSON"}
                           </span>
                           <a

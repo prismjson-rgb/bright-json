@@ -56,6 +56,8 @@ export default function JsonNoteEditorInner() {
   const [copied, setCopied] = useState(false);
 
   const editor = useEditor({
+    immediatelyRender: false,
+    shouldRerenderOnTransaction: true,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
