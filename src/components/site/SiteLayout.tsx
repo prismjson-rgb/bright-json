@@ -1,20 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { LearnHeader } from "@/components/learn/LearnHeader";
 import { getAllTools } from "@/lib/tool-content";
 import { getTutorialSections } from "@/lib/learn-content";
 
 interface SiteLayoutProps {
   children: React.ReactNode;
   activeNav?: "tools" | "learn" | "about";
+  learnDesign?: boolean;
 }
 
-export function SiteLayout({ children, activeNav }: SiteLayoutProps) {
+export function SiteLayout({ children, activeNav, learnDesign = false }: SiteLayoutProps) {
   const tools = getAllTools();
   const learnSections = getTutorialSections().slice(0, 8);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,_#07111b_0%,_#0b1320_100%)] text-white">
+    <div className={learnDesign ? "learn-section min-h-screen overflow-x-hidden text-white" : "min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,_#07111b_0%,_#0b1320_100%)] text-white"}>
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cyan-300 focus:text-slate-950 focus:rounded-full focus:font-semibold"
@@ -22,7 +24,7 @@ export function SiteLayout({ children, activeNav }: SiteLayoutProps) {
         Skip to content
       </a>
 
-      <SiteHeader activeNav={activeNav} />
+      {learnDesign ? <LearnHeader ids={getTutorialSections().map((section) => section.id)} /> : <SiteHeader activeNav={activeNav} />}
 
       <main id="main-content">{children}</main>
 
