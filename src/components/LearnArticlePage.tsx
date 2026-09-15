@@ -4,6 +4,7 @@ import { MarkdownArticleBody } from "./MarkdownArticleBody";
 import { RelatedLinks } from "./site/RelatedLinks";
 import { LearnCompletionButton } from "./learn/LearnProgress";
 import { LearnDiagnostic } from "./learn/LearnDiagnostic";
+import { LearnTableOfContents } from "./learn/LearnTableOfContents";
 import type { TutorialSection } from "@/lib/learn-content";
 import { readingMinutes } from "@/lib/learn-ui";
 import Link from "next/link";
@@ -22,7 +23,10 @@ function headingId(text: string): string {
 }
 
 export function LearnArticlePage({ section, sections, levelLabel, prev, next }: LearnArticlePageProps) {
-  const headings = [...section.contentMarkdown.matchAll(/^## (.+)$/gm)].map((match) => match[1].replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*`]/g, ""));
+  const headings = [...section.contentMarkdown.matchAll(/^## (.+)$/gm)].map((match) => {
+    const label = match[1].replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/[*`]/g, "");
+    return { id: headingId(label), label };
+  });
   const updated = section.updatedAt || section.publishedAt;
   const ids = sections.map((item) => item.id);
   return (
@@ -40,7 +44,7 @@ export function LearnArticlePage({ section, sections, levelLabel, prev, next }: 
           {next ? <Link href={`/learn/${next.id}/`}><span>Next →</span><strong>{next.title}</strong><ChevronRight size={16} aria-hidden="true" /></Link> : <span />}
         </nav>
       </article>
-      <aside className="learn-article-sidebar" aria-label="Lesson resources"><nav className="learn-side-card" aria-label="On this page"><h2>On this page</h2>{headings.map((heading, index) => <a key={`${heading}-${index}`} href={`#${headingId(heading)}`}>{heading}</a>)}</nav><div className="learn-side-card learn-side-cta"><h2>Fix it in the app</h2><p>Open the workspace to inspect or repair JSON locally.</p><Link href="/">Open in workspace →</Link></div></aside>
+      <aside className="learn-article-sidebar" aria-label="Lesson resources"><LearnTableOfContents headings={headings} /><div className="learn-side-card learn-side-cta"><h2>Fix it in the app</h2><p>Open the workspace to inspect or repair JSON locally.</p><Link href="/">Open in workspace →</Link></div></aside>
     </div>
   );
 }
