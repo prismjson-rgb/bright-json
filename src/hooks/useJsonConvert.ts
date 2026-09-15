@@ -10,15 +10,20 @@ export type ConvertFormat = "yaml" | "toon" | "xml" | "csv" | "string";
 
 export function useJsonConvert(parsed: unknown, initialFormat: ConvertFormat = "yaml") {
   const [format, setFormat] = useState<ConvertFormat>(initialFormat);
+  const [spreadsheetSafe, setSpreadsheetSafe] = useState(true);
 
-  const output = useMemo(() => {
-    if (parsed === null || parsed === undefined) return "";
+  const result = useMemo(() => {
+    try { return { output: convert(), error: null }; }
+    catch (error) { return { output: "", error: error instanceof Error ? error.message : "Conversion failed" }; }
+    function convert() {
+    if (parsed === undefined) return "";
     if (format === "yaml") return jsonToYaml(parsed);
     if (format === "toon") return jsonToToon(parsed);
     if (format === "xml") return jsonToXml(parsed);
     if (format === "string") return jsonToString(parsed);
-    return jsonToCsv(parsed);
-  }, [parsed, format]);
+    return jsonToCsv(parsed, spreadsheetSafe);
+    }
+  }, [parsed, format, spreadsheetSafe]);
 
   const fileExtension =
     format === "yaml" ? "yaml" : format === "toon" ? "toon" : format === "xml" ? "xml" : format === "string" ? "txt" : "csv";
@@ -33,5 +38,5 @@ export function useJsonConvert(parsed: unknown, initialFormat: ConvertFormat = "
             ? "text/plain"
             : "text/csv";
 
-  return { format, setFormat, output, fileExtension, mimeType };
+  return { format, setFormat, ...result, fileExtension, mimeType, spreadsheetSafe, setSpreadsheetSafe };
 }

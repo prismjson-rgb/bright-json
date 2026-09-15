@@ -10,11 +10,13 @@
  */
 
 export type CompressFormat = "deflate-raw" | "gzip" | "deflate";
+import { MAX_INPUT_CHARS, readBoundedText } from "./input-limits";
 
 export async function compressToBase64Url(
   input: string,
   format: CompressFormat = "deflate-raw",
 ): Promise<string> {
+  if (input.length > MAX_INPUT_CHARS) throw new Error("Share input exceeds the 1 million character limit.");
   const stream = new Blob([input]).stream().pipeThrough(new CompressionStream(format));
   const buf = await new Response(stream).arrayBuffer();
   return bufferToBase64Url(buf);
@@ -23,10 +25,14 @@ export async function compressToBase64Url(
 export async function decompressFromBase64Url(
   encoded: string,
   format: CompressFormat = "deflate-raw",
+  signal?: AbortSignal,
 ): Promise<string> {
+  if (encoded.length > MAX_INPUT_CHARS * 2) throw new Error("Encoded share is too large.");
   const bytes = base64UrlToBuffer(encoded);
   const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(format));
-  return await new Response(stream).text();
+  const text = await readBoundedText(stream, signal);
+  if (text.length > MAX_INPUT_CHARS) throw new Error("Expanded share exceeds the character limit.");
+  return text;
 }
 
 function bufferToBase64Url(buf: ArrayBuffer): string {

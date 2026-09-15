@@ -71,12 +71,6 @@ export default function LeftRail({
           {!iconOnly && (
             <span className="inline-flex items-center gap-1 min-w-0">
               <span className="truncate">Donate ❤️</span>
-              <InfoHelp
-                text="JSON Prism runs entirely in your browser — no account, no ads, nothing you paste ever touches a server. If it's saved you a headache or two, a small donation keeps it that way and helps me keep building. Never required, always appreciated. ❤️"
-                label="About Donate"
-                side="right"
-                className="shrink-0"
-              />
             </span>
           )}
         </a>
@@ -113,12 +107,6 @@ export default function LeftRail({
                 label={
                   <span className="inline-flex items-center gap-1 min-w-0 text-xs">
                     <span className="truncate">Import</span>
-                    <InfoHelp
-                      text="Pick one or more .json / .txt files. You can also drag files from your file manager onto the editor column — every file opens as its own tab."
-                      label="About Import"
-                      side="right"
-                      className="shrink-0"
-                    />
                   </span>
                 }
                 iconOnly={iconOnly}
@@ -136,12 +124,6 @@ export default function LeftRail({
                 label={
                   <span className="inline-flex items-center gap-1 min-w-0 text-xs">
                     <span className="truncate">From cURL</span>
-                    <InfoHelp
-                      text="Paste any curl command — supports -X, -H, -d, --json, -u. Runs the request from your browser and opens the JSON response as a new tab. Share the result as a full curl + response link."
-                      label="About From cURL"
-                      side="right"
-                      className="shrink-0"
-                    />
                   </span>
                 }
                 iconOnly={iconOnly}
@@ -160,12 +142,6 @@ export default function LeftRail({
                 label={
                   <span className="inline-flex items-center gap-1 min-w-0 text-xs">
                     <span className="truncate">Export</span>
-                    <InfoHelp
-                      text="Download the active tab's JSON as a .json file."
-                      label="About Export"
-                      side="right"
-                      className="shrink-0"
-                    />
                   </span>
                 }
                 iconOnly={iconOnly}
@@ -206,22 +182,12 @@ export default function LeftRail({
                     size={iconOnly ? "icon" : "sm"}
                     active={isActive}
                     onClick={() => onModeChange(cfg.id)}
-                    title={cfg.shortcut ? `${cfg.label} (${cfg.shortcut})` : cfg.label}
+                    title={`${cfg.label}: ${cfg.help}${cfg.shortcut ? ` (${cfg.shortcut})` : ""}`}
                     aria-label={cfg.label}
                     leftIcon={<Icon className="w-[15px] h-[15px]" />}
                     label={
                       <span className="inline-flex items-center gap-1 min-w-0 text-xs">
                         <span className="truncate">{cfg.label}</span>
-                        {/* Nested inside the button so the icon sits right next
-                         *  to the label instead of getting pushed to the row's
-                         *  right edge. InfoHelp stops propagation so clicks
-                         *  don't accidentally switch modes. */}
-                        <InfoHelp
-                          text={cfg.help}
-                          label={`About ${cfg.label}`}
-                          side="right"
-                          className="shrink-0"
-                        />
                       </span>
                     }
                     rightIcon={cfg.hint ? <span>{cfg.hint}</span> : undefined}

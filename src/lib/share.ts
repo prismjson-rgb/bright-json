@@ -1,3 +1,5 @@
+import { decodeBoundedLz } from "./bounded-lz";
+import { MAX_INPUT_CHARS } from "./input-limits";
 import LZString from "lz-string";
 import { lzEncodeAsync, lzDecodeAsync } from "./lz-worker-client";
 import { compressToBase64Url, decompressFromBase64Url } from "./compress-stream";
@@ -10,11 +12,12 @@ const MAX_SAFE_URL = 2000;
 const V2_MARKER = "~";
 
 export function encodeJson(json: string): string {
+  if (json.length > MAX_INPUT_CHARS) throw new Error("Share exceeds the input limit.");
   return LZString.compressToEncodedURIComponent(json);
 }
 
 export function decodeJson(encoded: string): string | null {
-  return LZString.decompressFromEncodedURIComponent(encoded);
+  return decodeBoundedLz(encoded);
 }
 
 export interface BundleEntry {
@@ -24,17 +27,17 @@ export interface BundleEntry {
 
 function parseBundle(raw: string): BundleEntry[] {
   const value: unknown = JSON.parse(raw);
-  if (!Array.isArray(value) || !value.every((entry) => entry && typeof entry === "object" && typeof entry.title === "string" && typeof entry.json === "string")) return [];
+  if (!Array.isArray(value) || value.length > 50 || !value.every((entry) => entry && typeof entry === "object" && typeof entry.title === "string" && typeof entry.json === "string")) return [];
   return value;
 }
 
 export function encodeBundle(entries: BundleEntry[]): string {
-  return LZString.compressToEncodedURIComponent(JSON.stringify(entries));
+  return encodeJson(JSON.stringify(entries));
 }
 
 export function decodeBundle(encoded: string): BundleEntry[] {
   try {
-    const raw = LZString.decompressFromEncodedURIComponent(encoded);
+    const raw = decodeBoundedLz(encoded);
     if (!raw) return [];
     return parseBundle(raw);
   } catch {
@@ -48,14 +51,16 @@ export function isTooLarge(url: string): boolean {
 
 /** Tries lz-string first, falls back to btoa for old links */
 export function safeDecodeJson(encoded: string): string | null {
+  if (encoded.length > MAX_INPUT_CHARS * 2) return null;
   // Try lz-string
   try {
-    const lz = LZString.decompressFromEncodedURIComponent(encoded);
+    const lz = decodeBoundedLz(encoded);
     if (lz && lz.length > 0) return lz;
   } catch {}
   // Fall back to old btoa encoding
   try {
-    return decodeURIComponent(escape(atob(encoded)));
+    const raw = decodeURIComponent(escape(atob(encoded)));
+    return raw.length <= MAX_INPUT_CHARS ? raw : null;
   } catch {}
   return null;
 }
@@ -80,7 +85,7 @@ export async function encodeBundleAsync(entries: BundleEntry[]): Promise<string>
     return V2_MARKER + (await compressToBase64Url(serialized));
   } catch {
     const viaWorker = await lzEncodeAsync(serialized).catch(() => null);
-    return viaWorker ?? LZString.compressToEncodedURIComponent(serialized);
+    return viaWorker ?? encodeJson(serialized);
   }
 }
 
@@ -119,7 +124,7 @@ export async function encodeCurlShare(payload: CurlSharePayload): Promise<string
     return V2_MARKER + (await compressToBase64Url(serialized));
   } catch {
     const viaWorker = await lzEncodeAsync(serialized).catch(() => null);
-    return viaWorker ?? LZString.compressToEncodedURIComponent(serialized);
+    return viaWorker ?? encodeJson(serialized);
   }
 }
 
@@ -146,7 +151,7 @@ export async function encodeCurlCmd(command: string): Promise<string> {
     return V2_MARKER + (await compressToBase64Url(command));
   } catch {
     const viaWorker = await lzEncodeAsync(command).catch(() => null);
-    return viaWorker ?? LZString.compressToEncodedURIComponent(command);
+    return viaWorker ?? encodeJson(command);
   }
 }
 

@@ -1,4 +1,5 @@
 "use client";
+import { parseJsonSafe } from "@/lib/precise-json";
 import { useMemo, useState } from "react";
 import { Wrench, Eye, EyeOff, AlertTriangle, CheckCircle2 } from "lucide-react";
 import {
@@ -40,7 +41,7 @@ export default function JsonFixPreview({ open, onOpenChange, json, issues, onApp
   const result = useMemo(() => {
     try {
       const repaired = repairJson(json);
-      const obj = JSON.parse(repaired);
+      const obj = parseJsonSafe(repaired);
       const formatted = JSON.stringify(obj, null, settings.format.beautifyIndent);
       return { ok: true as const, output: formatted };
     } catch {

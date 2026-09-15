@@ -17,7 +17,7 @@ export function getToolFaqs(tool: ToolContent): ToolFaq[] {
     },
     {
       question: `Does ${tool.title} store my data?`,
-      answer: `No. ${tool.title} runs entirely in your browser. Your JSON is never uploaded to any server unless you explicitly use the share link feature.`,
+      answer: `No. ${tool.title} runs entirely in your browser. Your JSON is never uploaded to any server unless you create a short link or send a URL/cURL request.`,
     },
     {
       question: `When should I use ${tool.title}?`,

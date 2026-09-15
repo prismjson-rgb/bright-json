@@ -10,6 +10,6 @@ const JsonNoteEditorInner = dynamic(() => import("./JsonNoteEditorInner"), {
   ),
 });
 
-export default function JsonNoteEditor() {
-  return <JsonNoteEditorInner />;
+export default function JsonNoteEditor(props: import("./JsonNoteEditorInner").NotesProps) {
+  return <JsonNoteEditorInner {...props} />;
 }

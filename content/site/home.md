@@ -1,12 +1,12 @@
 ---
 title: JSON Prism
-metaTitle: JSON Prism | All-in-One JSON Toolkit — 19 Free Tools
-metaDescription: Format, validate, edit, diff, and convert JSON in one free browser-based workspace. 19 tools, no sign-up, nothing ever uploaded.
+metaTitle: JSON Prism | All-in-One JSON Toolkit — {{toolCount}} Free Tools
+metaDescription: Format, validate, edit, diff, and convert JSON in one free browser-based workspace. {{toolCount}} tools, no sign-up, local processing with optional sharing.
 faqs:
   - question: Is JSON Prism free to use?
-    answer: Yes. JSON Prism is completely free. There is no sign-up, no subscription, and no usage limit. All core tools - formatter, validator, diff viewer, converter, debugger, and more - are available immediately.
+    answer: Yes. JSON Prism is completely free. There is no sign-up, no subscription, and no subscription quota (document size and processing limits apply). All core tools - formatter, validator, diff viewer, converter, debugger, and more - are available immediately.
   - question: Does JSON Prism upload my JSON to a server?
-    answer: No. All processing happens in your browser. Your JSON never leaves your machine unless you explicitly use the optional share link feature, which encodes your JSON in the URL fragment (never sent to a server) or stores it in Cloudflare KV for 30 days when you create a short link.
+    answer: No. All processing happens in your browser. Your JSON never leaves your machine unless you explicitly send a URL/cURL request or use the optional share link feature, which encodes your JSON in the URL fragment (never sent to a server) or stores it in Cloudflare KV for 30 days when you create a short link.
   - question: What JSON tools are included?
     answer: JSON Prism includes a formatter, validator, diff viewer, tree view, visual editor, flow view, converter (JSON ↔ CSV, XML, YAML), debugger, trimmer, token estimator, mock generator, AI JSON cleaner, structure analyzer, best practices checker, share links, notes, bundle viewer, and a learn-JSON mode.
   - question: Can I use JSON Prism offline?
@@ -17,13 +17,13 @@ faqs:
     answer: Open the JSON Diff tool from the left sidebar or use the keyboard shortcut. Paste the first JSON in the left panel and the second in the right panel. Differences are highlighted immediately - structural diffs, not line-by-line text diffs, so reformatting does not show as a change.
 trustPoints:
   - No install. Runs in any browser.
-  - No data upload. 100% local processing.
-  - 19 tools in one workspace.
+  - Local processing. Sharing and network requests are optional.
+  - {{toolCount}} tools in one workspace.
 ---
 
 ## What is JSON Prism?
 
-JSON Prism is a free, browser-based JSON toolkit built for developers. It combines 19 JSON tools in a single workspace - format, validate, diff, convert, debug, edit, and analyze JSON without installing anything or sending data to a server.
+JSON Prism is a free, browser-based JSON toolkit built for developers. It combines {{toolCount}} JSON tools in a single workspace - format, validate, diff, convert, debug, edit, and analyze JSON without installing anything or sending data to a server.
 
 ## Core tools
 

@@ -1,16 +1,17 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { readPreference, writePreference, removePreference } from "@/lib/local-preferences";
 
 const STORAGE_KEY = "json-viewer-donate-prompt";
 const ACTIVE_TIME_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutes
 const TICK_MS = 5000;
 
 function hasBeenDismissed(): boolean {
-  return localStorage.getItem(STORAGE_KEY) === "dismissed";
+  return readPreference(STORAGE_KEY) === "dismissed";
 }
 
 function markDismissed() {
-  localStorage.setItem(STORAGE_KEY, "dismissed");
+  writePreference(STORAGE_KEY, "dismissed");
 }
 
 /**
@@ -48,7 +49,7 @@ export function useDonatePrompt(hasJson: boolean): { open: boolean; dismiss: () 
     if (process.env.NODE_ENV === "production") return;
     (window as any).__donatePrompt = {
       show: () => setOpen(true),
-      reset: () => localStorage.removeItem(STORAGE_KEY),
+      reset: () => removePreference(STORAGE_KEY),
     };
     return () => {
       delete (window as any).__donatePrompt;

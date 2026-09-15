@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { decodeBoundedLz } from "../lib/bounded-lz";
 import LZString from "lz-string";
 
 type Op = "encode-uri-component" | "decompress-uri-component";
@@ -25,7 +26,7 @@ ctx.addEventListener("message", (e: MessageEvent<Request>) => {
     if (op === "encode-uri-component") {
       reply({ id, ok: true, result: LZString.compressToEncodedURIComponent(payload) });
     } else if (op === "decompress-uri-component") {
-      reply({ id, ok: true, result: LZString.decompressFromEncodedURIComponent(payload) });
+      reply({ id, ok: true, result: decodeBoundedLz(payload) });
     } else {
       reply({ id, ok: false, error: `unknown op: ${op as string}` });
     }

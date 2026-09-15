@@ -59,12 +59,12 @@ export default function JsonTabBar({
                 ? "border-t-primary/60 border-l-primary/60 border-r-primary/60 text-foreground"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
             }`}
-            onClick={() => editingId !== tab.id && onSwitch(tab.id)}
           >
             {editingId === tab.id ? (
               <div className="flex items-center gap-1 flex-1 min-w-0">
                 <Input
                   ref={inputRef}
+                  aria-label="Tab name"
                   value={editValue}
                   onChange={(e) => setEditValue(e.target.value)}
                   onBlur={handleCommitRename}
@@ -90,13 +90,19 @@ export default function JsonTabBar({
                 </button>
               </div>
             ) : (
-              <span
-                className="truncate flex-1 min-w-0"
+              <button
+                type="button"
+                className="truncate flex-1 min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={() => onSwitch(tab.id)}
+                aria-pressed={tab.id === activeId}
+                onKeyDown={(event) => {
+                  if (event.key === "F2") { event.preventDefault(); setEditingId(tab.id); }
+                }}
                 onDoubleClick={(e) => handleStartRename(e, tab.id)}
-                title="Double-click to rename"
+                title="Double-click or press F2 to rename"
               >
                 {tab.name}
-              </span>
+              </button>
             )}
             {editingId !== tab.id && (
               <button

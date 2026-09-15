@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { parseJsonSafe, formatJsonPrecisely } from "@/lib/precise-json";
 
 export interface FormatOptions {
   indent?: number;
@@ -43,7 +44,7 @@ export function useJsonParser(initialValue = "", onTransform?: (value: string) =
       return;
     }
     try {
-      const result = JSON.parse(value);
+      const result = parseJsonSafe(value);
       setParsed(result);
       setError(null);
     } catch (e: unknown) {
@@ -69,38 +70,30 @@ export function useJsonParser(initialValue = "", onTransform?: (value: string) =
     try {
       const indent = options?.indent ?? 2;
       const sort = options?.sortKeys ?? false;
-      let obj = JSON.parse(json);
-      if (sort) obj = sortObjectKeys(obj);
-      const formatted = JSON.stringify(obj, null, indent);
+      const formatted = formatJsonPrecisely(json, indent, sort);
       setJsonRaw(formatted);
-      setParsed(obj);
-      setError(null);
+      validate(formatted);
       onTransformRef.current?.(formatted);
-    } catch {}
-  }, [json]);
+    } catch (e) { setError(e instanceof Error ? e.message : "Cannot format JSON"); }
+  }, [json, validate]);
 
   const minify = useCallback(() => {
     try {
-      const obj = JSON.parse(json);
-      const minified = JSON.stringify(obj);
+      const minified = formatJsonPrecisely(json, 0);
       setJsonRaw(minified);
-      setParsed(obj);
-      setError(null);
+      validate(minified);
       onTransformRef.current?.(minified);
-    } catch {}
-  }, [json]);
+    } catch (e) { setError(e instanceof Error ? e.message : "Cannot minify JSON"); }
+  }, [json, validate]);
 
   const sortKeys = useCallback(() => {
     try {
-      const obj = JSON.parse(json);
-      const sorted = sortObjectKeys(obj);
-      const formatted = JSON.stringify(sorted, null, 2);
+      const formatted = formatJsonPrecisely(json, 2, true);
       setJsonRaw(formatted);
-      setParsed(sorted);
-      setError(null);
+      validate(formatted);
       onTransformRef.current?.(formatted);
-    } catch {}
-  }, [json]);
+    } catch (e) { setError(e instanceof Error ? e.message : "Cannot sort JSON"); }
+  }, [json, validate]);
 
   return { json, setJson, parsed, error, format, minify, sortKeys };
 }

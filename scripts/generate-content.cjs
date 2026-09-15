@@ -50,7 +50,7 @@ export const LEARN_SECTIONS: Array<{
   for (const file of files) {
     const id = file.replace(/\.md$/, "");
     const raw = fs.readFileSync(path.join(LEARN_DIR, file), "utf-8");
-    const { data, content } = matter(raw);
+    const { data, content } = matter(raw.replaceAll("{{toolCount}}", String(fs.readdirSync(TOOLS_DIR).filter((file) => file.endsWith(".md") && file !== "README.md").length)));
     const rawContent = content.trim();
     const excerpt =
       data.excerpt ??
@@ -151,7 +151,7 @@ export const PAGE_SLUGS: string[] = [];
     const slug = file.replace(/\.md$/, "");
     if (RESERVED_SLUGS.includes(slug)) continue;
     const raw = fs.readFileSync(path.join(PAGES_DIR, file), "utf-8");
-    const { data, content } = matter(raw);
+    const { data, content } = matter(raw.replaceAll("{{toolCount}}", String(fs.readdirSync(TOOLS_DIR).filter((file) => file.endsWith(".md") && file !== "README.md").length)));
 
     pages.push({
       slug,
@@ -181,7 +181,7 @@ export const PAGE_SLUGS: string[] = ${JSON.stringify(pages.map((page) => page.sl
 function readSiteFrontmatter(filePath) {
   if (!fs.existsSync(filePath)) return null;
   const raw = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(raw);
+  const { data, content } = matter(raw.replaceAll("{{toolCount}}", String(fs.readdirSync(TOOLS_DIR).filter((file) => file.endsWith(".md") && file !== "README.md").length)));
   return { data, content: content.trim() };
 }
 
@@ -311,7 +311,7 @@ export const TOOL_SLUGS: string[] = [];
   for (const file of files) {
     const slug = file.replace(/\.md$/, "");
     const raw = fs.readFileSync(path.join(TOOLS_DIR, file), "utf-8");
-    const { data, content } = matter(raw);
+    const { data, content } = matter(raw.replaceAll("{{toolCount}}", String(fs.readdirSync(TOOLS_DIR).filter((file) => file.endsWith(".md") && file !== "README.md").length)));
 
     tools.push({
       slug,

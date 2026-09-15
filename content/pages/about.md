@@ -4,7 +4,7 @@ metaTitle: "About JSON Prism — Format, Validate, Diff JSON"
 metaDescription: "JSON Prism is a free, open-source JSON toolkit. Format, validate, diff, and explore JSON in your browser. No data stored. Works offline."
 ---
 
-JSON Prism is a free, open-source JSON workspace that runs entirely in your browser. It combines 19 purpose-built JSON tools in a single interface — no installation required, no sign-up, no data uploaded to a server.
+JSON Prism is a free, open-source JSON workspace that runs entirely in your browser. It combines {{toolCount}} purpose-built JSON tools in a single interface — no installation required, no sign-up, local processing with optional sharing.
 
 ## What JSON Prism does
 
@@ -28,7 +28,7 @@ JSON Prism covers every common JSON task a developer encounters:
 
 ## Privacy
 
-All processing happens locally in your browser. JSON data is never sent to a server unless you explicitly create a share link. The short link feature stores JSON in Cloudflare Workers KV for 30 days — this is entirely opt-in. Analytics are collected via Google Tag Manager in aggregate, with no individual tracking.
+All processing happens locally in your browser. JSON data is never sent to a server unless you explicitly create a short link or send a URL/cURL request. The short link feature stores JSON in Cloudflare Workers KV for 30 days — this is entirely opt-in. We do not load analytics or advertising scripts. Requests you choose to send through URL/cURL and donations use the destination services described in our Privacy Policy.
 
 ## Technical details
 

@@ -1,16 +1,17 @@
 "use client";
 import { useState, useMemo } from "react";
 import { Hash } from "lucide-react";
-import { estimateTokens, estimateCost, MODELS } from "@/lib/token-estimate";
+import { estimateTokens, estimateCost } from "@/lib/token-estimate";
 import { jsonToYaml } from "@/lib/json-to-yaml";
 import { jsonToXml } from "@/lib/json-to-xml";
 import { InfoHelp } from "@/components/app/InfoHelp";
 import { MODES } from "@/lib/modes";
 
 export default function JsonTokenEstimator({ json, parsed }: { json: string; parsed: unknown }) {
-  const [selectedModel, setSelectedModel] = useState(MODELS[0].name);
-
-  const model = MODELS.find(m => m.name === selectedModel) ?? MODELS[0];
+  const [inputRate, setInputRate] = useState("");
+  const [outputRate, setOutputRate] = useState("");
+  const validRate = (rate: string) => rate.trim() !== "" && Number.isFinite(Number(rate)) && Number(rate) >= 0;
+  const model = useMemo(() => ({ name: "Custom rates", inputPricePer1M: Number(inputRate), outputPricePer1M: Number(outputRate) }), [inputRate, outputRate]);
 
   const jsonTokens = useMemo(() => estimateTokens(json), [json]);
   const yamlStr = useMemo(() => { try { return jsonToYaml(parsed); } catch { return ""; } }, [parsed]);
@@ -53,11 +54,9 @@ export default function JsonTokenEstimator({ json, parsed }: { json: string; par
 
           {/* Model selector */}
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2 block">Model</label>
-            <select value={selectedModel} onChange={e => setSelectedModel(e.target.value)}
-              className="w-full bg-secondary text-foreground text-xs rounded-lg px-3 py-2 border border-border">
-              {MODELS.map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
-            </select>
+            <p className="text-xs text-muted-foreground mb-2">Enter current provider rates in USD per million tokens. No bundled model prices; excludes caching, batch discounts and taxes.</p>
+            <label className="text-xs block">Input rate<input type="number" min="0" step="any" value={inputRate} onChange={e => setInputRate(e.target.value)} className="w-full bg-secondary p-2 rounded" /></label>
+            <label className="text-xs block mt-2">Output rate<input type="number" min="0" step="any" value={outputRate} onChange={e => setOutputRate(e.target.value)} className="w-full bg-secondary p-2 rounded" /></label>
           </div>
 
           {/* Cost */}
@@ -66,11 +65,11 @@ export default function JsonTokenEstimator({ json, parsed }: { json: string; par
             <div className="grid grid-cols-2 gap-2">
               <div className="bg-secondary/50 rounded-lg p-3">
                 <div className="text-[10px] text-muted-foreground mb-1">As input</div>
-                <div className="text-sm font-semibold font-mono text-foreground">{cost.input}</div>
+                <div className="text-sm font-semibold font-mono text-foreground">{validRate(inputRate) ? cost.input : "Enter a rate"}</div>
               </div>
               <div className="bg-secondary/50 rounded-lg p-3">
                 <div className="text-[10px] text-muted-foreground mb-1">As output</div>
-                <div className="text-sm font-semibold font-mono text-foreground">{cost.output}</div>
+                <div className="text-sm font-semibold font-mono text-foreground">{validRate(outputRate) ? cost.output : "Enter a rate"}</div>
               </div>
             </div>
           </div>

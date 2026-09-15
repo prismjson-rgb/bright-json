@@ -3,6 +3,7 @@
  */
 
 import { idbGet, idbSet } from "@/lib/json-prism-idb";
+import { readPreference } from "./local-preferences";
 
 const IDB_KEY = "json-prism-tabs-v1";
 const LEGACY_LS_KEY = "json-prism-tabs";
@@ -21,6 +22,7 @@ export interface TabData {
   id: string;
   name: string;
   json: string;
+  notes?: import("@tiptap/react").JSONContent;
   curlMeta?: CurlMeta;
 }
 
@@ -61,12 +63,13 @@ export async function loadTabs(): Promise<TabsState | null> {
     const fromIdb = await idbGet<TabsState>(IDB_KEY);
     const normalized = normalizeTabsState(fromIdb);
     if (normalized) return normalized;
+    if (fromIdb !== undefined) throw new Error("Stored tabs are invalid.");
 
-    const raw = localStorage.getItem(LEGACY_LS_KEY);
+    const raw = readPreference(LEGACY_LS_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as unknown;
     const migrated = normalizeTabsState(parsed);
-    if (!migrated) return null;
+    if (!migrated) throw new Error("Legacy tabs are invalid.");
     await idbSet(IDB_KEY, migrated);
     try {
       localStorage.removeItem(LEGACY_LS_KEY);
@@ -74,8 +77,8 @@ export async function loadTabs(): Promise<TabsState | null> {
       /* ignore */
     }
     return migrated;
-  } catch {
-    return null;
+  } catch (error) {
+    throw new Error("Could not restore tabs. Browser storage is unavailable.", { cause: error });
   }
 }
 
@@ -88,8 +91,8 @@ export async function saveTabs(state: TabsState): Promise<void> {
     } catch {
       /* ignore */
     }
-  } catch {
-    /* ignore */
+  } catch (error) {
+    throw new Error("Tabs and notes are not saved. Export your work before leaving.", { cause: error });
   }
 }
 

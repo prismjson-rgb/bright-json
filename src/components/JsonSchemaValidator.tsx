@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { ShieldCheck, ShieldX, AlertTriangle, FileJson, ChevronRight } from "lucide-react";
 import type { ErrorObject } from "ajv";
-import { validateJsonAgainstSchema, errorPath, type ValidationResult } from "@/lib/json-schema-validate";
+import { errorPath, type ValidationResult } from "@/lib/schema-result";
+import { validateSchemaAsync } from "@/lib/schema-worker-client";
 import { InfoHelp } from "@/components/app/InfoHelp";
 import { MODES } from "@/lib/modes";
 
@@ -27,7 +28,15 @@ export default function JsonSchemaValidator({ json, dark }: { json: string; dark
   const [validation, setValidation] = useState<ValidationResult>({ status: "idle", errors: [] });
 
   useEffect(() => {
-    setValidation(validateJsonAgainstSchema(json, schemaText));
+    if (!json.trim() || !schemaText.trim()) { setValidation({ status: "idle", errors: [] }); return; }
+    const controller = new AbortController();
+    setValidation({ status: "processing", errors: [] });
+    const timer = setTimeout(() => {
+      void validateSchemaAsync(json, schemaText, controller.signal).then((result) => {
+        if (!controller.signal.aborted) setValidation(result);
+      });
+    }, 300);
+    return () => { clearTimeout(timer); controller.abort(); };
   }, [json, schemaText]);
 
   const { status, errors, schemaErrorMsg } = validation;
@@ -37,6 +46,7 @@ export default function JsonSchemaValidator({ json, dark }: { json: string; dark
       <div className="pane-header">
         <ShieldCheck className="w-3.5 h-3.5" />
         <span>Schema Validator</span>
+        {status === "processing" && <span role="status">Validating…</span>}
         {status === "valid" && (
           <span className="ml-auto flex items-center gap-1 text-[10px] font-medium text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
             <ShieldCheck className="w-3 h-3" /> Valid
@@ -59,7 +69,7 @@ export default function JsonSchemaValidator({ json, dark }: { json: string; dark
       <div className="flex flex-col border-b border-border" style={{ height: "42%" }}>
         <div className="flex items-center gap-2 px-3 py-1.5 bg-[hsl(var(--pane-header))] border-b border-border">
           <FileJson className="w-3 h-3 text-muted-foreground" />
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex-1">JSON Schema (Draft 7)</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex-1">JSON Schema (Draft 7 / 2020-12)</span>
           {!schemaText.trim() && (
             <button
               onClick={() => setSchemaText(SAMPLE_SCHEMA)}
@@ -96,13 +106,13 @@ export default function JsonSchemaValidator({ json, dark }: { json: string; dark
               }}
             />
           ) : (
-            <div
-              className="h-full flex flex-col items-center justify-center gap-2 text-muted-foreground cursor-pointer hover:bg-secondary/20 transition-colors p-4"
+            <button type="button"
+              className="h-full w-full flex flex-col items-center justify-center gap-2 text-muted-foreground cursor-pointer hover:bg-secondary/20 transition-colors p-4"
               onClick={() => setSchemaText(SAMPLE_SCHEMA)}
             >
               <FileJson className="w-6 h-6 opacity-30" />
               <p className="text-xs text-center">Paste your JSON Schema here,<br />or click to load a sample</p>
-            </div>
+            </button>
           )}
         </div>
       </div>
@@ -110,7 +120,7 @@ export default function JsonSchemaValidator({ json, dark }: { json: string; dark
       {/* Results */}
       <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
         <div className="flex items-center gap-2 px-3 py-1.5 bg-[hsl(var(--pane-header))] border-b border-border sticky top-0">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Results</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Results (first 100 errors)</span>
         </div>
 
         <div className="flex-1 p-3">

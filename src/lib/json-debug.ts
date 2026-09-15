@@ -1,3 +1,4 @@
+import { assertInputBudget } from "./input-limits";
 import { jsonrepair } from "jsonrepair";
 
 export type IssueType =
@@ -439,6 +440,7 @@ function humanizeError(msg: string): string {
  * @see https://github.com/josdejong/jsonrepair
  */
 export function repairJson(input: string): string {
+  assertInputBudget(input);
   const s = input.trim();
   if (!s) return s;
   if (FENCE_RE.test(s)) return jsonrepair(s); // jsonrepair strips fences natively

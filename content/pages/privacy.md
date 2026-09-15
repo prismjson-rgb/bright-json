@@ -8,13 +8,13 @@ JSON Prism ("we", "our", or "the app") is a fully client-side, browser-based JSO
 
 ## Data we do not collect
 
-JSON Prism processes all JSON data entirely in your browser. We do not:
+Formatting, validation and conversion run in your browser. The optional network features described below send data only when you choose to use them. We do not:
 
-- Transmit, upload, or store any JSON content you paste or type
+- Automatically upload JSON content you paste or type
 - Collect personal information or create user accounts
 - Use cookies for tracking or advertising
-- Share any data with third parties
-- Run any server-side processing of your data
+- Load third-party analytics or advertising scripts
+- Use your editor content for analytics
 
 ## Browser storage
 
@@ -42,7 +42,13 @@ If you click **Create short link** in the Share panel, a compressed, encoded cop
 
 ## Analytics
 
-We use Google Tag Manager for aggregate, privacy-preserving usage analytics (page views, feature usage). GTM loads after the page is interactive to avoid blocking performance. No JSON content or identifiable user data is sent to analytics.
+Google Tag Manager was removed on 15 September 2026. The app does not load analytics or advertising scripts. Cloudflare still processes request metadata to deliver the site and protect its services.
+
+## Requests and donations
+
+When you run a URL/cURL request, your browser sends the URL, headers (including any credentials you supplied) and body to the destination you chose. That service may log the request and receives your IP address. Donation checkout sends payment-related information to Dodo Payments. Notes are saved per tab and are not included in JSON share links.
+
+If device storage is blocked or full, the workspace displays a save warning. Download your JSON and notes before leaving; browser data can also be lost when you clear site data.
 
 ## Third-party libraries
 

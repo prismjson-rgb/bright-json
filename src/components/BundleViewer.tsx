@@ -1,4 +1,5 @@
 "use client";
+import { parseJsonSafe } from "@/lib/precise-json";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -33,7 +34,7 @@ export default function BundleViewer() {
       }
       const p: Record<number, unknown> = {};
       decoded.forEach((entry, i) => {
-        try { p[i] = JSON.parse(entry.json); } catch {}
+        try { p[i] = parseJsonSafe(entry.json); } catch {}
       });
       setEntries(decoded);
       setParsed(p);

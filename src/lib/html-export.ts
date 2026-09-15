@@ -3,7 +3,9 @@
  * an interactive JSON tree viewer, search, expand/collapse, and syntax highlighting.
  * No external dependencies or network calls.
  */
+import { parseJsonSafe } from "./precise-json";
 export function generateHtml(json: string): string {
+  parseJsonSafe(json);
   // Safely embed JSON as a JS string literal
   // Double-encode: JSON string → JSON-stringified → safe to embed in <script>
   const jsonLiteral = JSON.stringify(json)

@@ -1,4 +1,5 @@
 "use client";
+import { parseJsonSafe } from "@/lib/precise-json";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
@@ -24,7 +25,7 @@ export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps
   const { output, error, isEmpty } = useMemo(() => {
     if (!input.trim()) return { output: "", error: null as string | null, isEmpty: true };
     try {
-      const parsed = JSON.parse(input);
+      const parsed = parseJsonSafe(input);
       return { output: JSON.stringify(parsed, null, 2), error: null as string | null, isEmpty: false };
     } catch (e) {
       return { output: "", error: e instanceof Error ? e.message : "Invalid JSON", isEmpty: false };
@@ -33,7 +34,7 @@ export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps
 
   const handleMinify = () => {
     try {
-      setInput(JSON.stringify(JSON.parse(input)));
+      setInput(JSON.stringify(parseJsonSafe(input)));
     } catch {
       /* leave input untouched — the error banner already explains why */
     }

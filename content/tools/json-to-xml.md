@@ -88,3 +88,7 @@ converts to:
 - [JSON Formatter](/tools/json-formatter/) — validate and pretty-print your JSON before converting it
 - [JSON to CSV Converter](/tools/json-to-csv/) — for when the destination is a spreadsheet instead of an XML document
 - [JSON vs XML vs CSV](/learn/json-vs-xml-csv/) — how the three formats differ and when to reach for each
+
+## XML names and characters
+
+Keys and the root name are normalized to valid ASCII XML names: unsupported characters become underscores and invalid starting characters receive an underscore prefix. Colliding normalized keys and characters XML 1.0 cannot represent produce an error. Null values use `xsi:nil` with the namespace declared on the root.

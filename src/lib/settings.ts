@@ -4,6 +4,7 @@
  */
 
 import { idbGet, idbSet } from "@/lib/json-prism-idb";
+import { readPreference } from "./local-preferences";
 
 export interface EditorSettings {
   fontSize: number;
@@ -82,7 +83,7 @@ export async function loadSettings(): Promise<AppSettings> {
       return mergePartial(fromIdb as Partial<AppSettings>);
     }
 
-    const raw = localStorage.getItem(LEGACY_LS_KEY);
+    const raw = readPreference(LEGACY_LS_KEY);
     if (!raw) return DEFAULT_SETTINGS;
     const parsed = JSON.parse(raw) as Partial<AppSettings>;
     const merged = mergePartial(parsed);
@@ -93,8 +94,8 @@ export async function loadSettings(): Promise<AppSettings> {
       /* ignore */
     }
     return merged;
-  } catch {
-    return DEFAULT_SETTINGS;
+  } catch (error) {
+    throw new Error("Settings could not be restored.", { cause: error });
   }
 }
 
@@ -122,8 +123,8 @@ export async function saveSettings(settings: AppSettings): Promise<void> {
     } catch {
       /* ignore */
     }
-  } catch {
-    /* ignore */
+  } catch (error) {
+    throw new Error("Settings could not be saved on this device.", { cause: error });
   }
 }
 

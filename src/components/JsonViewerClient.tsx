@@ -1,4 +1,5 @@
 "use client";
+import { parseJsonSafe, formatJsonPrecisely } from "@/lib/precise-json";
 import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -89,6 +90,7 @@ function isJsonLikeFile(file: File): boolean {
 }
 
 function readFileAsText(file: File): Promise<string> {
+  if (file.size > 4_000_000) return Promise.reject(new Error("File exceeds the 4 MB import limit."));
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -103,6 +105,9 @@ function readFileAsText(file: File): Promise<string> {
 export default function JsonViewerClient() {
   const [tabsState, setTabsState] = useState<TabsState>(getInitialTabs);
   const [tabsHydrated, setTabsHydrated] = useState(false);
+  const [storageReady, setStorageReady] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("Restoring tabs…");
+  const savedTabsRef = useRef<TabsState | null>(null);
   const tabsStateRef = useRef(tabsState);
   tabsStateRef.current = tabsState;
   const activeTab = tabsState.tabs.find((t) => t.id === tabsState.activeId) ?? tabsState.tabs[0];
@@ -191,7 +196,7 @@ export default function JsonViewerClient() {
     if (!json.trim()) return;
     try {
       const fixed = repairJson(json);
-      const obj = JSON.parse(fixed);
+      const obj = parseJsonSafe(fixed);
       const indent = settings.format.beautifyIndent;
       const out = JSON.stringify(obj, null, indent);
       applyFixResult(out, summarizeFixes(issues));
@@ -210,9 +215,11 @@ export default function JsonViewerClient() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const loaded = await loadTabs();
+      let loaded = null;
+      try { loaded = await loadTabs(); if (!cancelled) setStorageReady(true); }
+      catch { if (!cancelled) setSaveStatus("Storage unavailable: export your work before leaving."); }
       if (!cancelled) {
-        if (loaded) setTabsState(loaded);
+        if (loaded) { savedTabsRef.current = loaded; setTabsState(loaded); }
         setTabsHydrated(true);
       }
     })();
@@ -237,29 +244,41 @@ export default function JsonViewerClient() {
 
   // Debounced persist — avoids blocking the main thread on every keystroke
   useEffect(() => {
-    if (!tabsHydrated) return;
+    if (!tabsHydrated || !storageReady) return;
+    setSaveStatus("Unsaved changes…");
     const id = window.setTimeout(() => {
-      void saveTabs(tabsState);
+      setSaveStatus("Saving…");
+      void saveTabs(tabsState).then(() => {
+        savedTabsRef.current = tabsState;
+        if (tabsStateRef.current === tabsState) setSaveStatus("Saved on this device");
+      }).catch(() => setSaveStatus("Not saved: storage blocked or full. Export your work."));
     }, TABS_SAVE_DEBOUNCE_MS);
     return () => window.clearTimeout(id);
-  }, [tabsState, tabsHydrated]);
+  }, [tabsState, tabsHydrated, storageReady]);
 
   // Flush latest tabs when leaving or hiding the tab (debounce may not have run yet)
   useEffect(() => {
     const flush = () => {
-      if (!tabsHydrated) return;
-      void saveTabs(tabsStateRef.current);
+      if (!tabsHydrated || !storageReady) return;
+      const snapshot = tabsStateRef.current;
+      void saveTabs(snapshot).then(() => { savedTabsRef.current = snapshot; }).catch(() => setSaveStatus("Not saved: export your work before leaving."));
+    };
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (tabsHydrated && savedTabsRef.current !== tabsStateRef.current) {
+        event.preventDefault(); event.returnValue = "";
+      }
+      flush();
     };
     const onVisibility = () => {
       if (document.visibilityState === "hidden") flush();
     };
-    window.addEventListener("beforeunload", flush);
+    window.addEventListener("beforeunload", beforeUnload);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      window.removeEventListener("beforeunload", flush);
+      window.removeEventListener("beforeunload", beforeUnload);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [tabsHydrated]);
+  }, [tabsHydrated, storageReady]);
 
   // Load from URL hash after storage hydrate so hash wins over restored tabs
   useEffect(() => {
@@ -394,7 +413,7 @@ export default function JsonViewerClient() {
       const normalized = items.map(({ content, filename }) => {
         let parsed = content;
         try {
-          parsed = JSON.stringify(JSON.parse(content), null, 2);
+          parsed = formatJsonPrecisely(content);
         } catch {
           /* keep raw so user can fix in editor */
         }
@@ -866,6 +885,7 @@ export default function JsonViewerClient() {
                   }}
                 />
               )}
+              {error && <p role="alert" className="px-3 py-2 text-xs text-destructive">{error}</p>}
               <div className="flex-1 min-h-0 relative">
                 <JsonEditor
                   value={json}
@@ -1010,8 +1030,10 @@ export default function JsonViewerClient() {
               {mode === "practices" && <JsonBestPractices parsed={parsed} />}
               {mode === "tokens" && <JsonTokenEstimator json={json} parsed={parsed} />}
               {mode === "schema" && <JsonSchemaValidator json={json} dark={dark} />}
-              {mode === "convert" && <JsonConvertPanel parsed={parsed} dark={dark} initialFormat={launchConfig?.convertFormat} />}
-              {mode === "notes" && <JsonNoteEditor />}
+              {mode === "convert" && <JsonConvertPanel parsed={error || !hasJson ? undefined : parsed} dark={dark} initialFormat={launchConfig?.convertFormat} />}
+              {mode === "notes" && <JsonNoteEditor key={tabsState.activeId} content={activeTab?.notes} onChange={(notes) => {
+                setTabsState((prev) => ({ ...prev, tabs: prev.tabs.map((tab) => tab.id === tabsState.activeId ? { ...tab, notes } : tab) }));
+              }} />}
               {mode === "learn" && (
                 <JsonLearnPanel
                   onTryInEditor={(json) => {
@@ -1098,6 +1120,7 @@ export default function JsonViewerClient() {
 
       <footer className="status-bar flex-wrap gap-y-1.5 px-3 sm:px-4">
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <span role="status">{saveStatus}</span>
           {statusLabel ? (
             <>
               <span>{statusLabel}</span>
@@ -1121,10 +1144,10 @@ export default function JsonViewerClient() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {parsed !== null ? (
+          {!error && hasJson ? (
             <><span className="glow-dot" /><span className="text-primary font-medium">Valid JSON</span></>
           ) : error ? (
-            <><span className="glow-dot-error" /><span className="text-destructive font-medium">Invalid JSON</span></>
+            <><span className="glow-dot-error" /><span className="text-destructive font-medium">Needs attention</span></>
           ) : (
             <span>No input</span>
           )}
