@@ -53,11 +53,11 @@ JSON is typically 40–60% smaller than XML for the same data.
 
 ## When to use JSON
 
-- REST APIs and web services — JSON is the universal default
-- Configuration files — readable and writable by humans and machines
-- Browser-side data storage — `localStorage`, `IndexedDB`
-- Nested or hierarchical data — JSON handles this naturally
-- Any modern language ecosystem — every language has a JSON library
+- REST APIs and web services - JSON is the universal default
+- Configuration files - readable and writable by humans and machines
+- Browser-side data storage - `localStorage`, `IndexedDB`
+- Nested or hierarchical data - JSON handles this naturally
+- Any modern language ecosystem - every language has a JSON library
 
 ```json
 {
@@ -106,4 +106,4 @@ CSV cannot represent nested structures at all. A product with multiple categorie
 
 ## Try it in JSON Prism
 
-Need to convert between these formats? The [JSON Converter](/tools/json-converter/) handles JSON-to-CSV, JSON-to-XML, and the reverse — no manual reformatting required. For a look at other alternatives beyond these three, see [JSON Alternatives](/learn/json-alternatives/).
+Need to convert between these formats? The [JSON Converter](/tools/json-converter/) handles JSON-to-CSV, JSON-to-XML, and the reverse - no manual reformatting required. For a look at other alternatives beyond these three, see [JSON Alternatives](/learn/json-alternatives/).

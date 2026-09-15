@@ -93,7 +93,7 @@ const JsonNode = memo(function JsonNode({ data }: NodeProps) {
         title={d.label}
       >
         {d.lines && d.lines.length > 0 ? (
-          // Grouped primitive properties — one row per property
+          // Grouped primitive properties - one row per property
           <div className="px-4 py-3 space-y-2.5">
             {d.lines.map((line, i) => {
               const pt: PrimitiveType = d.lineTypes?.[i] ?? "null";
@@ -247,7 +247,7 @@ function JsonFlowCanvas({ parsed, dark }: JsonFlowViewProps) {
           <Panel position="top-center" className="m-2">
             <div className="flex items-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-1.5 text-[11px] text-amber-800 dark:text-amber-200/90 max-w-[min(420px,92vw)] text-center leading-snug">
               <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-              Graph truncated — document is very large. Collapse data or use Tree view.
+              Graph truncated - document is very large. Collapse data or use Tree view.
             </div>
           </Panel>
         )}

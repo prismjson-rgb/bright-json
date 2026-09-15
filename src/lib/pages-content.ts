@@ -1,5 +1,5 @@
 /**
- * Static pages — from content/pages/*.md (generated at build)
+ * Static pages - from content/pages/*.md (generated at build)
  */
 
 import {

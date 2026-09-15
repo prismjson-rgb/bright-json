@@ -45,7 +45,7 @@ export default function LeftRail({
         isMobile ? "w-full min-w-0" : iconOnly ? "w-12" : "w-[244px]"
       }`}
     >
-      {/* Header (mobile only — desktop logo lives in top header) */}
+      {/* Header (mobile only - desktop logo lives in top header) */}
       {isMobile && (
         <div className="flex items-center gap-2 px-3 py-3 border-b border-border/60 shrink-0">
           <Logo size="sm" className="min-w-0 flex-1" />
@@ -72,7 +72,7 @@ export default function LeftRail({
           href={DONATE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          title="Support JSON Prism — opens the payment gateway in a new tab"
+          title="Support JSON Prism - opens the payment gateway in a new tab"
           aria-label="Donate"
           className={`inline-flex items-center gap-1.5 rounded-md font-medium border border-primary/30 bg-primary/10 text-foreground hover:bg-primary/20 transition-colors ${
             iconOnly ? "justify-center w-9 h-9" : "w-full justify-start pl-3 pr-14 py-2 text-xs"
@@ -88,7 +88,7 @@ export default function LeftRail({
           <span className="sr-only">Opens the payment gateway in a new tab</span>
         </a>
         {!iconOnly && <InfoHelp
-          text="JSON Prism runs entirely in your browser — no account, no ads, nothing you paste ever touches a server. If it's saved you a headache or two, a small donation keeps it that way and helps me keep building. Never required, always appreciated. ❤️"
+          text="JSON Prism runs entirely in your browser - no account, no ads, nothing you paste ever touches a server. If it's saved you a headache or two, a small donation keeps it that way and helps me keep building. Never required, always appreciated. ❤️"
           label="About Donate"
           side="right"
           className="absolute right-9 top-1/2 -translate-y-1/2"
@@ -96,7 +96,7 @@ export default function LeftRail({
         </div>
       </div>}
 
-      {/* Input section (Import / From URL / Export) — surfaced here because
+      {/* Input section (Import / From URL / Export) - surfaced here because
        *  users kept missing these buried in the editor toolbar, especially
        *  From URL. Keeping it as the first rail group makes the entry
        *  points obvious and gives drag-drop a visible neighbor. */}

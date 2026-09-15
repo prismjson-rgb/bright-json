@@ -1,4 +1,4 @@
-# Learn content — simple Markdown authoring
+# Learn content - simple Markdown authoring
 
 Each article is a `.md` file. The filename (without `.md`) becomes the URL slug, e.g. `what-is-json.md` → `/learn/what-is-json/`.
 
@@ -23,16 +23,16 @@ excerpt: "Short preview"         # Optional; for in-app panel; otherwise auto fr
 
 Use standard Markdown:
 
-- **Paragraphs** — normal text
-- **Lists** — `-` bullets, `1.` numbered
-- **Headings** — `##` for subsections
-- **Code blocks** — use ` ```json ` for JSON (shows "Try in JSON Prism" button)
-- **Inline code** — `` `code` ``
+- **Paragraphs** - normal text
+- **Lists** - `-` bullets, `1.` numbered
+- **Headings** - `##` for subsections
+- **Code blocks** - use ` ```json ` for JSON (shows "Try in JSON Prism" button)
+- **Inline code** - `` `code` ``
 
 ### Code block languages
 
-- ` ```json ` — JSON with "Try in JSON Prism" button
-- ` ```text ` or ` ``` ` — plain code, no button
+- ` ```json ` - JSON with "Try in JSON Prism" button
+- ` ```text ` or ` ``` ` - plain code, no button
 
 ## Regenerating
 
@@ -42,4 +42,4 @@ After editing, run:
 npm run generate:content
 ```
 
-Or start dev (`npm run dev`) — it runs the generator automatically.
+Or start dev (`npm run dev`) - it runs the generator automatically.

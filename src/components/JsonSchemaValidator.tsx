@@ -134,7 +134,7 @@ export default function JsonSchemaValidator({ json, dark }: { json: string; dark
           {status === "json-error" && (
             <div className="flex items-start gap-2 rounded-lg bg-amber-500/8 border border-amber-500/20 p-3 text-xs text-amber-600 dark:text-amber-400">
               <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-              The JSON in the editor is not valid — fix it before validating against a schema.
+              The JSON in the editor is not valid - fix it before validating against a schema.
             </div>
           )}
 

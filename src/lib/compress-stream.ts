@@ -1,7 +1,7 @@
 /**
  * URL-safe encoder/decoder using the browser-native CompressionStream API.
  *
- * "deflate-raw" is preferred — it has zero header/footer overhead, so it
+ * "deflate-raw" is preferred - it has zero header/footer overhead, so it
  * produces the smallest output, which matters for URL fragments where every
  * byte shows up in the shared link.
  *

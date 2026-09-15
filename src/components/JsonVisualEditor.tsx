@@ -402,7 +402,7 @@ export default function JsonVisualEditor({ parsed, onChange, dark }: JsonVisualE
     <div className="h-full overflow-auto p-4">
       <div className="mb-4 pb-3 border-b border-border">
         <p className="text-xs text-muted-foreground">
-          Edit JSON visually — no coding required. Add, remove, and change values using the form
+          Edit JSON visually - no coding required. Add, remove, and change values using the form
           below. Changes sync with the code editor.
         </p>
       </div>

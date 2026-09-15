@@ -21,7 +21,7 @@ function analyzeIssues(parsed: unknown, stats: JsonStructure | null): Issue[] {
   }
 
   if (stats.nullCount > 0) {
-    issues.push({ severity: "info", title: `${stats.nullCount} null value${stats.nullCount > 1 ? "s" : ""}`, description: "Null values add payload size without conveying data.", suggestion: "Consider omitting null keys to reduce payload — use Minimal Mode" });
+    issues.push({ severity: "info", title: `${stats.nullCount} null value${stats.nullCount > 1 ? "s" : ""}`, description: "Null values add payload size without conveying data.", suggestion: "Consider omitting null keys to reduce payload - use Minimal Mode" });
   }
 
   if (stats.longestKeyLength > 25) {

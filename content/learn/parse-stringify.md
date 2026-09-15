@@ -2,7 +2,7 @@
 title: Parsing and Stringifying
 level: practical
 order: 10
-metaTitle: "JSON.parse() and JSON.stringify() — Complete Guide"
+metaTitle: "JSON.parse() and JSON.stringify() - Complete Guide"
 metaDescription: "Convert JSON text to objects with JSON.parse. Convert objects to JSON with JSON.stringify. Learn revivers, replacers, and pretty-printing."
 keyTerms: []
 relatedTools: [json-formatter, json-validator, json-to-string, string-to-json]
@@ -10,9 +10,9 @@ relatedLearn: [parse-json-javascript, parse-json-python, pretty-vs-minified]
 publishedAt: "2025-12-08"
 ---
 
-`JSON.parse()` converts a JSON string into a JavaScript object. `JSON.stringify()` does the opposite — it converts a JavaScript object into a JSON string. These two functions are the core of JSON handling in the browser and Node.js. Every other language has equivalents with the same semantics.
+`JSON.parse()` converts a JSON string into a JavaScript object. `JSON.stringify()` does the opposite - it converts a JavaScript object into a JSON string. These two functions are the core of JSON handling in the browser and Node.js. Every other language has equivalents with the same semantics.
 
-## JSON.parse() — string to object
+## JSON.parse() - string to object
 
 ```json
 {"name": "Alice", "age": 30, "active": true}
@@ -37,7 +37,7 @@ try {
 }
 ```
 
-## JSON.stringify() — object to string
+## JSON.stringify() - object to string
 
 ```javascript
 const user = { name: "Alice", age: 30, active: true };
@@ -95,7 +95,7 @@ JSON.stringify(user, ["name", "age"]);
 
 ## Using a reviver to transform on parse
 
-The second argument to `JSON.parse()` is a reviver function — useful for converting date strings back to `Date` objects:
+The second argument to `JSON.parse()` is a reviver function - useful for converting date strings back to `Date` objects:
 
 ```javascript
 const str = '{"name":"Alice","createdAt":"2024-01-15T00:00:00Z"}';
@@ -118,4 +118,4 @@ console.log(obj.createdAt instanceof Date); // true
 
 ## Try it in JSON Prism
 
-Paste a JSON string into the [JSON Formatter](/tools/json-formatter/) to visualize what `JSON.parse()` would produce. Run it through the [JSON Validator](/tools/json-validator/) first if you suspect the string may be malformed — it will catch the issue before your code throws a runtime error.
+Paste a JSON string into the [JSON Formatter](/tools/json-formatter/) to visualize what `JSON.parse()` would produce. Run it through the [JSON Validator](/tools/json-validator/) first if you suspect the string may be malformed - it will catch the issue before your code throws a runtime error.

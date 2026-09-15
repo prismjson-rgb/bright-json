@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 const courseLd = {
   "@context": "https://schema.org",
   "@type": "Course",
-  name: content.heroTitle || "Complete JSON Tutorial — From Beginner to Expert",
+  name: content.heroTitle || "Complete JSON Tutorial - From Beginner to Expert",
   description: DESCRIPTION,
   provider: { "@type": "Organization", name: "JSON Prism", url: `${BASE}/` },
   hasCourseInstance: { "@type": "CourseInstance", courseMode: "online", courseWorkload: "PT5H" },

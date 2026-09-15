@@ -1,5 +1,5 @@
 import { parseJsonSafe } from "@/lib/precise-json";
-// Lightweight fake data generator — no external dependencies
+// Lightweight fake data generator - no external dependencies
 
 const firstNames = ["Alice","Bob","Carlos","Diana","Eve","Frank","Grace","Henry","Isabel","Jack","Karen","Liam","Maya","Noah","Olivia","Peter","Quinn","Rachel","Sam","Tara","Uma","Victor","Wendy","Xander","Yara","Zoe"];
 const lastNames = ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Wilson","Moore","Taylor","Anderson","Thomas","Jackson","White","Harris","Martin","Thompson","Young","Allen"];
@@ -56,7 +56,7 @@ export function inferType(value: unknown): CustomField["type"] | null {
     if (DATE_RE.test(value)) return "date";
     return "string";
   }
-  return null; // object, array, null — skip
+  return null; // object, array, null - skip
 }
 
 export function inferFieldsFromJson(jsonStr: string): CustomField[] | null {

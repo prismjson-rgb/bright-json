@@ -5,7 +5,7 @@ import { safeJsonLd } from "@/lib/json-ld";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 
-const TITLE = "JSON Tools — Formatter, Validator, Diff & More | JSON Prism";
+const TITLE = "JSON Tools - Formatter, Validator, Diff & More | JSON Prism";
 const DESCRIPTION =
   `Free online JSON tools: format, validate, diff, convert, and debug JSON in your browser. No install, no sign-up. ${getAllTools().length} tools in one workspace.`;
 

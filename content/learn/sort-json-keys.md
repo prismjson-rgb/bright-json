@@ -1,7 +1,7 @@
 ---
 title: "Sorting JSON Keys Alphabetically"
 metaTitle: "Sort JSON Keys for Clean Diffs & Stable Output"
-metaDescription: "Sorting object keys makes JSON deterministic — smaller git diffs, fewer merge conflicts, stable hashes. Learn how to sort keys and when not to."
+metaDescription: "Sorting object keys makes JSON deterministic - smaller git diffs, fewer merge conflicts, stable hashes. Learn how to sort keys and when not to."
 level: practical
 order: 49
 keyTerms: [sort json keys, deterministic, git diff, canonical json, stable order]
@@ -11,11 +11,11 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** Sorting an object's keys alphabetically makes JSON **deterministic** — the same data always serializes the same way. That means smaller git diffs, fewer merge conflicts, and stable hashes for caching or signatures. Key order has **no effect on the data's meaning**, so sorting is safe. Sort and reformat in one step with the [JSON Formatter](/tools/json-formatter/).
+**Quick answer:** Sorting an object's keys alphabetically makes JSON **deterministic** - the same data always serializes the same way. That means smaller git diffs, fewer merge conflicts, and stable hashes for caching or signatures. Key order has **no effect on the data's meaning**, so sorting is safe. Sort and reformat in one step with the [JSON Formatter](/tools/json-formatter/).
 
 ![Sorting object keys alphabetically produces a deterministic order, which shrinks diffs and avoids merge conflicts.](/learn/sort-json-keys.svg)
 
-## Why order doesn't change meaning — but still matters
+## Why order doesn't change meaning - but still matters
 
 JSON objects are **unordered** by definition: `{"a":1,"b":2}` and `{"b":2,"a":1}` represent the same data, and parsers treat them identically. So sorting keys never changes what the JSON *means*.
 
@@ -52,14 +52,14 @@ import json
 json.dumps(data, sort_keys=True, indent=2)
 ```
 
-Note that sorting recurses into nested objects but **must not reorder arrays** — array order *is* meaningful data, unlike object key order.
+Note that sorting recurses into nested objects but **must not reorder arrays** - array order *is* meaningful data, unlike object key order.
 
 ## When not to sort
 
 - **When key order is intentional for humans.** A config grouped by concern (server settings together, then logging) can read better than alphabetical. Sorting flattens that intent.
-- **Inside arrays.** Never sort array *elements* as a side effect — that changes the data. Only object keys are safe to reorder.
+- **Inside arrays.** Never sort array *elements* as a side effect - that changes the data. Only object keys are safe to reorder.
 
-For a canonical, byte-stable form used in signing, sorting keys is one half of "canonical JSON"; the other half is consistent whitespace — see [Pretty vs Minified JSON](/learn/pretty-vs-minified/). To confirm two documents are equivalent regardless of key order, use the [JSON Diff Viewer](/tools/json-diff-viewer/).
+For a canonical, byte-stable form used in signing, sorting keys is one half of "canonical JSON"; the other half is consistent whitespace - see [Pretty vs Minified JSON](/learn/pretty-vs-minified/). To confirm two documents are equivalent regardless of key order, use the [JSON Diff Viewer](/tools/json-diff-viewer/).
 
 ## Frequently asked questions
 

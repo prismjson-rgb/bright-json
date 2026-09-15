@@ -1,5 +1,5 @@
 ---
-title: JSON Syntax Rules — The Golden Rules
+title: JSON Syntax Rules - The Golden Rules
 level: beginner
 order: 4
 metaTitle: "JSON Syntax Rules Explained (With Examples)"
@@ -14,13 +14,13 @@ JSON has a small, precise grammar. Break any of these rules and every parser wil
 
 ## The seven golden rules
 
-1. **Keys must be double-quoted strings** — `"name"`, not `name` or `'name'`
-2. **Strings must use double quotes** — single quotes are never valid
-3. **No trailing commas** — no comma after the last item in an object or array
-4. **No comments** — JSON has no `//` or `/* */` syntax
-5. **`true`, `false`, and `null` are lowercase** — `True`, `False`, `Null` are all invalid
-6. **Numbers have no quotes** — write `42`, not `"42"` (unless you want a string)
-7. **The root must be a valid JSON value** — object, array, string, number, boolean, or null
+1. **Keys must be double-quoted strings** - `"name"`, not `name` or `'name'`
+2. **Strings must use double quotes** - single quotes are never valid
+3. **No trailing commas** - no comma after the last item in an object or array
+4. **No comments** - JSON has no `//` or `/* */` syntax
+5. **`true`, `false`, and `null` are lowercase** - `True`, `False`, `Null` are all invalid
+6. **Numbers have no quotes** - write `42`, not `"42"` (unless you want a string)
+7. **The root must be a valid JSON value** - object, array, string, number, boolean, or null
 
 ## Valid examples
 
@@ -54,25 +54,25 @@ A valid nested structure:
 
 ## Invalid examples and why they fail
 
-Single quotes — invalid:
+Single quotes - invalid:
 
 ```json
 {'name': 'Alice'}
 ```
 
-Trailing comma — invalid:
+Trailing comma - invalid:
 
 ```json
 {"name": "Alice", "age": 30,}
 ```
 
-Unquoted key — invalid:
+Unquoted key - invalid:
 
 ```json
 {name: "Alice"}
 ```
 
-Comment — invalid:
+Comment - invalid:
 
 ```json
 {
@@ -81,7 +81,7 @@ Comment — invalid:
 }
 ```
 
-Uppercase boolean — invalid:
+Uppercase boolean - invalid:
 
 ```json
 {"active": True}
@@ -89,19 +89,19 @@ Uppercase boolean — invalid:
 
 ## Why no comments in JSON?
 
-Douglas Crockford intentionally removed comments from JSON because he observed that developers were using them to hold parsing directives — turning JSON into a configuration language with side effects. JSON is a pure data format. If you need comments, consider JSONC (used by VS Code) or YAML, or store comments as a `_comment` string field.
+Douglas Crockford intentionally removed comments from JSON because he observed that developers were using them to hold parsing directives - turning JSON into a configuration language with side effects. JSON is a pure data format. If you need comments, consider JSONC (used by VS Code) or YAML, or store comments as a `_comment` string field.
 
 ## What about JSON5?
 
-JSON5 relaxes several of these rules — it allows comments, trailing commas, single quotes, and unquoted keys. But JSON5 is not JSON. Standard parsers like `JSON.parse()` will reject JSON5 syntax. Use JSON5 only if your toolchain explicitly supports it.
+JSON5 relaxes several of these rules - it allows comments, trailing commas, single quotes, and unquoted keys. But JSON5 is not JSON. Standard parsers like `JSON.parse()` will reject JSON5 syntax. Use JSON5 only if your toolchain explicitly supports it.
 
 ## Frequently asked questions
 
 **What are two syntax rules for writing a JSON array?**
-A JSON array is enclosed in square brackets `[ ]`, with elements separated by commas and no trailing comma after the last item — `["apple", "banana", "cherry"]` is valid, `["apple", "banana",]` is not.
+A JSON array is enclosed in square brackets `[ ]`, with elements separated by commas and no trailing comma after the last item - `["apple", "banana", "cherry"]` is valid, `["apple", "banana",]` is not.
 
 **Can a JSON array contain mixed types?**
-Yes. `[1, "two", true, null]` is valid JSON — array elements don't need to share a type. Keeping them uniform is a best practice for predictability, not a syntax requirement.
+Yes. `[1, "two", true, null]` is valid JSON - array elements don't need to share a type. Keeping them uniform is a best practice for predictability, not a syntax requirement.
 
 ## Try it in JSON Prism
 

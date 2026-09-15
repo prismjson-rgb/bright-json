@@ -11,13 +11,13 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** Flattening turns nested JSON into a **single-level object whose keys are dotted paths** — `{"user":{"address":{"city":"Paris"}}}` becomes `{"user.address.city":"Paris"}`. It's how you make deep data easy to query, diff, or export to CSV. Watch out for arrays and key collisions. Explore a document's nesting first with the [JSON Structure Analyzer](/tools/json-structure-analyzer/).
+**Quick answer:** Flattening turns nested JSON into a **single-level object whose keys are dotted paths** - `{"user":{"address":{"city":"Paris"}}}` becomes `{"user.address.city":"Paris"}`. It's how you make deep data easy to query, diff, or export to CSV. Watch out for arrays and key collisions. Explore a document's nesting first with the [JSON Structure Analyzer](/tools/json-structure-analyzer/).
 
 ![A nested JSON object is converted into a flat object whose keys are dotted paths such as user.address.city.](/learn/flatten-nested-json.svg)
 
 ## What flattening does
 
-Each *leaf* value (a string, number, boolean, or null) keeps its value, but its key becomes the **full path** from the root, joined by a delimiter — usually `.`:
+Each *leaf* value (a string, number, boolean, or null) keeps its value, but its key becomes the **full path** from the root, joined by a delimiter - usually `.`:
 
 ```json
 { "user": { "name": "Ada", "address": { "city": "Paris" } } }
@@ -39,7 +39,7 @@ Now every value is one key lookup away, with no traversal. This is exactly the s
 - Keep the array as a value at `tags`.
 - Join into a string: `tags = "a,b"`.
 
-Pick one and apply it consistently — and remember that index-based keys make the flat shape sensitive to array order.
+Pick one and apply it consistently - and remember that index-based keys make the flat shape sensitive to array order.
 
 **Key collisions.** If a real key already contains a dot (`{"a.b": 1}`), it can collide with a flattened path. Choose a delimiter your keys don't use (some tools use `/` or `__`), or escape literal dots.
 

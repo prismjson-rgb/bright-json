@@ -1,7 +1,7 @@
 ---
 title: JSON Token Estimator
 metaTitle: JSON Token Estimator | Free, Private LLM Token Counter
-metaDescription: Estimate LLM token cost for any JSON payload instantly. 100% browser-based — nothing is uploaded, no signup required.
+metaDescription: Estimate LLM token cost for any JSON payload instantly. 100% browser-based - nothing is uploaded, no signup required.
 summary: Understand the likely token footprint of JSON before it reaches an LLM.
 category: AI analysis
 appHref: /app/?tool=json-token-estimator
@@ -28,23 +28,23 @@ faqs:
   - question: "Which tokenizer does the JSON Token Estimator use?"
     answer: "It uses a rough character-based estimate: 3.8 characters per token. It does not run a model tokenizer. Use your provider's tokenizer for exact counts and enter current provider rates for cost estimates."
 ---
-The JSON Token Estimator approximates how many LLM tokens a JSON payload will consume before you send it to a model. Token cost is not obvious from file size alone — whitespace, key repetition, and verbose string values all inflate the count in ways that differ from what the byte count suggests. When you are managing a context window budget, comparing compressed versus pretty-printed formats, or trying to fit structured data into a prompt without hitting limits, the estimator gives you a fast, concrete estimate to work from.
+The JSON Token Estimator approximates how many LLM tokens a JSON payload will consume before you send it to a model. Token cost is not obvious from file size alone - whitespace, key repetition, and verbose string values all inflate the count in ways that differ from what the byte count suggests. When you are managing a context window budget, comparing compressed versus pretty-printed formats, or trying to fit structured data into a prompt without hitting limits, the estimator gives you a fast, concrete estimate to work from.
 
 ## How to use the JSON Token Estimator
 
 1. Paste your JSON payload into the input panel.
 2. The estimator divides character count by 3.8; it does not run a model tokenizer.
 3. Read the estimated token count for the current format.
-4. Toggle to a minified version of the payload and compare — whitespace adds tokens, and the difference is often larger than expected.
+4. Toggle to a minified version of the payload and compare - whitespace adds tokens, and the difference is often larger than expected.
 5. If the count is too high, use [JSON Minimal Mode](/tools/json-minimal-mode/) to filter fields, then re-estimate.
 
 ## What it fixes
 
 - Sending a 3 KB JSON payload to a model and not realizing it consumes 900+ tokens before any instruction text
-- Guessing that pretty-printed and minified JSON cost the same — they do not; indentation whitespace adds real token overhead
+- Guessing that pretty-printed and minified JSON cost the same - they do not; indentation whitespace adds real token overhead
 - Designing prompts around "small" payloads that turn out to be large once tokenized
 - No visibility into how much of a model's context window your structured data is consuming versus the instructions and examples around it
-- Iterating blind: change payload, send, check cost — instead of estimating first and trimming before the API call
+- Iterating blind: change payload, send, check cost - instead of estimating first and trimming before the API call
 
 ## JSON code example
 
@@ -87,9 +87,9 @@ The pretty-printed version of a full page with 20 records may consume 1,200–1,
 
 ## Related tools and articles
 
-- [AI JSON Cleaner](/tools/ai-json-cleaner/) — clean up raw LLM output before estimating its token cost for a subsequent request
-- [JSON Trimmer](/tools/json-trimmer/) — remove comments and non-standard syntax that add tokens without adding meaning
-- [Performance and Large Files](/learn/performance-large-files/) — techniques for handling large JSON payloads efficiently across parsing, storage, and model contexts
+- [AI JSON Cleaner](/tools/ai-json-cleaner/) - clean up raw LLM output before estimating its token cost for a subsequent request
+- [JSON Trimmer](/tools/json-trimmer/) - remove comments and non-standard syntax that add tokens without adding meaning
+- [Performance and Large Files](/learn/performance-large-files/) - techniques for handling large JSON payloads efficiently across parsing, storage, and model contexts
 
 ## Pricing estimates
 

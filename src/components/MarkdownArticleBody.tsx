@@ -42,7 +42,7 @@ const LANG_LABELS: Record<string, string> = {
   plaintext: "TEXT",
 };
 
-// Recursively pull the raw text out of React children — needed because, with
+// Recursively pull the raw text out of React children - needed because, with
 // syntax highlighting, a code block's children are nested <span> nodes rather
 // than a plain string. The raw text drives the "Try in JSON Prism" button and
 // the JSON-detection heuristic.

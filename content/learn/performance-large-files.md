@@ -9,7 +9,7 @@ relatedLearn: [minify-json, flatten-nested-json, count-json-tokens-llm]
 publishedAt: "2025-12-11"
 ---
 
-Parsing a large JSON file is straightforward until it is not. A 5MB file parses instantly. A 500MB file can freeze a browser tab, exhaust a server's memory, or trigger a timeout. Understanding how parsers work — and the alternatives when they break down — is essential for working with production data at scale.
+Parsing a large JSON file is straightforward until it is not. A 5MB file parses instantly. A 500MB file can freeze a browser tab, exhaust a server's memory, or trigger a timeout. Understanding how parsers work - and the alternatives when they break down - is essential for working with production data at scale.
 
 ## Why large JSON is slow
 
@@ -17,10 +17,10 @@ Standard JSON parsers (like `JSON.parse()`) load the entire file into memory and
 
 ## What counts as "large"?
 
-- Under 1MB — no concern, parse normally
-- 1–10MB — consider streaming if you only need part of the data
-- 10–50MB — streaming recommended; loading fully will be slow and may cause issues
-- Over 50MB — do not load fully; streaming or pre-processing required
+- Under 1MB - no concern, parse normally
+- 1–10MB - consider streaming if you only need part of the data
+- 10–50MB - streaming recommended; loading fully will be slow and may cause issues
+- Over 50MB - do not load fully; streaming or pre-processing required
 
 ## Streaming parsers: process chunk by chunk
 
@@ -100,19 +100,19 @@ Cursor-based pagination (using a cursor token instead of page numbers) is more e
 
 For data volumes where even streaming JSON is too slow, consider:
 
-- **MessagePack** — binary JSON equivalent, typically 20–50% smaller, 2–5x faster to parse
-- **BSON** — binary JSON used by MongoDB, supports more types
-- **Parquet** — columnar format ideal for analytics on millions of records
-- **Arrow** — in-memory columnar format with near-zero deserialization cost
+- **MessagePack** - binary JSON equivalent, typically 20–50% smaller, 2–5x faster to parse
+- **BSON** - binary JSON used by MongoDB, supports more types
+- **Parquet** - columnar format ideal for analytics on millions of records
+- **Arrow** - in-memory columnar format with near-zero deserialization cost
 
 ## Reduce file size before parsing
 
 Before paying the cost of parsing a huge JSON file, reduce it:
 
-- Minify first — remove whitespace (saves 15–30%)
-- Remove unused fields — if you only need 3 of 50 keys, strip the rest before parsing
-- Compress — gzip typically reduces JSON by 70–90%; always use it for API transfers
+- Minify first - remove whitespace (saves 15–30%)
+- Remove unused fields - if you only need 3 of 50 keys, strip the rest before parsing
+- Compress - gzip typically reduces JSON by 70–90%; always use it for API transfers
 
 ## Try it in JSON Prism
 
-The [JSON Token Estimator](/tools/json-token-estimator/) counts tokens in your JSON payload — useful for understanding costs when sending JSON to LLM APIs with token limits. To strip unused fields and reduce file size before processing, use the [JSON Trimmer](/tools/json-trimmer/).
+The [JSON Token Estimator](/tools/json-token-estimator/) counts tokens in your JSON payload - useful for understanding costs when sending JSON to LLM APIs with token limits. To strip unused fields and reduce file size before processing, use the [JSON Trimmer](/tools/json-trimmer/).

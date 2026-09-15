@@ -9,7 +9,7 @@ relatedLearn: [minify-json, parse-stringify]
 publishedAt: "2025-12-03"
 ---
 
-Pretty-printed JSON uses indentation and newlines for human readability. Minified JSON removes all unnecessary whitespace to reduce file size. The data is identical — only the formatting differs. Knowing when to use each form is a practical skill for any developer working with APIs or config files.
+Pretty-printed JSON uses indentation and newlines for human readability. Minified JSON removes all unnecessary whitespace to reduce file size. The data is identical - only the formatting differs. Knowing when to use each form is a practical skill for any developer working with APIs or config files.
 
 ## What is pretty-printed JSON?
 
@@ -50,7 +50,7 @@ Use minified JSON for:
 
 ## How much size difference does minification make?
 
-For small documents the difference is trivial. For large API responses or files with many short keys, minification typically saves 15–30% of bytes. With gzip compression applied on top, the gap narrows further — but minifying before compressing still helps.
+For small documents the difference is trivial. For large API responses or files with many short keys, minification typically saves 15–30% of bytes. With gzip compression applied on top, the gap narrows further - but minifying before compressing still helps.
 
 ## Does formatting change the data?
 
@@ -85,7 +85,7 @@ const minified = JSON.stringify(JSON.parse(jsonString));
 const pretty = JSON.stringify(JSON.parse(jsonString), null, 2);
 ```
 
-Or use a tool — no code required.
+Or use a tool - no code required.
 
 ## Try it in JSON Prism
 

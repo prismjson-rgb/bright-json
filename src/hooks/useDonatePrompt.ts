@@ -16,11 +16,11 @@ function markDismissed() {
 
 /**
  * Surfaces the donate prompt once someone has had real JSON open and the tab
- * visible for 10 cumulative active minutes in this session — not just an idle
+ * visible for 10 cumulative active minutes in this session - not just an idle
  * tab left open in the background. Dismissing it (any way: the X, "Maybe
  * later", clicking outside, Escape) is permanent for this browser; it never
  * asks again. There's no server here, so localStorage is the only memory we
- * have — that's the deliberate tradeoff of a static site.
+ * have - that's the deliberate tradeoff of a static site.
  */
 export function useDonatePrompt(hasJson: boolean): { open: boolean; dismiss: () => void } {
   const [open, setOpen] = useState(false);
@@ -43,7 +43,7 @@ export function useDonatePrompt(hasJson: boolean): { open: boolean; dismiss: () 
     return () => clearInterval(interval);
   }, []);
 
-  // Dev-only console helper — the 10-minute timer is impractical to sit
+  // Dev-only console helper - the 10-minute timer is impractical to sit
   // through while testing. Never runs in production builds.
   useEffect(() => {
     if (process.env.NODE_ENV === "production") return;

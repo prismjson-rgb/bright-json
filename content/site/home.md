@@ -1,6 +1,6 @@
 ---
 title: JSON Prism
-metaTitle: JSON Prism | All-in-One JSON Toolkit — {{toolCount}} Free Tools
+metaTitle: JSON Prism | All-in-One JSON Toolkit - {{toolCount}} Free Tools
 metaDescription: Format, validate, edit, diff, and convert JSON in one free browser-based workspace. {{toolCount}} tools, no sign-up, local processing with optional sharing.
 faqs:
   - question: Is JSON Prism free to use?

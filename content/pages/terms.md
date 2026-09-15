@@ -1,7 +1,7 @@
 ---
 title: "Terms & Conditions"
-metaTitle: "Terms & Conditions — JSON Prism"
-metaDescription: "Terms and conditions for using JSON Prism — a free, browser-based JSON formatting, validation, diff, and conversion tool."
+metaTitle: "Terms & Conditions - JSON Prism"
+metaDescription: "Terms and conditions for using JSON Prism - a free, browser-based JSON formatting, validation, diff, and conversion tool."
 ---
 
 By accessing or using JSON Prism ("the app", "we", "our"), you agree to be bound by these Terms & Conditions. If you do not agree with any part of these terms, please discontinue use of the app immediately.
@@ -26,7 +26,7 @@ JSON Prism is a free, browser-based tool that provides the following functionali
 - Share via URL fragment or optional 30-day short link
 - Optional, voluntary one-time donation via a third-party payment processor
 
-All processing occurs locally in your browser. JSON content is never sent to any server except when you explicitly opt in to short links, send a URL/cURL request to a destination service, or choose to make a donation — see the Privacy Policy for details.
+All processing occurs locally in your browser. JSON content is never sent to any server except when you explicitly opt in to short links, send a URL/cURL request to a destination service, or choose to make a donation - see the Privacy Policy for details.
 
 ## Use license
 
@@ -54,7 +54,7 @@ A donation is a voluntary contribution, not a purchase of goods, services, or a 
 
 ### No refund policy
 
-All donations made through JSON Prism are final and non-refundable. Because a donation is a voluntary contribution rather than payment for goods or services, we do not provide refunds, credits, or exchanges for any donation amount, except where required by applicable law. If you believe a donation was made in error — for example, a duplicate or unauthorized charge — contact Dodo Payments directly, as they act as merchant of record and handle all billing inquiries and payment disputes.
+All donations made through JSON Prism are final and non-refundable. Because a donation is a voluntary contribution rather than payment for goods or services, we do not provide refunds, credits, or exchanges for any donation amount, except where required by applicable law. If you believe a donation was made in error - for example, a duplicate or unauthorized charge - contact Dodo Payments directly, as they act as merchant of record and handle all billing inquiries and payment disputes.
 
 ## Disclaimer of warranties
 
@@ -64,7 +64,7 @@ We do not warrant that the app will be error-free, uninterrupted, secure, or tha
 
 ## Limitation of liability
 
-To the fullest extent permitted by applicable law, JSON Prism and its contributors shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the app, including but not limited to loss of data, loss of profits, or business interruption — even if advised of the possibility of such damages.
+To the fullest extent permitted by applicable law, JSON Prism and its contributors shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the app, including but not limited to loss of data, loss of profits, or business interruption - even if advised of the possibility of such damages.
 
 ## Third-party content
 

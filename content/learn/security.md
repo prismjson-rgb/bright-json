@@ -10,7 +10,7 @@ relatedLearn: [validate-webhook-payloads, escaping-special-chars]
 publishedAt: "2025-12-11"
 ---
 
-JSON is a data format, not an execution format — but that does not make it safe by default. When your application receives JSON from an untrusted source (a user, a third-party API, a webhook), a range of security issues can arise if you process it without care.
+JSON is a data format, not an execution format - but that does not make it safe by default. When your application receives JSON from an untrusted source (a user, a third-party API, a webhook), a range of security issues can arise if you process it without care.
 
 ## Never use eval() to parse JSON
 
@@ -22,7 +22,7 @@ Dangerous (never do this):
 const data = eval("(" + jsonString + ")");
 ```
 
-Always use `JSON.parse()`, which only parses data — it cannot execute code:
+Always use `JSON.parse()`, which only parses data - it cannot execute code:
 
 ```javascript
 const data = JSON.parse(jsonString); // safe
@@ -44,7 +44,7 @@ Syntactically valid JSON can still be semantically harmful. An API that expects 
 }
 ```
 
-`additionalProperties: false` is especially important — it prevents unexpected keys from being processed by downstream code.
+`additionalProperties: false` is especially important - it prevents unexpected keys from being processed by downstream code.
 
 ## Limit parsing depth to prevent stack overflow
 

@@ -11,11 +11,11 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** Plain JSON has no comments and no trailing commas. **JSONC** is "JSON with Comments" — it adds `//` and `/* */` comments (and tolerates trailing commas), popularized by VS Code. **JSON5** is a larger superset that also allows unquoted keys, single quotes, and more relaxed numbers. Use **JSONC** for config in tools that already accept it; use **JSON5** when you want fully human-friendly config and control the parser. Strip either back to strict JSON with the [JSON Trimmer](/tools/json-trimmer/).
+**Quick answer:** Plain JSON has no comments and no trailing commas. **JSONC** is "JSON with Comments" - it adds `//` and `/* */` comments (and tolerates trailing commas), popularized by VS Code. **JSON5** is a larger superset that also allows unquoted keys, single quotes, and more relaxed numbers. Use **JSONC** for config in tools that already accept it; use **JSON5** when you want fully human-friendly config and control the parser. Strip either back to strict JSON with the [JSON Trimmer](/tools/json-trimmer/).
 
 ## Why plain JSON has neither
 
-JSON ([RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)) is a data-interchange format with a deliberately minimal grammar — no [comments](/learn/syntax-rules/), no [trailing commas](/learn/fixing-trailing-commas/), [double quotes only](/learn/fix-single-quotes-json/), [quoted keys](/learn/fix-unquoted-keys-json/). That strictness is a feature for machine-to-machine data, but a pain for hand-edited config files where you'd like to leave a note or reorder lines cleanly. JSONC and JSON5 exist to fill that gap.
+JSON ([RFC 8259](https://www.rfc-editor.org/rfc/rfc8259)) is a data-interchange format with a deliberately minimal grammar - no [comments](/learn/syntax-rules/), no [trailing commas](/learn/fixing-trailing-commas/), [double quotes only](/learn/fix-single-quotes-json/), [quoted keys](/learn/fix-unquoted-keys-json/). That strictness is a feature for machine-to-machine data, but a pain for hand-edited config files where you'd like to leave a note or reorder lines cleanly. JSONC and JSON5 exist to fill that gap.
 
 ## What each one allows
 
@@ -59,7 +59,7 @@ JSON5 goes further for human-authored files:
 }
 ```
 
-Choose JSON5 when configs are complex enough that readability really matters and you're willing to add the `json5` parser to your toolchain. The cost is that JSON5 is *not* JSON — `JSON.parse()` will reject it, so every consumer needs the JSON5 library.
+Choose JSON5 when configs are complex enough that readability really matters and you're willing to add the `json5` parser to your toolchain. The cost is that JSON5 is *not* JSON - `JSON.parse()` will reject it, so every consumer needs the JSON5 library.
 
 ## The catch: neither parses with `JSON.parse()`
 
@@ -79,7 +79,7 @@ Not standard JSON. JSONC and JSON5 add comments, but `JSON.parse()` and strict p
 JSONC is essentially JSON plus comments (and tolerated trailing commas). JSON5 is a broader superset that also allows unquoted keys, single quotes, and relaxed number formats.
 
 **Which should I use for a config file?**
-Use JSONC if your tool already supports it (e.g. VS Code, `tsconfig.json`) — it's the least friction. Use JSON5 when you want the full set of human-friendly features and can add its parser.
+Use JSONC if your tool already supports it (e.g. VS Code, `tsconfig.json`) - it's the least friction. Use JSON5 when you want the full set of human-friendly features and can add its parser.
 
 **How do I convert JSON5 or JSONC to plain JSON?**
-Remove the comments and trailing commas and quote any bare keys — or paste it into the [JSON Trimmer](/tools/json-trimmer/), which outputs strict JSON in one step.
+Remove the comments and trailing commas and quote any bare keys - or paste it into the [JSON Trimmer](/tools/json-trimmer/), which outputs strict JSON in one step.

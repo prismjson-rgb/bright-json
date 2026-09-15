@@ -11,14 +11,14 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** When an LLM hits its output-token limit mid-response, the JSON is **cut off** — strings and brackets are left open, and `JSON.parse()` throws `Unexpected end of JSON input`. To recover, either raise the token limit and re-run, or apply a repair pass that closes the dangling structures. The [AI JSON Cleaner](/tools/ai-json-cleaner/) attempts to close open brackets and strings so you can salvage the partial result.
+**Quick answer:** When an LLM hits its output-token limit mid-response, the JSON is **cut off** - strings and brackets are left open, and `JSON.parse()` throws `Unexpected end of JSON input`. To recover, either raise the token limit and re-run, or apply a repair pass that closes the dangling structures. The [AI JSON Cleaner](/tools/ai-json-cleaner/) attempts to close open brackets and strings so you can salvage the partial result.
 
 ## How to know it was truncated
 
 Truncation has a distinct signature, different from a syntax typo:
 
 - The error is `Unexpected end of JSON input` (ran out of data), not `Unexpected token` (wrong character).
-- The text simply *stops* — often mid-string or mid-number, with no closing `}`/`]`.
+- The text simply *stops* - often mid-string or mid-number, with no closing `}`/`]`.
 - If you have access to the API response, the **finish reason** says `length` (or `max_tokens`) rather than `stop`. That's the definitive signal.
 
 ```json
@@ -29,15 +29,15 @@ The string `"Gr` never closes; two arrays/objects are still open. This is incomp
 
 ## The right fix: prevent the cutoff
 
-Repairing truncated JSON recovers *partial* data — you've still lost whatever came after the cut. So prevention matters:
+Repairing truncated JSON recovers *partial* data - you've still lost whatever came after the cut. So prevention matters:
 
 - **Raise `max_tokens`** (or the model's output cap) to fit the expected response.
-- **Reduce what you ask for** — request fewer fields, or paginate large lists into multiple calls.
+- **Reduce what you ask for** - request fewer fields, or paginate large lists into multiple calls.
 - **Check the finish reason** in code and re-request when it's `length`:
 
 ```js
 if (response.choices[0].finish_reason === "length") {
-  // response was cut off — retry with a higher limit or smaller request
+  // response was cut off - retry with a higher limit or smaller request
 }
 ```
 
@@ -45,9 +45,9 @@ if (response.choices[0].finish_reason === "length") {
 
 ## Recovering partial data when you must
 
-Sometimes you can't re-run (cost, latency, the data is "good enough"). To salvage what arrived, close the open structures: finish any open string, then append the missing `]` and `}` in the right order. Doing this by hand is fiddly, so use an automated repair — paste the fragment into the [AI JSON Cleaner](/tools/ai-json-cleaner/), which balances brackets and closes strings, then run the result through the [JSON Validator](/tools/json-validator/) to confirm it parses.
+Sometimes you can't re-run (cost, latency, the data is "good enough"). To salvage what arrived, close the open structures: finish any open string, then append the missing `]` and `}` in the right order. Doing this by hand is fiddly, so use an automated repair - paste the fragment into the [AI JSON Cleaner](/tools/ai-json-cleaner/), which balances brackets and closes strings, then run the result through the [JSON Validator](/tools/json-validator/) to confirm it parses.
 
-Treat the recovered object as **possibly incomplete**: the last element may be partial, so validate against your expected shape before trusting it — see [Validating LLM JSON Against a Schema](/learn/validate-llm-json-schema/).
+Treat the recovered object as **possibly incomplete**: the last element may be partial, so validate against your expected shape before trusting it - see [Validating LLM JSON Against a Schema](/learn/validate-llm-json-schema/).
 
 ## Related LLM JSON issues
 

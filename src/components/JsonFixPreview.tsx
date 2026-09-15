@@ -27,7 +27,7 @@ interface Props {
 /**
  * Diagnose → Preview → Apply → Validate → Format, in one dialog. `analyzeJson`
  * (via `issues`) already explained what's wrong; this only decides *whether*
- * to run the fix and lets the user see the result first — the actual repair
+ * to run the fix and lets the user see the result first - the actual repair
  * still comes from `repairJson` (jsonrepair).
  */
 export default function JsonFixPreview({ open, onOpenChange, json, issues, onApply }: Props) {
@@ -75,7 +75,7 @@ export default function JsonFixPreview({ open, onOpenChange, json, issues, onApp
           <DialogDescription>
             {result.ok
               ? `${fixable.length} issue${fixable.length !== 1 ? "s" : ""} can be automatically fixed.`
-              : "The structure is too broken to repair automatically — try fixing it manually in the editor."}
+              : "The structure is too broken to repair automatically - try fixing it manually in the editor."}
           </DialogDescription>
         </DialogHeader>
 

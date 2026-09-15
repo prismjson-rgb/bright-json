@@ -14,7 +14,7 @@ JSON is flexible enough to represent almost any data structure, but a handful of
 
 ## Pattern 1: List of objects (API responses)
 
-The most common pattern — an array of uniform objects. Used by almost every REST API list endpoint. Each object has the same keys, making it easy to loop through and render in a table or list.
+The most common pattern - an array of uniform objects. Used by almost every REST API list endpoint. Each object has the same keys, making it easy to loop through and render in a table or list.
 
 ```json
 [
@@ -41,7 +41,7 @@ When returned by an API, this is usually wrapped in an envelope:
 
 ## Pattern 2: Nested configuration
 
-Objects inside objects for grouping related settings. This pattern is ubiquitous in config files — `package.json`, `tsconfig.json`, Docker Compose, and countless application configs all use it.
+Objects inside objects for grouping related settings. This pattern is ubiquitous in config files - `package.json`, `tsconfig.json`, Docker Compose, and countless application configs all use it.
 
 ```json
 {

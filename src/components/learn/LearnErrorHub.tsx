@@ -5,10 +5,10 @@ import Link from "next/link";
 import type { TutorialSection } from "@/lib/learn-content";
 
 const ERROR_MESSAGES = [
-  { message: "Unexpected token < in JSON at position 0", cause: "You received an HTML page — a 404, 500 or login redirect.", lesson: "unexpected-token-in-json" },
+  { message: "Unexpected token < in JSON at position 0", cause: "You received an HTML page - a 404, 500 or login redirect.", lesson: "unexpected-token-in-json" },
   { message: "Unexpected end of JSON input", cause: "Empty body, truncated response or an unclosed bracket.", lesson: "unexpected-end-of-json-input" },
   { message: "Unexpected token } in JSON", cause: "A trailing comma before the closing brace.", lesson: "fixing-trailing-commas" },
-  { message: "Unexpected token ' in JSON", cause: "Single quotes — JSON requires double quotes.", lesson: "fix-single-quotes-json" },
+  { message: "Unexpected token ' in JSON", cause: "Single quotes - JSON requires double quotes.", lesson: "fix-single-quotes-json" },
   { message: "Expecting property name enclosed in double quotes", cause: "Unquoted object keys, commonly reported by Python.", lesson: "fix-unquoted-keys-json" },
   { message: "Unexpected token BOM in JSON at position 0", cause: "An invisible byte-order mark before the first brace.", lesson: "json-bom-error" },
   { message: "Unexpected token o in JSON at position 1", cause: "An object was passed to JSON.parse instead of a JSON string.", lesson: "parse-stringify" },

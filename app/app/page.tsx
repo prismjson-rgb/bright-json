@@ -1,4 +1,4 @@
-// app/app/page.tsx  — Server Component exports metadata
+// app/app/page.tsx - Server Component exports metadata
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AppRedirect } from "./AppRedirect";

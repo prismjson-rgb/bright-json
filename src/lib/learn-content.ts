@@ -1,5 +1,5 @@
 /**
- * Learn content — uses generated sections (no Node fs at runtime).
+ * Learn content - uses generated sections (no Node fs at runtime).
  * Run `npm run generate:content` to regenerate from content/learn/*.md
  */
 

@@ -115,7 +115,7 @@ export default function BundleViewer() {
                   <h1 className="text-lg font-semibold">JSON Bundle</h1>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {entries.length} JSON{entries.length !== 1 ? "s" : ""} shared — click an entry to view it
+                  {entries.length} JSON{entries.length !== 1 ? "s" : ""} shared - click an entry to view it
                 </p>
               </div>
               {entries.length > 1 && (

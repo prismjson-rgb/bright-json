@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Braces } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "404 — Page Not Found | JSON Prism",
+  title: "404 - Page Not Found | JSON Prism",
   description: "This page could not be found.",
   robots: { index: false, follow: false },
 };

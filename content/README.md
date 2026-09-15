@@ -1,4 +1,4 @@
-# Content — Markdown-driven, no database
+# Content - Markdown-driven, no database
 
 All content lives in `.md` files. Editable via IDE or GitHub. No DB required.
 

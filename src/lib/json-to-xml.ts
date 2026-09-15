@@ -14,7 +14,7 @@ function escapeXml(val: string): string {
 }
 
 function toXmlTag(tag: string): string {
-  // Ensure tag is valid XML — replace spaces/special chars with underscore
+  // Ensure tag is valid XML - replace spaces/special chars with underscore
   const clean = tag.replace(/[^a-zA-Z0-9_.-]/g, "_");
   // XML tags can't start with a digit
   return clean ? (/^[a-zA-Z_]/.test(clean) ? clean : `_${clean}`) : "item";

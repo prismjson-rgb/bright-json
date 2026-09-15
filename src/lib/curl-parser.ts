@@ -103,7 +103,7 @@ export function parseCurl(input: string): CurlRequest {
       i += 2;
     } else if (t === "-d" || t === "--data" || t === "--data-raw" || t === "--data-binary" || t === "--data-ascii") {
       let val = tokens[i + 1] ?? "";
-      if (val.startsWith("@")) val = val.slice(1); // @file — treat remainder as literal
+      if (val.startsWith("@")) val = val.slice(1); // @file - treat remainder as literal
       body = val;
       i += 2;
     } else if (t === "--json") {
@@ -133,7 +133,7 @@ export function parseCurl(input: string): CurlRequest {
     } else if (VALUE_FLAGS_IGNORED.has(t)) {
       i += 2;
     } else if (/^-[a-zA-Z]{2,}$/.test(t)) {
-      // Combined short flags like -sL — skip; if any need a value, also skip next token
+      // Combined short flags like -sL - skip; if any need a value, also skip next token
       const needsValue = /[XHduobecmxA]/.test(t.slice(1));
       i += needsValue ? 2 : 1;
     } else if (!t.startsWith("-")) {

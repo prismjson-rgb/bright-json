@@ -1,7 +1,7 @@
 ---
 title: "Querying JSON with jq"
 metaTitle: "Query JSON with jq: A Practical Guide"
-metaDescription: "jq is the command-line tool for slicing, filtering, and reshaping JSON. Learn the core filters — dot, pipe, map, select — with practical examples."
+metaDescription: "jq is the command-line tool for slicing, filtering, and reshaping JSON. Learn the core filters - dot, pipe, map, select - with practical examples."
 level: intermediate
 order: 50
 keyTerms: [jq, query json, command line, filter json, json transform]
@@ -62,11 +62,11 @@ jq '.users | map({user_id: .id, city: .address.city})' data.json
 jq 'group_by(.role) | map({role: .[0].role, count: length})' data.json
 ```
 
-Object construction (`{key: expr}`) and array construction (`[expr]`) are how you turn one shape into another — the heart of most real jq scripts.
+Object construction (`{key: expr}`) and array construction (`[expr]`) are how you turn one shape into another - the heart of most real jq scripts.
 
 ## jq vs JSONPath
 
-Both query JSON, but they fit different jobs. **JSONPath** is a concise *path* language, often embedded in other languages and tools, great for "pluck this value." **jq** is a full *transformation* language with its own runtime — better when you need to filter, reshape, group, or compute. See [JSONPath](/learn/jsonpath/) for the path-style approach; reach for jq when a path expression isn't enough.
+Both query JSON, but they fit different jobs. **JSONPath** is a concise *path* language, often embedded in other languages and tools, great for "pluck this value." **jq** is a full *transformation* language with its own runtime - better when you need to filter, reshape, group, or compute. See [JSONPath](/learn/jsonpath/) for the path-style approach; reach for jq when a path expression isn't enough.
 
 A common pattern is piping an API straight through jq:
 
@@ -88,4 +88,4 @@ It feeds the output of one filter into the next, like a Unix pipe. `.users | len
 Use `map(select(condition))`, e.g. `.users | map(select(.active))` keeps only elements where `active` is truthy. Wrap a streaming pipeline in `[ ... ]` to collect results into an array.
 
 **Should I use jq or JSONPath?**
-Use JSONPath to pluck values with a short path expression, especially when it's embedded in another language. Use jq when you need to filter, reshape, group, or compute — it's a full transformation language.
+Use JSONPath to pluck values with a short path expression, especially when it's embedded in another language. Use jq when you need to filter, reshape, group, or compute - it's a full transformation language.

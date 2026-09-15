@@ -11,7 +11,7 @@ relatedLearn: [what-is-json, objects-arrays-depth, common-patterns]
 publishedAt: "2025-12-01"
 ---
 
-A JSON object is a collection of key-value pairs wrapped in curly braces `{}`. Think of it like a dictionary or a filled-in form — each field has a name (the key) and a value. Keys are always strings in double quotes. Values can be any of the [six JSON data types](/learn/six-data-types/).
+A JSON object is a collection of key-value pairs wrapped in curly braces `{}`. Think of it like a dictionary or a filled-in form - each field has a name (the key) and a value. Keys are always strings in double quotes. Values can be any of the [six JSON data types](/learn/six-data-types/).
 
 ```json
 {
@@ -26,10 +26,10 @@ A JSON object is a collection of key-value pairs wrapped in curly braces `{}`. T
 
 Every JSON object follows the same structure:
 
-- **Key** — a string in double quotes, e.g. `"name"`
-- **Colon** — separates key from value: `:`
-- **Value** — any valid JSON value
-- **Comma** — separates pairs from each other (no comma after the last pair)
+- **Key** - a string in double quotes, e.g. `"name"`
+- **Colon** - separates key from value: `:`
+- **Value** - any valid JSON value
+- **Comma** - separates pairs from each other (no comma after the last pair)
 
 ```json
 {
@@ -66,7 +66,7 @@ Here is an object that uses all six types at once:
 
 ## How do I write my first JSON object?
 
-Start small. Pick a thing you want to describe — a person, a product, a config setting — and list its properties:
+Start small. Pick a thing you want to describe - a person, a product, a config setting - and list its properties:
 
 1. Open with `{`
 2. Write each property as `"key": value`
@@ -85,7 +85,7 @@ Start small. Pick a thing you want to describe — a person, a product, a config
 
 ## Common beginner mistakes
 
-- Using single quotes: `{'name': 'Alice'}` is invalid — always use double quotes
+- Using single quotes: `{'name': 'Alice'}` is invalid - always use double quotes
 - Adding a trailing comma: `{"a": 1,}` will cause a parse error
 - Forgetting quotes around keys: `{name: "Alice"}` is JavaScript syntax, not JSON
 

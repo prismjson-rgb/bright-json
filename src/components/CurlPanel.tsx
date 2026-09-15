@@ -102,7 +102,7 @@ export default function CurlPanel({ open, onClose, initialCommand, onRun }: Curl
         aria-label="Close"
       />
 
-      {/* Panel — slides in from right */}
+      {/* Panel - slides in from right */}
       <aside
         data-state="open"
         className="relative ml-auto w-full max-w-md sm:max-w-lg h-full bg-surface1 border-l border-border shadow-2xl flex flex-col overflow-hidden data-[state=open]:animate-in data-[state=open]:slide-in-from-right data-[state=open]:duration-200"
@@ -220,16 +220,16 @@ export default function CurlPanel({ open, onClose, initialCommand, onRun }: Curl
             <ul className="space-y-1.5 text-[11px] text-muted-foreground leading-snug">
               <li>
                 <span className="font-mono text-foreground/70">-H &quot;Authorization: Bearer TOKEN&quot;</span>
-                {" "}— pass auth headers directly
+                {" "} - pass auth headers directly
               </li>
               <li>
                 Use <span className="font-mono text-foreground/70">\</span> to break long commands across lines
               </li>
               <li>
-                The response body loads into a new tab — works with any JSON API
+                The response body loads into a new tab - works with any JSON API
               </li>
               <li className="text-muted-foreground/50">
-                Note: browser fetch requires CORS — some APIs block cross-origin requests
+                Note: browser fetch requires CORS - some APIs block cross-origin requests
               </li>
             </ul>
           </div>

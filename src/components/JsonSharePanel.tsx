@@ -364,7 +364,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
         <span>
           <strong className="text-foreground font-medium">Zero storage by default.</strong>{" "}
           Your JSON is encoded into the link itself.{shortEnabled ? (
-            <> Optional short links store the encoded payload for 30 days on our own Cloudflare KV — auto-deleted after.</>
+            <> Optional short links store the encoded payload for 30 days on our own Cloudflare KV - auto-deleted after.</>
           ) : null}
         </span>
       </div>
@@ -437,7 +437,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                   <>
                     {shortEnabled && (
                       <p className="text-[11px] text-muted-foreground">
-                        Fallback — share the full link directly:
+                        Fallback - share the full link directly:
                       </p>
                     )}
                     <div className="flex items-center gap-2">
@@ -470,7 +470,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
         {open === "bundle" && (
           <div className="px-4 py-4 flex flex-col gap-3 border-b border-border">
             <p className="text-[11px] text-muted-foreground/70">
-              Combine multiple JSONs into one link — like a Linktree for JSON. Recipients can browse and open each one.
+              Combine multiple JSONs into one link - like a Linktree for JSON. Recipients can browse and open each one.
             </p>
 
             <div className="flex flex-col gap-2">
@@ -544,7 +544,7 @@ export default function JsonSharePanel({ json, onDownloadJson, onClose, tabs = [
                     <>
                       {shortEnabled && (
                         <p className="text-[11px] text-muted-foreground">
-                          Fallback — share the full link directly:
+                          Fallback - share the full link directly:
                         </p>
                       )}
                       <div className="flex items-center gap-2">
@@ -807,7 +807,7 @@ function CurlCommandSection({ meta }: { meta: CurlMeta }) {
         </div>
       </div>
       <p className="mt-1.5 text-[10px] text-muted-foreground/60">
-        The share link encodes both this curl command and the response — recipients see the full request + JSON.
+        The share link encodes both this curl command and the response - recipients see the full request + JSON.
       </p>
     </div>
   );

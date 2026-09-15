@@ -1,7 +1,7 @@
 /**
  * Client for the Cloudflare Worker short-link service.
  *
- * The feature is gated on `NEXT_PUBLIC_SHORTENER_URL` — if unset, the UI
+ * The feature is gated on `NEXT_PUBLIC_SHORTENER_URL` - if unset, the UI
  * should not render the "Create short link" action at all, so forks and
  * self-hosters who don't want any server-side storage get a clean build.
  */

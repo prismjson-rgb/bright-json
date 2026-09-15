@@ -11,14 +11,14 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** When ChatGPT returns JSON, it often wraps it in a ```` ```json ```` markdown fence or adds a sentence like *"Sure! Here's the JSON:"* — both of which make `JSON.parse()` fail. The fix is to **extract just the JSON** before parsing. Paste the raw reply into the [AI JSON Cleaner](/tools/ai-json-cleaner/) to strip fences, prose, and trailing commas in one step.
+**Quick answer:** When ChatGPT returns JSON, it often wraps it in a ```` ```json ```` markdown fence or adds a sentence like *"Sure! Here's the JSON:"* - both of which make `JSON.parse()` fail. The fix is to **extract just the JSON** before parsing. Paste the raw reply into the [AI JSON Cleaner](/tools/ai-json-cleaner/) to strip fences, prose, and trailing commas in one step.
 
 ## Why ChatGPT's JSON won't parse
 
 The model is trained to be helpful and to format code nicely, which works against you when you need raw data:
 
-- **Markdown code fences** — the reply starts with ```` ```json ```` and ends with ```` ``` ````. Those backticks are not JSON.
-- **Conversational preamble or trailing notes** — "Here's your data:" before, "Let me know if you need changes!" after.
+- **Markdown code fences** - the reply starts with ```` ```json ```` and ends with ```` ``` ````. Those backticks are not JSON.
+- **Conversational preamble or trailing notes** - "Here's your data:" before, "Let me know if you need changes!" after.
 - **Trailing commas**, because models mimic human-written JavaScript.
 - **Smart quotes** (`"` `"`) instead of straight `"` when the text passes through a chat UI.
 
@@ -40,7 +40,7 @@ function extractJson(reply) {
 JSON.parse(extractJson(reply));
 ```
 
-This handles the two most common cases — a fenced block, or JSON buried in prose. For messier output (smart quotes, trailing commas, truncation), the [AI JSON Cleaner](/tools/ai-json-cleaner/) applies a fuller repair pass and shows you the cleaned result.
+This handles the two most common cases - a fenced block, or JSON buried in prose. For messier output (smart quotes, trailing commas, truncation), the [AI JSON Cleaner](/tools/ai-json-cleaner/) applies a fuller repair pass and shows you the cleaned result.
 
 ## The better fix: stop the chatter at the source
 
@@ -48,13 +48,13 @@ Cleaning after the fact is a patch. The durable fix is to make the model emit ra
 
 - **Ask for it explicitly:** "Respond with only valid JSON. No markdown, no code fences, no commentary."
 - **Use the provider's structured-output / JSON mode** so the response is constrained to JSON at generation time. See [Getting Reliable JSON from LLMs](/learn/reliable-json-from-llms/).
-- **Validate against a schema** so you catch a malformed or off-shape response immediately — see [Validating LLM JSON Against a Schema](/learn/validate-llm-json-schema/).
+- **Validate against a schema** so you catch a malformed or off-shape response immediately - see [Validating LLM JSON Against a Schema](/learn/validate-llm-json-schema/).
 
-For the broader set of breakages models introduce — and how to repair them — see [Fixing Broken LLM JSON](/learn/fixing-llm-json/).
+For the broader set of breakages models introduce - and how to repair them - see [Fixing Broken LLM JSON](/learn/fixing-llm-json/).
 
 ## Watch the token cost too
 
-If you're piping large JSON into or out of a model, remember that JSON's quotes and braces are token-expensive. Before sending a big payload, estimate it with the [JSON Token Estimator](/tools/json-token-estimator/) — see [Counting JSON Tokens for LLMs](/learn/count-json-tokens-llm/).
+If you're piping large JSON into or out of a model, remember that JSON's quotes and braces are token-expensive. Before sending a big payload, estimate it with the [JSON Token Estimator](/tools/json-token-estimator/) - see [Counting JSON Tokens for LLMs](/learn/count-json-tokens-llm/).
 
 ## Frequently asked questions
 

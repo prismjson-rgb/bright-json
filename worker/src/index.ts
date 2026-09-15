@@ -27,7 +27,7 @@ function htmlEscape(value: string): string {
 }
 function redirectHtml(target: string, kind: Kind, siteUrl: string): string {
   const label = { json: "JSON", bundle: "JSON Bundle", curl: "cURL Response", curlcmd: "cURL Command" }[kind];
-  const title = `JSON Prism — Shared ${label}`;
+  const title = `JSON Prism - Shared ${label}`;
   const description = `A shared ${label} document. Open it in JSON Prism in your browser.`;
   // JSON.stringify alone cannot escape script end tags, including in legacy KV values.
   const targetJson = JSON.stringify(target).replace(/</g, "\\u003c").replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
@@ -46,7 +46,7 @@ function redirectHtml(target: string, kind: Kind, siteUrl: string): string {
 }
 function notFoundHtml(siteUrl: string): Response {
   return new Response(`<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>Link expired — JSON Prism</title></head>
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Link expired - JSON Prism</title></head>
 <body><h1>Link expired or not found</h1><p>Short links expire after 30 days.</p>
 <p><a href="${htmlEscape(siteUrl)}">Open JSON Prism</a></p></body></html>`, {
     status: 404, headers: { "Content-Type": "text/html; charset=utf-8" },

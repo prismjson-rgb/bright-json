@@ -1,5 +1,5 @@
 /**
- * Single source of truth for panel modes — labels, icons, grouping, layout,
+ * Single source of truth for panel modes - labels, icons, grouping, layout,
  * keyboard shortcuts, and help copy for info tooltips. Navigation chrome
  * (header tabs, left rail, mobile header) reads from here so adding a mode
  * = one object entry.
@@ -150,7 +150,7 @@ export const MODES: Record<PanelMode, ModeConfig> = {
     icon: ShieldCheck,
     group: "analyze",
     layout: "split",
-    help: "Paste a JSON Schema (Draft 7) and instantly see whether the current JSON is valid — with per-field error paths.",
+    help: "Paste a JSON Schema (Draft 7) and instantly see whether the current JSON is valid - with per-field error paths.",
   },
   convert: {
     id: "convert",
@@ -166,7 +166,7 @@ export const MODES: Record<PanelMode, ModeConfig> = {
     icon: Quote,
     group: "transform",
     layout: "focused",
-    help: "Paste an escaped JSON string (with \\\" and \\n) — copied from a log line, code, or an API field — and convert it back into readable JSON.",
+    help: "Paste an escaped JSON string (with \\\" and \\n) - copied from a log line, code, or an API field - and convert it back into readable JSON.",
   },
   notes: {
     id: "notes",
@@ -183,7 +183,7 @@ export const MODES: Record<PanelMode, ModeConfig> = {
     group: "transform",
     layout: "split",
     hideFromRail: true,
-    help: "Encode JSON into links or files. By default nothing is uploaded; optional short links may use temporary storage—see the privacy note in the panel.",
+    help: "Encode JSON into links or files. By default nothing is uploaded; optional short links may use temporary storage - see the privacy note in the panel.",
   },
   learn: {
     id: "learn",
@@ -203,7 +203,7 @@ export const RAIL_GROUPS: { key: ModeGroup; label: string; help: string }[] = [
   {
     key: "tools",
     label: "Tools",
-    help: "Generate mock data, debug parses, trim noise, run AI cleanup, or shrink payloads—editor stays on the left.",
+    help: "Generate mock data, debug parses, trim noise, run AI cleanup, or shrink payloads - editor stays on the left.",
   },
   {
     key: "analyze",

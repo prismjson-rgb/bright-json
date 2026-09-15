@@ -10,14 +10,14 @@ const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
 const toolCount = getAllTools().length;
 
 export const metadata: Metadata = {
-  title: `JSON Prism | All-in-One JSON Toolkit — ${toolCount} Free Tools`,
+  title: `JSON Prism | All-in-One JSON Toolkit - ${toolCount} Free Tools`,
   description:
     `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
   alternates: {
     canonical: `${BASE}/`,
   },
   openGraph: {
-    title: "JSON Prism — The Free All-in-One JSON Toolkit",
+    title: "JSON Prism - The Free All-in-One JSON Toolkit",
     description:
       `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
     type: "website",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "JSON Prism — The Free All-in-One JSON Toolkit",
+    title: "JSON Prism - The Free All-in-One JSON Toolkit",
     description:
       `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
     images: [`${BASE}/og-image.png`],

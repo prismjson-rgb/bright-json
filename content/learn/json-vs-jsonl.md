@@ -11,7 +11,7 @@ publishedAt: "2026-06-25"
 updatedAt: "2026-06-25"
 ---
 
-**Quick answer:** **JSON** is one self-contained document — usually a single object or array. **JSONL** (JSON Lines, identical to **NDJSON**) is one complete JSON value *per line*, with no enclosing array. JSONL streams and appends line by line; JSON must be read and parsed all at once. Use JSON for a single payload; use JSONL for logs, datasets, and anything processed incrementally. Convert and inspect either with the [JSON Converter](/tools/json-converter/).
+**Quick answer:** **JSON** is one self-contained document - usually a single object or array. **JSONL** (JSON Lines, identical to **NDJSON**) is one complete JSON value *per line*, with no enclosing array. JSONL streams and appends line by line; JSON must be read and parsed all at once. Use JSON for a single payload; use JSONL for logs, datasets, and anything processed incrementally. Convert and inspect either with the [JSON Converter](/tools/json-converter/).
 
 ![A single JSON document holds one array spanning multiple lines, while JSONL stores one self-contained JSON object per line as a streamable set of records.](/learn/json-vs-jsonl.svg)
 
@@ -35,14 +35,14 @@ A JSONL file holds **one record per line**, each a standalone JSON value, with n
 {"id": 3, "name": "Alan"}
 ```
 
-Each line parses on its own. There is no top-level array, so the file as a whole is *not* a single valid JSON document — and that's the point.
+Each line parses on its own. There is no top-level array, so the file as a whole is *not* a single valid JSON document - and that's the point.
 
 ## Why JSONL exists
 
 The line-per-record format unlocks things a monolithic array can't do:
 
-- **Streaming.** You can read and process one line at a time without loading the whole file into memory — essential for multi-gigabyte datasets. See [Performance with Large JSON Files](/learn/performance-large-files/).
-- **Appending.** Adding a record is just writing a new line. Appending to a JSON array means rewriting the closing `]` — awkward and error-prone.
+- **Streaming.** You can read and process one line at a time without loading the whole file into memory - essential for multi-gigabyte datasets. See [Performance with Large JSON Files](/learn/performance-large-files/).
+- **Appending.** Adding a record is just writing a new line. Appending to a JSON array means rewriting the closing `]` - awkward and error-prone.
 - **Unix-friendliness.** `grep`, `head`, `tail`, `wc -l`, and `sed` all work naturally because each record is a line.
 - **Fault tolerance.** If a write is cut off, you lose one line, not the whole document.
 
@@ -59,12 +59,12 @@ This is why JSONL dominates log files, ML training data, data exports, and event
 
 ## Converting between them
 
-Going from a JSON array to JSONL is "write each element on its own line"; going back is "wrap the lines in `[...]` with commas." The [JSON Converter](/tools/json-converter/) does both, and you can format or minify each line with the [JSON Formatter](/tools/json-formatter/). Note that tools expecting strict JSON will reject a raw JSONL file — feed them one line at a time.
+Going from a JSON array to JSONL is "write each element on its own line"; going back is "wrap the lines in `[...]` with commas." The [JSON Converter](/tools/json-converter/) does both, and you can format or minify each line with the [JSON Formatter](/tools/json-formatter/). Note that tools expecting strict JSON will reject a raw JSONL file - feed them one line at a time.
 
 ## Frequently asked questions
 
 **Are JSONL and NDJSON the same thing?**
-Effectively yes. Both mean newline-delimited JSON — one complete JSON value per line. "JSONL" and "JSON Lines" are the more common names today; NDJSON is an older label for the same format.
+Effectively yes. Both mean newline-delimited JSON - one complete JSON value per line. "JSONL" and "JSON Lines" are the more common names today; NDJSON is an older label for the same format.
 
 **Is a JSONL file valid JSON?**
 No. The file as a whole isn't a single JSON document because it has no enclosing array. Each individual line, however, is valid JSON on its own.
