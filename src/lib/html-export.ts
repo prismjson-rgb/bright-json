@@ -7,8 +7,9 @@ export function generateHtml(json: string): string {
   // Safely embed JSON as a JS string literal
   // Double-encode: JSON string → JSON-stringified → safe to embed in <script>
   const jsonLiteral = JSON.stringify(json)
-    .replace(/<\/script>/gi, "<\\/script>")
-    .replace(/<!--/g, "<\\!--");
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
 
   const now = new Date().toLocaleString();
 

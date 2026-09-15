@@ -1,0 +1,24 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "json-prism-local",
+  "account_id": "8294e44ced7d8f156440f89cc13b1bd4",
+  "compatibility_date": "2026-09-15",
+  "workers_dev": true,
+  "assets": {
+    "directory": "./out",
+    "html_handling": "force-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "env": {
+    "production": {
+      "name": "json-prism",
+      "workers_dev": false,
+      "routes": [
+        {
+          "pattern": "jsonprism.com",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
+}

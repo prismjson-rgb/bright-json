@@ -33,12 +33,12 @@ When you use the Share feature, your JSON is compressed and encoded directly int
 
 ## Optional short links
 
-If you click **Create short link** in the Share panel, the already-encoded payload (not your original JSON) is sent to our own Cloudflare Worker and stored in Cloudflare Workers KV for **30 days**, then automatically deleted. The short link service is never contacted unless you explicitly press that button. We store only the compressed payload — we never see your original JSON.
+If you click **Create short link** in the Share panel, a compressed, encoded copy of your content is sent to our Cloudflare Worker and stored in Cloudflare Workers KV for **30 days**, then automatically expires. Compression is **not encryption**: the stored payload can be decoded back into the original content. Anyone with the short link can access it while it is active. Creating a short link is optional; ordinary fragment links do not use this storage service.
 
-- Stored value: the compressed, base64url-encoded payload only
+- Stored value: the share type and compressed, encoded payload (JSON, bundle, or cURL content)
 - Retention: 30 days, auto-deleted
 - Data location: Cloudflare KV (globally distributed edge storage)
-- No IP addresses, user agents, or request metadata are logged
+- The Worker application does not log request bodies or IP addresses. Cloudflare processes request metadata to serve requests and enforce rate limits.
 
 ## Analytics
 

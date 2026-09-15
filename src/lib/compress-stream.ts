@@ -36,7 +36,7 @@ function bufferToBase64Url(buf: ArrayBuffer): string {
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-function base64UrlToBuffer(str: string): Uint8Array {
+function base64UrlToBuffer(str: string): Uint8Array<ArrayBuffer> {
   const padded = str.padEnd(Math.ceil(str.length / 4) * 4, "=");
   const b64 = padded.replace(/-/g, "+").replace(/_/g, "/");
   const bin = atob(b64);

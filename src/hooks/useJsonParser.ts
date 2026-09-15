@@ -15,7 +15,7 @@ interface UseJsonParserResult {
   sortKeys: () => void;
 }
 
-function sortObjectKeys(obj: unknown): unknown {
+export function sortObjectKeys(obj: unknown): unknown {
   if (Array.isArray(obj)) return obj.map(sortObjectKeys);
   if (obj !== null && typeof obj === "object") {
     return Object.keys(obj as Record<string, unknown>)
@@ -23,7 +23,7 @@ function sortObjectKeys(obj: unknown): unknown {
       .reduce((acc, key) => {
         acc[key] = sortObjectKeys((obj as Record<string, unknown>)[key]);
         return acc;
-      }, {} as Record<string, unknown>);
+      }, Object.create(null) as Record<string, unknown>);
   }
   return obj;
 }
