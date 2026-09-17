@@ -24,6 +24,8 @@ import OverlaySidebar from "@/components/OverlaySidebar";
 import AppHeader from "@/components/app/AppHeader";
 import ModeTabs from "@/components/app/ModeTabs";
 import ToolBrowser from "@/components/app/ToolBrowser";
+import DeploymentNotice from "@/components/app/DeploymentNotice";
+import { refreshWorkspace } from "@/lib/refresh-workspace";
 import { DEFAULT_FAVOURITES, FAVOURITES_KEY, parseFavourites } from "@/lib/workspace-tools";
 import { readPreference, writePreference } from "@/lib/local-preferences";
 import type { ToolSlug } from "@/lib/tool-links";
@@ -734,8 +736,14 @@ export default function JsonViewerClient() {
     onToggleRail: () => setRailCollapsed((c) => !c),
   };
 
+  const refreshDeployment = async () => {
+    if (!tabsHydrated || !storageReady) throw new Error("Storage is unavailable. Export your work before refreshing.");
+    await refreshWorkspace(() => tabsStateRef.current, snapshot => { savedTabsRef.current = snapshot; });
+  };
+
   return (
     <div className="workspace flex flex-col h-dvh bg-bg" onKeyDownCapture={handleHistoryKey}>
+      <DeploymentNotice onRefresh={refreshDeployment} />
       <div className="hidden md:contents">
         <AppHeader {...headerProps} />
       </div>

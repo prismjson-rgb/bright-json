@@ -69,6 +69,8 @@ Cloudflare response handler. The Worker runs before page assets; `/_next/*`
 retains direct static asset delivery.
 
 After deployment, run `node scripts/verify-agent-discovery.mjs https://jsonprism.com`
+
+The production workspace checks `/deployment.json` only when a tab becomes visible after at least 30 minutes hidden. There is no initial request, periodic polling, or focus/reconnect check. Cloudflare serves the version file directly as a static asset, bypassing the Worker, with `Cache-Control: no-store`. The build embeds its commit SHA for comparison. A persistent **Save & refresh** notice lets the user update when ready; it waits for tabs, notes, and undo history to save and blocks refresh if saving fails or edits change during the save. Continuously visible tabs receive no update checks. Existing tabs opened before this mechanism was deployed need one manual reload to receive it.
 and POST `{"url":"https://jsonprism.com"}` to
 `https://isitagentready.com/api/scan`. Check the contentSignals,
 markdownNegotiation, apiCatalog and linkHeaders results. An auth scanner may
