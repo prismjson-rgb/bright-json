@@ -166,7 +166,7 @@ export function HomePageSEOContent() {
           </div>
           <Link
             href="/"
-            className="inline-flex w-fit items-center gap-2 rounded-full bg-cyan-300 px-5 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-200"
+            className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-cyan-300 px-5 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-200"
           >
             Open editor
             <ArrowRight className="h-4 w-4" />

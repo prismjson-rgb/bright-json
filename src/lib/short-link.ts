@@ -85,8 +85,17 @@ export async function createShortLink(
     return { ok: false, code: "server", status: res.status };
   }
 
-  const body = await res.json().catch(() => null);
-  if (!body || typeof body.slug !== "string" || typeof body.url !== "string" || typeof body.expiresInSeconds !== "number") {
+  const body: unknown = await res.json().catch(() => null);
+  if (
+    !body ||
+    typeof body !== "object" ||
+    !("slug" in body) ||
+    typeof body.slug !== "string" ||
+    !("url" in body) ||
+    typeof body.url !== "string" ||
+    !("expiresInSeconds" in body) ||
+    typeof body.expiresInSeconds !== "number"
+  ) {
     return { ok: false, code: "server", status: res.status };
   }
   return {

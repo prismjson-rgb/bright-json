@@ -10,7 +10,7 @@ const env = {
   NEXT_PUBLIC_SHORTENER_URL: serviceUrl,
   NEXT_PUBLIC_DONATE_URL: `${serviceUrl}/donate`,
 };
-for (const args of [["scripts/generate-content.cjs"], ["node_modules/next/dist/bin/next", "build"]]) {
+for (const args of [["scripts/generate-content.cjs"], ["scripts/generate-openapi.mjs"], ["node_modules/wrangler/bin/wrangler.js", "types", "edge/worker-configuration.d.ts"], ["node_modules/next/dist/bin/next", "build"]]) {
   const result = spawnSync(process.execPath, args, { env, stdio: "inherit" });
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
