@@ -45,6 +45,7 @@ jobs:
         with:
           name: production-site
           path: out
+          include-hidden-files: true
           retention-days: 14
   deploy:
     needs: validate
@@ -75,8 +76,12 @@ jobs:
           path: out
       - name: Check deployment credentials
         run: test -n "$CLOUDFLARE_API_TOKEN"
+      - name: Generate content modules for the site Worker
+        run: npm run generate:content
       - run: npm run deploy:production --prefix worker
       - run: npx wrangler deploy --env production
       - run: npx wrangler deploy --config redirect/wrangler.jsonc --env production
       - name: Verify live deployment and commit
         run: node scripts/verify-deployment.mjs
+      - name: Verify live agent discovery
+        run: node scripts/verify-agent-discovery.mjs https://jsonprism.com
