@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import {
   ChevronsDownUp, ChevronsUpDown, Copy, Check,
   Minimize2, Maximize2, ArrowUpDown, Sparkles, Wrench, Upload, MousePointerClick, Share2, X,
-  ChevronDown, Eye, Undo2, Redo2,
+  ChevronDown, Eye, Undo2, Redo2, MoreHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
@@ -753,11 +753,23 @@ export default function JsonViewerClient() {
         </Sheet>
 
         <div className="workspace-main flex flex-col flex-1 min-w-0 min-h-0">
-          <div className="md:hidden shrink-0">{documentTabs}</div>
-          <div className="workspace-toolbar flex flex-wrap items-center gap-3 px-3 py-2 border-b border-border shrink-0">
-            <ModeTabs mode={mode} onChange={handleModeSelect} />
-            <div className="flex-1" />
-            <div className="workspace-actions flex items-center flex-wrap gap-1">                <div className="workspace-actions flex items-center gap-1 flex-wrap">
+          <div className="md:hidden shrink-0">
+            <MobileHeader
+              onOpenMenu={() => setMobileMenuOpen(true)}
+              onOpenShare={handleShareClick}
+              onOpenSettings={handleSettingsClick}
+              searchOpen={searchOpen}
+              onSearchToggle={handleSearchToggle}
+              shareActive={shareOpen}
+              settingsActive={settingsOpen}
+              hasJson={hasJson}
+            />
+          </div>
+          <div className="border-b border-border md:hidden shrink-0">{documentTabs}</div>
+          <div className="workspace-toolbar flex flex-col items-stretch gap-2 px-2 py-2 border-b border-border shrink-0 md:flex-row md:flex-wrap md:items-center md:gap-3 md:px-3">
+            <ModeTabs mode={mode} onChange={handleModeSelect} className="w-full md:w-auto" />
+            <div className="hidden flex-1 md:block" />
+            <div className="workspace-actions flex w-full items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden md:w-auto md:overflow-visible">
                   <AppButton onClick={() => changeHistory("undo")} disabled={!activeHistory?.past.length} title="Undo (Ctrl/Cmd+Z)" aria-label="Undo JSON change" leftIcon={<Undo2 className="w-3.5 h-3.5" />} label="Undo" hideLabelOnMobile />
                   <AppButton onClick={() => changeHistory("redo")} disabled={!activeHistory?.future.length} title="Redo (Ctrl/Cmd+Shift+Z or Ctrl+Y)" aria-label="Redo JSON change" leftIcon={<Redo2 className="w-3.5 h-3.5" />} label="Redo" hideLabelOnMobile />
                   <AppButton
@@ -776,6 +788,7 @@ export default function JsonViewerClient() {
                     leftIcon={<Minimize2 className="w-3.5 h-3.5" />}
                     label="Minify"
                     hideLabelOnMobile
+                    className="hidden md:flex"
                   />
                   <AppButton
                     onClick={sortKeys}
@@ -784,8 +797,9 @@ export default function JsonViewerClient() {
                     leftIcon={<ArrowUpDown className="w-3.5 h-3.5" />}
                     label="Sort keys"
                     hideLabelOnMobile
+                    className="hidden md:flex"
                   />
-                  <div className="flex items-center">
+                  <div className="hidden items-center md:flex">
                     <AppButton
                       onClick={handleRepairJson}
                       disabled={!hasJson || fixableIssues.length === 0}
@@ -815,9 +829,33 @@ export default function JsonViewerClient() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                </div>
-
                 <AppButton onClick={handleCopy} disabled={!hasJson} title="Copy JSON" leftIcon={copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />} label={copied ? "Copied!" : "Copy"} hideLabelOnMobile />
+                <div className="md:hidden">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <AppButton
+                        title="More editing actions"
+                        aria-label="More editing actions"
+                        leftIcon={<MoreHorizontal className="w-4 h-4" />}
+                        iconOnly
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={minify} disabled={!hasJson} className="text-xs gap-2">
+                        <Minimize2 className="w-3.5 h-3.5" /> Minify
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={sortKeys} disabled={!hasJson} className="text-xs gap-2">
+                        <ArrowUpDown className="w-3.5 h-3.5" /> Sort keys
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleRepairJson} disabled={!hasJson || fixableIssues.length === 0} className="text-xs gap-2">
+                        <Wrench className="w-3.5 h-3.5" /> Fix automatically
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setFixPreviewOpen(true)} disabled={!hasJson || fixableIssues.length === 0} className="text-xs gap-2">
+                        <Eye className="w-3.5 h-3.5" /> Preview fixes
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
                 <AppButton
                   onClick={handleShareClick}
                   disabled={!hasJson}
@@ -826,8 +864,9 @@ export default function JsonViewerClient() {
                   leftIcon={<Share2 className="w-3.5 h-3.5" />}
                   label="Share"
                   hideLabelOnMobile
+                  className="hidden md:flex"
                 />
-</div>
+            </div>
           </div>
                           <input
                   ref={fileRef}
@@ -839,19 +878,6 @@ export default function JsonViewerClient() {
                 />
         {layout === "focused" && mode === "diff" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            <div className="md:hidden">
-              <MobileHeader
-                mode={mode}
-                onOpenMenu={() => setMobileMenuOpen(true)}
-                onOpenShare={handleShareClick}
-                onOpenSettings={handleSettingsClick}
-                searchOpen={searchOpen}
-                onSearchToggle={handleSearchToggle}
-                shareActive={shareOpen}
-                settingsActive={settingsOpen}
-                hasJson={hasJson}
-              />
-            </div>
             <div className="pane-header">
               <span className="inline-flex items-center gap-1">
                 Diff Viewer
@@ -866,57 +892,18 @@ export default function JsonViewerClient() {
 
         {layout === "focused" && mode === "clean" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            <div className="md:hidden">
-              <MobileHeader
-                mode={mode}
-                onOpenMenu={() => setMobileMenuOpen(true)}
-                onOpenShare={handleShareClick}
-                onOpenSettings={handleSettingsClick}
-                searchOpen={searchOpen}
-                onSearchToggle={handleSearchToggle}
-                shareActive={shareOpen}
-                settingsActive={settingsOpen}
-                hasJson={hasJson}
-              />
-            </div>
             <JsonAiCleaner onUseJson={handleUseJson} dark={dark} />
           </main>
         )}
 
         {layout === "focused" && mode === "unescape" && (
           <main className="flex flex-1 min-h-0 flex-col min-w-0">
-            <div className="md:hidden">
-              <MobileHeader
-                mode={mode}
-                onOpenMenu={() => setMobileMenuOpen(true)}
-                onOpenShare={handleShareClick}
-                onOpenSettings={handleSettingsClick}
-                searchOpen={searchOpen}
-                onSearchToggle={handleSearchToggle}
-                shareActive={shareOpen}
-                settingsActive={settingsOpen}
-                hasJson={hasJson}
-              />
-            </div>
             <JsonUnescapePanel onUseJson={handleUseJson} dark={dark} />
           </main>
         )}
 
         {layout === "split" && (
           <main className="flex flex-1 min-h-0 flex-col md:flex-row min-w-0 overflow-y-auto md:overflow-visible">
-            <div className="md:hidden">
-              <MobileHeader
-                mode={mode}
-                onOpenMenu={() => setMobileMenuOpen(true)}
-                onOpenShare={handleShareClick}
-                onOpenSettings={handleSettingsClick}
-                searchOpen={searchOpen}
-                onSearchToggle={handleSearchToggle}
-                shareActive={shareOpen}
-                settingsActive={settingsOpen}
-                hasJson={hasJson}
-              />
-            </div>
             <section
               className="flex flex-col min-w-0 border-r border-border bg-surface1 min-h-[70vh] md:flex-1 md:min-h-0 shrink-0 relative"
               onDragEnter={onEditorDragEnter}

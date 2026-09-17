@@ -76,14 +76,14 @@ export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps
             <button
               type="button"
               onClick={handleMinify}
-              className="rounded-md border border-white/10 px-2.5 py-1 text-[11px] font-medium text-slate-300 transition-colors hover:border-white/25 hover:text-white"
+              className="min-h-10 rounded-md border border-white/10 px-3 py-2 text-[11px] font-medium text-slate-300 transition-colors hover:border-white/25 hover:text-white"
             >
               Minify
             </button>
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1 text-[11px] font-medium text-slate-300 transition-colors hover:border-white/25 hover:text-white"
+              className="inline-flex min-h-10 items-center gap-1 rounded-md border border-white/10 px-3 py-2 text-[11px] font-medium text-slate-300 transition-colors hover:border-white/25 hover:text-white"
             >
               <RotateCcw className="h-3 w-3" /> Reset
             </button>
@@ -91,7 +91,7 @@ export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps
               type="button"
               onClick={handleCopy}
               disabled={!output}
-              className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2.5 py-1 text-[11px] font-medium text-slate-300 transition-colors hover:border-white/25 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex min-h-10 items-center gap-1 rounded-md border border-white/10 px-3 py-2 text-[11px] font-medium text-slate-300 transition-colors hover:border-white/25 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
             >
               {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
               {copied ? "Copied" : "Copy output"}
@@ -142,7 +142,7 @@ export function InlineJsonFormatter({ appHref, title }: InlineJsonFormatterProps
           </span>
           <Link
             href={editorHref}
-            className="inline-flex items-center gap-1.5 rounded-full bg-cyan-300 px-4 py-2 text-[12px] font-semibold text-slate-950 transition-all hover:bg-cyan-200 hover:-translate-y-0.5"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-cyan-300 px-4 py-2 text-[12px] font-semibold text-slate-950 transition-all hover:bg-cyan-200 hover:-translate-y-0.5"
           >
             Open in full editor
             <ArrowRight className="h-3.5 w-3.5" />

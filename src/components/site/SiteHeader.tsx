@@ -35,7 +35,7 @@ export function SiteHeader({ activeNav }: SiteHeaderProps) {
             className="shrink-0"
             priority
           />
-          <div className="flex flex-col min-w-0">
+          <div className="flex flex-col min-w-0 max-[359px]:hidden">
             <span className="font-semibold text-sm tracking-tight text-white leading-none">
               JSON Prism
             </span>
@@ -62,7 +62,7 @@ export function SiteHeader({ activeNav }: SiteHeaderProps) {
         <div className="flex md:hidden items-center gap-2">
           <Link
             href="/"
-            className="rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:outline-none"
+            className="inline-flex min-h-11 items-center rounded-full bg-cyan-300 px-4 py-2 text-sm font-semibold text-slate-950 focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:outline-none"
           >
             Open App
           </Link>
@@ -71,7 +71,7 @@ export function SiteHeader({ activeNav }: SiteHeaderProps) {
             onClick={() => setOpen((o) => !o)}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
-            className="rounded-md p-2 text-slate-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
+            className="grid min-h-11 min-w-11 place-items-center rounded-md p-2 text-slate-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
