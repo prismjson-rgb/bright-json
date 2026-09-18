@@ -9,14 +9,15 @@ interface SiteLayoutProps {
   children: React.ReactNode;
   activeNav?: "tools" | "learn" | "about";
   learnDesign?: boolean;
+  contentDesign?: boolean;
 }
 
-export function SiteLayout({ children, activeNav, learnDesign = false }: SiteLayoutProps) {
+export function SiteLayout({ children, activeNav, learnDesign = false, contentDesign = false }: SiteLayoutProps) {
   const tools = getAllTools();
   const learnSections = getTutorialSections().slice(0, 8);
 
   return (
-    <div className={learnDesign ? "learn-section min-h-screen overflow-x-clip text-white" : "min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,_#07111b_0%,_#0b1320_100%)] text-white"}>
+    <div className={learnDesign || contentDesign ? `learn-section ${contentDesign ? "content-guide" : ""} min-h-screen overflow-x-clip text-white` : "min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,_#07111b_0%,_#0b1320_100%)] text-white"}>
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-cyan-300 focus:text-slate-950 focus:rounded-full focus:font-semibold"

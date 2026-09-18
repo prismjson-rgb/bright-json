@@ -1,0 +1,68 @@
+/* The homepage uses the same layout primitives and palette as Learn. */
+.company-guide-lead { color: var(--learn-muted); font-size: 17px; line-height: 1.65; margin-bottom: 28px; padding-bottom: 28px; border-bottom: 1px solid var(--learn-border); }
+.company-guide .learn-side-card > a[aria-current="page"] { color: var(--learn-accent); background: #202b28; border-left-color: var(--learn-accent); }
+.company-guide-note p { padding: 16px; font-size: 13px; line-height: 1.65; color: var(--learn-muted); }
+.content-guide > header { background: #111315ee; border-color: var(--learn-border); }
+.content-guide > header > div { max-width: 1180px; padding-inline: clamp(14px, 4vw, 44px); }
+.content-guide > header nav[aria-label="Mobile navigation"] { background: var(--learn-bg); }
+.content-guide > header a[href="/"]:not([aria-label]), .content-guide > footer a[href="/"].rounded-full { background: var(--learn-accent); color: #10211c; border-radius: 2px; transform: none; }
+.content-guide > header nav > a[href="/about/"] { color: var(--learn-accent); }
+.content-guide > footer { background: var(--learn-bg); }
+.home-guide { border-top: 1px solid var(--learn-border); }
+.home-guide .learn-index-inner { padding-bottom: 0; }
+.home-guide .home-guide-hero h1 { max-width: 17ch; }
+.home-guide .learn-hero-actions a { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 42px; }
+.home-guide-trust-row { display: flex; align-items: center; gap: 16px; padding: 20px; border-bottom: 1px solid var(--learn-border); }
+.home-guide-trust-row svg { flex: none; color: var(--learn-accent); }
+.home-guide-trust-row p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--learn-text); }
+.home-guide-trust-note { padding: 16px 20px; color: var(--learn-muted); font-size: 12px; line-height: 1.6; }
+.home-guide .home-guide-workflows { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-guide .home-guide-workflows > a { position: relative; padding-bottom: 44px; }
+.home-guide-card-meta { display: flex; align-items: center; justify-content: space-between; }
+.home-guide-card-arrow { position: absolute; bottom: 18px; right: 19px; color: var(--learn-subtle); }
+.home-guide-workflows > a:hover .home-guide-card-arrow { color: var(--learn-accent); }
+.home-guide-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+.home-guide-section-heading .learn-eyebrow { margin-bottom: 10px; }
+.home-guide h2:not(.learn-eyebrow) { color: var(--learn-text); font-size: clamp(22px, 2.4vw, 28px); font-weight: 600; line-height: 1.2; letter-spacing: -.025em; }
+.home-guide-section-heading > a { display: inline-flex; align-items: center; gap: 8px; flex: none; color: var(--learn-accent); font-size: 12px; min-height: 36px; }
+.home-guide .home-guide-tool-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) 140px 14px; gap: 20px; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--learn-border); background: var(--learn-panel); }
+.home-guide-tool-row:last-child { border-bottom: 0; }
+.home-guide .home-guide-tool-row:hover { background: #222629; }
+.home-guide-row-number, .home-guide-category { font-family: var(--font-jetbrains), monospace; font-size: 10px; color: var(--learn-subtle); }
+.home-guide-category { text-align: right; text-transform: uppercase; letter-spacing: .04em; }
+.home-guide-tool-row h3 { font-size: 14px; font-weight: 550; color: var(--learn-text); }
+.home-guide-tool-row p { margin-top: 4px; color: var(--learn-muted); font-size: 12px; line-height: 1.6; }
+.home-guide-tool-row > svg { color: var(--learn-subtle); }
+.home-guide-faq { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; margin-top: 70px; padding-top: 40px; border-top: 1px solid var(--learn-border); }
+.home-guide-faq > div > p:not(.learn-eyebrow) { color: var(--learn-muted); font-size: 14px; line-height: 1.7; margin-top: 16px; max-width: 30ch; }
+.home-guide-faq details { border-bottom: 1px solid var(--learn-border); }
+.home-guide-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; list-style: none; padding: 20px 0; cursor: pointer; font-size: 14px; font-weight: 550; }
+.home-guide-faq summary::-webkit-details-marker { display: none; }
+.home-guide-faq summary span { color: var(--learn-accent); font-size: 18px; font-weight: 400; }
+.home-guide-faq details[open] summary span { transform: rotate(45deg); }
+.home-guide-faq summary:focus-visible { outline: 2px solid var(--learn-accent); outline-offset: 4px; }
+.home-guide-faq details p { color: var(--learn-muted); font-size: 14px; line-height: 1.75; padding: 0 24px 22px 0; }
+.home-guide .home-guide-privacy { margin: 48px 0; }
+.home-guide .home-guide-privacy p:last-child { font-size: 13px; }
+.home-guide-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 24px; padding: 28px 0; border-top: 1px solid var(--learn-border); font-size: 12px; }
+.home-guide-brand { font-size: 15px; font-weight: 650; }
+.home-guide-footer nav { display: flex; flex-wrap: wrap; gap: 20px; color: var(--learn-muted); }
+.home-guide-footer p { margin-left: auto; color: var(--learn-subtle); font-size: 11px; }
+@media (max-width: 900px) {
+  .home-guide .home-guide-workflows { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-guide-faq { gap: 32px; }
+  .home-guide .home-guide-tool-row { grid-template-columns: 22px minmax(0, 1fr) 14px; gap: 12px; }
+  .home-guide-category { display: none; }
+}
+@media (max-width: 700px) {
+  .home-guide-faq { grid-template-columns: minmax(0, 1fr); gap: 20px; margin-top: 48px; }
+  .home-guide-section-heading { align-items: start; flex-direction: column; gap: 10px; }
+  .home-guide-footer { gap: 20px; }
+  .home-guide-footer nav { width: 100%; gap: 8px 20px; }
+  .home-guide-footer nav a { min-height: 40px; display: inline-flex; align-items: center; }
+  .home-guide-footer p { margin-left: 0; }
+}
+@media (max-width: 420px) {
+  .home-guide .home-guide-workflows { grid-template-columns: minmax(0, 1fr); }
+  .home-guide .home-guide-tool-row { padding: 16px 12px; }
+}
