@@ -24,11 +24,6 @@
   }
 }
 
-.home-content a:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 4px;
-}
-
 /* highlight.js: keep token colors from the github-dark theme but let the
    code block's own dark background (#080b14) show through instead of the
    theme's default panel color. */
@@ -131,8 +126,8 @@
 @media (max-width: 420px) { .learn-header-inner { padding-inline: 8px; gap: 7px; }.learn-brand { flex: none; margin-right: auto; }.learn-brand span { display: none; }.learn-open-app { min-height: 40px; padding: 8px 11px; font-size: 12px; }.learn-path-grid { grid-template-columns: minmax(0, 1fr); }.learn-search { margin-left: 0; width: 100%; max-width: none; }.learn-lesson-link span { white-space: normal; }.learn-article-meta .learn-completion { margin-left: 0; }.learn-hero-actions { display: grid; grid-template-columns: minmax(0, 1fr); }.learn-hero-actions > a { width: 100%; }.learn-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }.learn-filters button { display: flex; align-items: center; justify-content: space-between; gap: 6px; text-align: left; }.learn-article-next { grid-template-columns: minmax(0, 1fr); } }
 
 /* Workspace chrome follows the imported design; tools retain their controls. */
-.workspace, .home-content { --radius: 0.2rem; }
-.dark .workspace, .dark .workspace-tool-browser, .dark .home-content {
+.workspace { --radius: 0.2rem; }
+.dark .workspace, .dark .workspace-tool-browser {
   --bg: 225 18% 5%;
   --surface-1: 225 20% 4%;
   --surface-2: 225 16% 7%;
