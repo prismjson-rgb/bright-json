@@ -1,11 +1,15 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ToolLandingPage } from "@/components/site/ToolLandingPage";
+import { JsonLdScripts } from "@/components/JsonLdScripts";
 import { getAllToolSlugs, getToolBySlug } from "@/lib/tool-content";
 import { getToolFaqs } from "@/lib/tool-faqs";
-import { safeJsonLd } from "@/lib/json-ld";
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
+import {
+  breadcrumbJsonLd,
+  buildMetadata,
+  faqJsonLd,
+  softwareApplicationJsonLd,
+  webPageJsonLd,
+} from "@/lib/seo";
 
 export function generateStaticParams() {
   return getAllToolSlugs().map((slug) => ({ slug }));
@@ -15,7 +19,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+}) {
   const { slug } = await params;
   const tool = getToolBySlug(slug);
 
@@ -23,29 +27,12 @@ export async function generateMetadata({
     return { title: "Not Found" };
   }
 
-  const title = tool.metaTitle || `${tool.title} | JSON Prism`;
-
-  return {
-    title,
-    description: tool.metaDescription || tool.summary,
-    alternates: {
-      canonical: `${BASE}/tools/${slug}/`,
-    },
-    openGraph: {
-      title,
-      description: tool.metaDescription || tool.summary,
-      type: "article",
-      url: `${BASE}/tools/${slug}/`,
-      siteName: "JSON Prism",
-      images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: title }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description: tool.metaDescription || tool.summary,
-      images: [`${BASE}/og-image.png`],
-    },
-  };
+  return buildMetadata({
+    title: tool.metaTitle || `${tool.title} | JSON Prism`,
+    description: tool.metaDescription || tool.summary || "",
+    path: `/tools/${slug}/`,
+    type: "article",
+  });
 }
 
 export default async function ToolPage({
@@ -61,80 +48,37 @@ export default async function ToolPage({
   }
 
   const faqs = getToolFaqs(tool);
+  const description = tool.metaDescription || tool.summary || "";
+  const path = `/tools/${slug}/`;
 
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
-      { "@type": "ListItem", position: 2, name: "Tools", item: `${BASE}/tools/` },
-      { "@type": "ListItem", position: 3, name: tool.title, item: `${BASE}/tools/${slug}/` },
-    ],
-  };
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Tools", path: "/tools/" },
+    { name: tool.title, path },
+  ]);
 
-  const pageLd = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
+  const pageLd = webPageJsonLd({
     name: tool.title,
-    description: tool.metaDescription || tool.summary,
-    url: `${BASE}/tools/${slug}/`,
-    isPartOf: { "@type": "WebPage", "@id": `${BASE}/tools/` },
-  };
+    description,
+    path,
+    isPartOfPath: "/tools/",
+  });
 
-  const softwareLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+  const softwareLd = softwareApplicationJsonLd({
     name: tool.title,
-    applicationCategory: "DeveloperApplication",
-    applicationSubCategory: tool.category || "JSON Tool",
-    operatingSystem: "Web",
-    browserRequirements: "Requires JavaScript. Runs in any modern browser.",
-    url: `${BASE}/tools/${slug}/`,
-    description: tool.metaDescription || tool.summary,
-    image: `${BASE}/og-image.png`,
-    isAccessibleForFree: true,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    featureList: tool.highlights,
-    publisher: {
-      "@type": "Organization",
-      name: "JSON Prism",
-      url: `${BASE}/`,
-      logo: `${BASE}/icons/icon-512.png`,
-    },
-  };
+    description,
+    path,
+    subCategory: tool.category || "JSON Tool",
+    features: tool.highlights,
+  });
 
-  const faqLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((faq) => ({
-      "@type": "Question",
-      name: faq.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: faq.answer,
-      },
-    })),
-  };
+  const faqLd = faqJsonLd(faqs);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(pageLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(softwareLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(faqLd) }}
-      />
+      <JsonLdScripts data={[breadcrumbLd, pageLd, softwareLd, faqLd]} />
       <ToolLandingPage tool={tool} faqs={faqs} />
     </>
   );
 }
+

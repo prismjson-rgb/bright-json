@@ -6,7 +6,7 @@
 .content-guide > header > div { max-width: 1180px; padding-inline: clamp(14px, 4vw, 44px); }
 .content-guide > header nav[aria-label="Mobile navigation"] { background: var(--learn-bg); }
 .content-guide > header a[href="/"]:not([aria-label]), .content-guide > footer a[href="/"].rounded-full { background: var(--learn-accent); color: #10211c; border-radius: 2px; transform: none; }
-.content-guide > header nav > a[href="/about/"] { color: var(--learn-accent); }
+.content-guide > header nav > a[href="/about/"], .content-guide > header nav > a[href="/tools/"] { color: var(--learn-accent); }
 .content-guide > footer { background: var(--learn-bg); }
 .home-guide { border-top: 1px solid var(--learn-border); }
 .home-guide .learn-index-inner { padding-bottom: 0; }
@@ -66,3 +66,45 @@
   .home-guide .home-guide-workflows { grid-template-columns: minmax(0, 1fr); }
   .home-guide .home-guide-tool-row { padding: 16px 12px; }
 }
+
+/* Shared tool-directory and tool-landing styles use the Learn primitives. */
+.tool-index-hero h1 { max-width: 18ch; }
+.tool-index-summary { margin: 0; color: var(--learn-muted); font-size: 14px; line-height: 1.6; }
+
+.tool-landing-hero { padding-top: clamp(28px, 4vw, 44px); }
+.tool-landing-hero h1 { max-width: none; }
+.tool-landing-hero .learn-hero { margin-top: 6px; padding-top: 24px; }
+.tool-landing-hero-live { grid-template-columns: minmax(0, 1fr); }
+.tool-landing-preview { min-width: 0; }
+
+.tool-landing-highlights { list-style: none; display: grid; gap: 8px; margin: 24px 0 0; padding: 0; }
+.tool-landing-highlights li { display: flex; align-items: flex-start; gap: 10px; color: var(--learn-muted); font-size: 14px; line-height: 1.6; }
+.tool-landing-highlights li::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--learn-accent); margin-top: 8px; }
+
+.tool-landing-guide .learn-article > h2 { color: var(--learn-text); font-size: clamp(24px, 3vw, 32px); font-weight: 600; line-height: 1.2; letter-spacing: -.025em; margin: 12px 0 10px; }
+.tool-landing-guide-lead { color: var(--learn-muted); font-size: 15px; line-height: 1.7; margin: 0 0 28px; }
+
+.learn-side-list { list-style: none; margin: 0; padding: 12px 15px 15px; display: grid; gap: 8px; }
+.learn-side-list li { color: var(--learn-muted); font-size: 13px; line-height: 1.55; padding-left: 14px; position: relative; }
+.learn-side-list li::before { content: ""; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--learn-accent); }
+
+.learn-side-card > p { margin: 15px; color: var(--learn-muted); font-size: 13px; line-height: 1.55; }
+.learn-side-card > a { padding: 9px 15px; color: var(--learn-muted); font-size: 12px; border-left: 2px solid transparent; }
+.learn-side-card > a:hover { color: var(--learn-accent); background: #202628; }
+
+.learn-side-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 15px 15px; }
+.learn-side-tags span { border: 1px solid var(--learn-border); background: var(--learn-bg); border-radius: 2px; padding: 4px 7px; color: var(--learn-subtle); font-size: 11px; }
+
+.learn-side-promise { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px 15px 15px; }
+.learn-side-promise span { border: 1px solid var(--learn-border); background: var(--learn-bg); border-radius: 2px; padding: 8px; color: var(--learn-muted); font-size: 12px; text-align: center; }
+
+.tool-landing-faq > h2 { color: var(--learn-text); font-size: clamp(24px, 3vw, 32px); font-weight: 600; line-height: 1.2; letter-spacing: -.025em; margin: 12px 0 10px; }
+.tool-landing-faq > p { color: var(--learn-muted); font-size: 14px; line-height: 1.7; margin: 0 0 28px; }
+
+.tool-landing-cta-card { border: 1px solid var(--learn-border); background: var(--learn-panel); border-radius: 3px; padding: clamp(32px, 6vw, 64px); text-align: center; }
+.tool-landing-cta-card h2 { color: var(--learn-text); font-size: clamp(24px, 3vw, 32px); font-weight: 600; line-height: 1.2; letter-spacing: -.025em; margin: 12px 0 12px; }
+.tool-landing-cta-card h2 span { color: var(--learn-accent); }
+.tool-landing-cta-card p { color: var(--learn-muted); font-size: 14px; line-height: 1.7; margin: 0 auto 22px; max-width: 42ch; }
+.tool-landing-cta-card a { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+
+

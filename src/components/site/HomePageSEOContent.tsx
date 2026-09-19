@@ -14,6 +14,7 @@ import {
 import { getHomeContent } from "@/lib/site-content";
 import { getAllTools } from "@/lib/tool-content";
 import { getTutorialSections } from "@/lib/learn-content";
+import { ToolDirectory } from "@/components/site/ToolDirectory";
 
 const CORE_WORKFLOWS = [
   {
@@ -102,14 +103,7 @@ export function HomePageSEOContent() {
 
         <section className="learn-lessons" aria-labelledby="home-tools">
           <div className="home-guide-section-heading"><div><p className="learn-eyebrow">The complete toolkit</p><h2 id="home-tools">{tools.length} tools. One familiar workspace.</h2></div><Link href="/tools/">Browse tool pages <ArrowRight size={14} aria-hidden /></Link></div>
-          <div className="learn-lesson-list">
-            {tools.map((tool, index) => <Link href={`/tools/${tool.slug}/`} className="home-guide-tool-row" key={tool.slug}>
-              <span className="home-guide-row-number">{String(index + 1).padStart(2, "0")}</span>
-              <div><h3>{tool.title}</h3><p>{tool.summary}</p></div>
-              <span className="home-guide-category">{tool.badge || tool.category || "Tool"}</span>
-              <ArrowRight size={14} aria-hidden />
-            </Link>)}
-          </div>
+          <ToolDirectory tools={tools} />
         </section>
 
         <section className="learn-lessons" aria-labelledby="home-learn">

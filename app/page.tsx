@@ -1,139 +1,53 @@
-import type { Metadata } from "next";
 import AppShell from "@/components/AppShell";
 import { HomePageSEOContent } from "@/components/site/HomePageSEOContent";
+import { JsonLdScripts } from "@/components/JsonLdScripts";
 import { getHomeContent } from "@/lib/site-content";
 import { getAllTools } from "@/lib/tool-content";
-import { safeJsonLd } from "@/lib/json-ld";
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
+import {
+  buildMetadata,
+  faqJsonLd,
+  itemListJsonLd,
+  organizationJsonLd,
+  siteUrl,
+  softwareApplicationJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 
 const toolCount = getAllTools().length;
+const home = getHomeContent();
 
-export const metadata: Metadata = {
+export const metadata = buildMetadata({
   title: `JSON Prism | All-in-One JSON Toolkit - ${toolCount} Free Tools`,
-  description:
-    `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
-  alternates: {
-    canonical: `${BASE}/`,
-  },
-  openGraph: {
-    title: "JSON Prism - The Free All-in-One JSON Toolkit",
-    description:
-      `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
-    type: "website",
-    url: `${BASE}/`,
-    siteName: "JSON Prism",
-    images: [
-      {
-        url: `${BASE}/og-image.png`,
-        width: 1200,
-        height: 630,
-        alt: "JSON Prism - JSON workspace in your browser",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "JSON Prism - The Free All-in-One JSON Toolkit",
-    description:
-      `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
-    images: [`${BASE}/og-image.png`],
-  },
-};
+  description: `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
+  path: "/",
+  ogTitle: "JSON Prism - The Free All-in-One JSON Toolkit",
+  ogDescription: `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
+  twitterTitle: "JSON Prism - The Free All-in-One JSON Toolkit",
+  twitterDescription: `Format, validate, edit, diff, and convert JSON in one free browser-based workspace. ${toolCount} tools, no sign-up, local processing with optional sharing.`,
+  imageAlt: "JSON Prism - JSON workspace in your browser",
+});
 
 export default function HomePage() {
-  const home = getHomeContent();
   const tools = getAllTools();
 
-  const softwareLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
+  const softwareLd = softwareApplicationJsonLd({
     name: "JSON Prism",
-    applicationCategory: "DeveloperApplication",
-    operatingSystem: "Web",
-    url: `${BASE}/`,
-    description: home.metaDescription,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    featureList: tools.map((t) => t.title),
-    image: `${BASE}/icons/icon-512.png`,
-    publisher: {
-      "@type": "Organization",
-      name: "JSON Prism",
-      logo: `${BASE}/icons/icon-512.png`,
-      url: `${BASE}/`,
-    },
-  };
+    description: home.metaDescription || "",
+    path: "/",
+    features: tools.map((tool) => tool.title),
+    imageUrl: `${siteUrl()}/icons/icon-512.png`,
+  });
 
-  const organizationLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "JSON Prism",
-    url: `${BASE}/`,
-    logo: `${BASE}/icons/icon-512.png`,
-  };
-
-  const websiteLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "JSON Prism",
-    url: `${BASE}/`,
-    description: home.metaDescription,
-    publisher: {
-      "@type": "Organization",
-      name: "JSON Prism",
-      url: `${BASE}/`,
-      logo: { "@type": "ImageObject", url: `${BASE}/icons/icon-512.png` },
-    },
-  };
-
-  const itemListLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "JSON Prism tools",
-    itemListElement: tools.map((t, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      url: `${BASE}/tools/${t.slug}/`,
-      name: t.title,
-    })),
-  };
-
-  const faqLd = home.faqs.length > 0
-    ? {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: home.faqs.map((faq) => ({
-          "@type": "Question",
-          name: faq.question,
-          acceptedAnswer: { "@type": "Answer", text: faq.answer },
-        })),
-      }
-    : null;
+  const organizationLd = organizationJsonLd();
+  const websiteLd = websiteJsonLd(home.metaDescription || "");
+  const itemListLd = itemListJsonLd(
+    tools.map((tool) => ({ name: tool.title, url: siteUrl(`/tools/${tool.slug}/`) }))
+  );
+  const faqLd = home.faqs.length > 0 ? faqJsonLd(home.faqs) : null;
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(softwareLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(websiteLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(itemListLd) }}
-      />
-      {faqLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: safeJsonLd(faqLd) }}
-        />
-      )}
+      <JsonLdScripts data={[softwareLd, organizationLd, websiteLd, itemListLd, faqLd]} />
 
       {/* App workspace - fills the viewport (h-screen) */}
       <AppShell />
@@ -143,3 +57,5 @@ export default function HomePage() {
     </>
   );
 }
+
+

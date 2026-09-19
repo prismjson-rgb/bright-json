@@ -32,11 +32,11 @@ export function RelatedLinks({ relatedTools, relatedLearn, variant = "light" }: 
         <div
           className={
             dark
-              ? "rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5"
+              ? "rounded-[3px] border border-[var(--learn-border)] bg-[var(--learn-panel)] p-5"
               : "rounded-2xl border border-border bg-surface p-5"
           }
         >
-          <div className={`mb-3 flex items-center gap-2 ${dark ? "text-slate-400" : "text-muted-foreground"}`}>
+          <div className={`mb-3 flex items-center gap-2 ${dark ? "text-[var(--learn-subtle)]" : "text-muted-foreground"}`}>
             <Wrench className="h-4 w-4" />
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em]">Related tools</p>
           </div>
@@ -47,7 +47,7 @@ export function RelatedLinks({ relatedTools, relatedLearn, variant = "light" }: 
                   href={`/tools/${tool.slug}/`}
                   className={
                     dark
-                      ? "group flex items-center justify-between gap-2 text-sm text-slate-300 hover:text-cyan-200"
+                      ? "group flex items-center justify-between gap-2 text-sm text-[var(--learn-muted)] hover:text-[var(--learn-accent)]"
                       : "group flex items-center justify-between gap-2 text-sm text-foreground hover:text-primary"
                   }
                 >
@@ -64,11 +64,11 @@ export function RelatedLinks({ relatedTools, relatedLearn, variant = "light" }: 
         <div
           className={
             dark
-              ? "rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5"
+              ? "rounded-[3px] border border-[var(--learn-border)] bg-[var(--learn-panel)] p-5"
               : "rounded-2xl border border-border bg-surface p-5"
           }
         >
-          <div className={`mb-3 flex items-center gap-2 ${dark ? "text-slate-400" : "text-muted-foreground"}`}>
+          <div className={`mb-3 flex items-center gap-2 ${dark ? "text-[var(--learn-subtle)]" : "text-muted-foreground"}`}>
             <BookOpen className="h-4 w-4" />
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em]">Related lessons</p>
           </div>
@@ -79,7 +79,7 @@ export function RelatedLinks({ relatedTools, relatedLearn, variant = "light" }: 
                   href={`/learn/${section.id}/`}
                   className={
                     dark
-                      ? "group flex items-center justify-between gap-2 text-sm text-slate-300 hover:text-cyan-200"
+                      ? "group flex items-center justify-between gap-2 text-sm text-[var(--learn-muted)] hover:text-[var(--learn-accent)]"
                       : "group flex items-center justify-between gap-2 text-sm text-foreground hover:text-primary"
                   }
                 >
@@ -94,3 +94,4 @@ export function RelatedLinks({ relatedTools, relatedLearn, variant = "light" }: 
     </div>
   );
 }
+
