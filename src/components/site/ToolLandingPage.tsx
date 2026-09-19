@@ -1,54 +1,14 @@
 import Link from "next/link";
-import { ArrowRight, ChevronRight, Layers3, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { MarkdownArticleBody } from "@/components/MarkdownArticleBody";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { ContentBreadcrumb } from "@/components/site/ContentBreadcrumb";
+import { Eyebrow } from "@/components/site/SitePrimitives";
 import { FaqAccordion } from "@/components/site/FaqAccordion";
 import { RelatedLinks } from "@/components/site/RelatedLinks";
 import { InlineJsonFormatter } from "@/components/site/InlineJsonFormatter";
 import type { ToolContent } from "@/lib/tool-content";
 import type { ToolFaq } from "@/lib/tool-faqs";
-
-// ---------------------------------------------------------------------------
-// Shared typography primitives
-// ---------------------------------------------------------------------------
-
-/** Pill-style eyebrow label */
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-400">
-      {children}
-    </span>
-  );
-}
-
-/** Large display heading - first part white, last word(s) in cyan gradient */
-function DisplayHeading({
-  prefix,
-  accent,
-  tag: Tag = "h1",
-  className = "",
-}: {
-  prefix: string;
-  accent?: string;
-  tag?: "h1" | "h2";
-  className?: string;
-}) {
-  return (
-    <Tag
-      className={`font-bold tracking-tighter text-white leading-[1.06] ${className}`}
-    >
-      {prefix}
-      {accent && (
-        <>
-          {" "}
-          <span className="bg-gradient-to-r from-cyan-300 via-teal-300 to-cyan-200 bg-clip-text text-transparent">
-            {accent}
-          </span>
-        </>
-      )}
-    </Tag>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Tool-specific code preview snippets
@@ -171,162 +131,80 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
   const toolKey = tool.appHref?.match(/tool=([^&]+)/)?.[1] ?? "";
   const hasLiveWidget = LIVE_WIDGET_TOOLS.has(toolKey);
 
-  // Split title into first words + last word for gradient accent
-  const words = tool.title.split(" ");
-  const accentWord = words.slice(-1)[0];
-  const prefixWords = words.slice(0, -1).join(" ");
-
   return (
-    <SiteLayout activeNav="tools">
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-5%,rgba(34,211,238,0.07),transparent)]"
+    <SiteLayout activeNav="tools" contentDesign>
+      <div className="learn-index-inner tool-landing-hero">
+        <ContentBreadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Tools", href: "/tools/" },
+            { label: tool.title },
+          ]}
         />
 
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 pb-16 pt-10 sm:pb-24 sm:pt-16">
-          {/* Breadcrumb */}
-          <nav aria-label="Breadcrumb" className="mb-10 flex items-center gap-1.5 text-xs text-slate-600">
-            <Link href="/" className="hover:text-slate-400 transition-colors">Home</Link>
-            <ChevronRight className="h-3 w-3 shrink-0" />
-            <Link href="/tools/" className="hover:text-slate-400 transition-colors">Tools</Link>
-            <ChevronRight className="h-3 w-3 shrink-0" />
-            <span className="text-slate-400 truncate">{tool.title}</span>
-          </nav>
+        <div className={`learn-hero ${hasLiveWidget ? "tool-landing-hero-live" : ""}`}>
+          <div className="learn-hero-copy">
+            <Eyebrow>{tool.badge || tool.category || "Tool"}</Eyebrow>
+            <h1>{tool.title}</h1>
+            <p className="learn-hero-description">{tool.summary || tool.metaDescription}</p>
 
-          <div className={`grid items-center gap-12 lg:gap-16 ${hasLiveWidget ? "" : "lg:grid-cols-2"}`}>
-            {/* Left: text */}
-            <div>
-              <Eyebrow>{tool.badge || tool.category || "Tool"}</Eyebrow>
-
-              <DisplayHeading
-                prefix={prefixWords || tool.title}
-                accent={prefixWords ? accentWord : undefined}
-                tag="h1"
-                className="mt-5 text-5xl sm:text-6xl lg:text-[4rem] xl:text-[4.5rem]"
-              />
-
-              <p className="mt-6 max-w-lg text-base leading-8 text-slate-400 sm:text-lg">
-                {tool.summary || tool.metaDescription}
-              </p>
-
-              {/* CTAs */}
-              <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
-                <Link
-                  href={appLink}
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-cyan-300 px-6 py-3 text-sm font-semibold text-slate-950 transition-all hover:bg-cyan-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
-                >
-                  Open {tool.title}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/tools/"
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-slate-300 transition-colors hover:border-white/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
-                >
-                  All tools
-                </Link>
-              </div>
-
-              {/* Highlights */}
-              {tool.highlights.length > 0 && (
-                <ul className="mt-10 space-y-3">
-                  {tool.highlights.map((highlight) => (
-                    <li key={highlight} className="flex items-start gap-3 text-sm text-slate-400">
-                      <span className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-cyan-400/15">
-                        <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-                      </span>
-                      {highlight}
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <div className="learn-hero-actions">
+              <Link href={appLink} className="learn-button-primary">
+                Open {tool.title}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="/tools/" className="learn-button-outline">
+                All tools
+              </Link>
             </div>
 
-            {/* Right: code preview (desktop only) */}
-            {!hasLiveWidget && (
-              <div className="hidden lg:block">
-                <ToolPreview appHref={tool.appHref} title={tool.title} />
-              </div>
+            {tool.highlights.length > 0 && (
+              <ul className="tool-landing-highlights">
+                {tool.highlights.map((highlight) => (
+                  <li key={highlight}>{highlight}</li>
+                ))}
+              </ul>
             )}
           </div>
 
-          {/* Live widget - full width, visible at every breakpoint, replaces the
-              static code preview for tools worth trying inline. */}
-          {hasLiveWidget && (
-            <div className="mt-14">
-              <InlineJsonFormatter appHref={tool.appHref ?? "/app/?tool=json-formatter"} title={tool.title} />
+          {hasLiveWidget ? (
+            <InlineJsonFormatter appHref={tool.appHref ?? "/app/?tool=json-formatter"} title={tool.title} />
+          ) : (
+            <div className="tool-landing-preview hidden lg:block">
+              <ToolPreview appHref={tool.appHref} title={tool.title} />
             </div>
           )}
         </div>
-      </section>
+      </div>
 
-      {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/[0.07] to-transparent" />
+      <div className="h-px bg-[var(--learn-border)]" />
 
-      {/* ── Article + Aside ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden py-14 sm:py-20">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_65%_45%_at_50%_0%,rgba(45,212,191,0.09),transparent_72%)]"
-        />
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
-                Practical guide
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                Build, validate, and reuse JSON with less friction.
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm leading-6 text-slate-500">
+      <div className="learn-article-shell tool-landing-guide">
+        <div className="learn-article-grid">
+          <article className="learn-article">
+            <Eyebrow>Practical guide</Eyebrow>
+            <h2>Build, validate, and reuse JSON with less friction.</h2>
+            <p className="tool-landing-guide-lead">
               A focused walkthrough for deciding when the tool fits your workflow.
             </p>
-          </div>
+            <div className="learn-article-content">
+              <MarkdownArticleBody content={tool.contentMarkdown} variant="learn" />
+            </div>
+          </article>
 
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
-            <div className="min-w-0 rounded-[2rem] border border-white/[0.08] bg-white/[0.025] p-5 shadow-[0_35px_120px_-60px_rgba(34,211,238,0.35)] sm:p-8">
-              <MarkdownArticleBody content={tool.contentMarkdown} variant="landing" />
+          <aside className="learn-article-sidebar">
+            <div className="learn-side-card">
+              <h2>Start in seconds</h2>
+              <p>Private, free, browser-only</p>
+              <Link href={appLink}>Open {tool.title}</Link>
             </div>
 
-            <aside className="space-y-4 lg:sticky lg:top-24">
-              <div className="overflow-hidden rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.06]">
-                <div className="border-b border-cyan-300/10 px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-300 text-slate-950">
-                      <Sparkles className="h-4 w-4" />
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-white">Start in seconds</p>
-                      <p className="mt-0.5 text-xs text-slate-500">Private, free, browser-only</p>
-                    </div>
-                  </div>
-                </div>
-
-                <Link
-                  href={appLink}
-                  className="flex items-center justify-between gap-3 px-5 py-4 text-sm font-semibold text-cyan-200 transition-colors hover:bg-cyan-300/10 hover:text-cyan-100"
-                >
-                  Open {tool.title}
-                  <ArrowRight className="h-4 w-4 shrink-0" />
-                </Link>
-              </div>
-
             {tool.useCases.length > 0 && (
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5">
-                <div className="mb-4 flex items-center gap-2">
-                  <Layers3 className="h-4 w-4 text-cyan-300" />
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                    Best for
-                  </p>
-                </div>
-                <ul className="space-y-3">
+              <div className="learn-side-card">
+                <h2>Best for</h2>
+                <ul className="learn-side-list">
                   {tool.useCases.map((useCase) => (
-                    <li key={useCase} className="flex items-start gap-2.5 text-sm leading-6 text-slate-300">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300" />
-                      {useCase}
-                    </li>
+                    <li key={useCase}>{useCase}</li>
                   ))}
                 </ul>
               </div>
@@ -335,88 +213,60 @@ export function ToolLandingPage({ tool, faqs }: { tool: ToolContent; faqs: ToolF
             <RelatedLinks relatedTools={tool.relatedTools} relatedLearn={tool.relatedLearn} variant="dark" />
 
             {tool.keywords.length > 0 && (
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600">
-                  Related searches
-                </p>
-                <div className="flex flex-wrap gap-1.5">
+              <div className="learn-side-card">
+                <h2>Related searches</h2>
+                <div className="learn-side-tags">
                   {tool.keywords.map((keyword) => (
-                    <span
-                      key={keyword}
-                      className="rounded-full border border-white/[0.07] bg-white/[0.03] px-3 py-1 text-xs text-slate-500"
-                    >
-                      {keyword}
-                    </span>
+                    <span key={keyword}>{keyword}</span>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="rounded-2xl border border-white/[0.08] bg-[#0a121e] p-5">
-              <div className="mb-4 flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-emerald-300" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                  Promise
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="learn-side-card">
+              <h2>Promise</h2>
+              <div className="learn-side-promise">
                 {["No upload", "No account", "Instant output", "Editable JSON"].map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-xl border border-white/[0.07] bg-white/[0.035] px-3 py-2 text-slate-300"
-                  >
-                    {item}
-                  </span>
+                  <span key={item}>{item}</span>
                 ))}
               </div>
             </div>
-            </aside>
-          </div>
+          </aside>
         </div>
-      </section>
+      </div>
 
-      {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/[0.07] to-transparent" />
+      <div className="h-px bg-[var(--learn-border)]" />
 
-      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-3xl px-4 sm:px-6 py-14 sm:py-20">
-        <div className="mb-10 text-center">
-          <Eyebrow>FAQ</Eyebrow>
-          <DisplayHeading
-            prefix="Questions about"
-            accent={tool.title}
-            tag="h2"
-            className="mt-5 text-3xl sm:text-4xl"
-          />
-          <p className="mt-4 text-sm text-slate-500">
-            Everything you need to know before you start.
-          </p>
-        </div>
+      <div className="learn-article-shell tool-landing-faq">
+        <Eyebrow>FAQ</Eyebrow>
+        <h2>Questions about {tool.title}</h2>
+        <p>Everything you need to know before you start.</p>
         <FaqAccordion faqs={faqs} />
-      </section>
+      </div>
 
-      {/* ── Bottom CTA ──────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-3xl px-4 sm:px-6 pb-16 sm:pb-24">
-        <div className="rounded-3xl border border-white/[0.07] bg-white/[0.02] px-6 py-14 text-center sm:py-16">
+      <div className="learn-article-shell tool-landing-cta">
+        <div className="tool-landing-cta-card">
           <Eyebrow>Ready to use it?</Eyebrow>
-          <h2 className="mt-5 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2>
             {tool.title},{" "}
-            <span className="bg-gradient-to-r from-cyan-300 to-teal-300 bg-clip-text text-transparent">
-              free &amp; private.
-            </span>
+            <span>free &amp; private.</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-sm text-sm text-slate-500">
-            No account needed. Your JSON never leaves your browser.
-          </p>
-          <Link
-            href={appLink}
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-cyan-300 px-8 py-4 text-base font-semibold text-slate-950 transition-all hover:bg-cyan-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
-          >
+          <p>No account needed. Your JSON never leaves your browser.</p>
+          <Link href={appLink} className="learn-button-primary">
             Launch {tool.title}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-      </section>
+      </div>
     </SiteLayout>
   );
 }
+
+
+
+
+
+
+
+
+

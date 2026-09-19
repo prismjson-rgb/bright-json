@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getTutorialSections,
@@ -7,9 +6,8 @@ import {
 } from "@/lib/learn-content";
 import { LearnArticlePage } from "@/components/LearnArticlePage";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { safeJsonLd } from "@/lib/json-ld";
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://jsonprism.com";
+import { JsonLdScripts } from "@/components/JsonLdScripts";
+import { articleJsonLd, breadcrumbJsonLd, buildMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return getTutorialSections().map((s) => ({ slug: s.id }));
@@ -19,7 +17,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+}) {
   const { slug } = await params;
   const section = getSectionById(slug);
   if (!section) return { title: "Not Found" };
@@ -29,28 +27,15 @@ export async function generateMetadata({
     section.metaDescription ||
     `Learn about ${section.title} in this JSON tutorial. Part of the complete JSON guide from JSON Prism.`;
 
-  return {
+  return buildMetadata({
     title: `${title} | JSON Prism`,
     description,
+    path: `/learn/${slug}/`,
+    type: "article",
     keywords: section.keyTerms ?? [],
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      siteName: "JSON Prism",
-      url: `${BASE}/learn/${slug}/`,
-      images: [{ url: `${BASE}/og-image.png`, width: 1200, height: 630, alt: title }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [`${BASE}/og-image.png`],
-    },
-    alternates: {
-      canonical: `${BASE}/learn/${slug}/`,
-    },
-  };
+    ogTitle: title,
+    twitterTitle: title,
+  });
 }
 
 export default async function LearnArticleRoute({
@@ -68,46 +53,25 @@ export default async function LearnArticleRoute({
   const next = idx >= 0 && idx < allSections.length - 1 ? allSections[idx + 1] : undefined;
 
   const levelInfo = LEARN_LEVELS.find((l) => l.id === section.level);
+  const path = `/learn/${slug}/`;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: section.title,
+  const jsonLd = articleJsonLd({
+    title: section.title,
     description: section.metaDescription || section.contentMarkdown.slice(0, 160),
-    author: { "@type": "Organization", name: "JSON Prism" },
-    publisher: {
-      "@type": "Organization",
-      name: "JSON Prism",
-      url: `${BASE}/`,
-      logo: { "@type": "ImageObject", url: `${BASE}/icons/icon-512.png`, width: 512, height: 512 },
-    },
-    image: { "@type": "ImageObject", url: `${BASE}/og-image.png`, width: 1200, height: 630 },
-    url: `${BASE}/learn/${slug}/`,
+    path,
     datePublished: section.publishedAt || "2025-12-01",
     dateModified: section.updatedAt || section.publishedAt || "2025-12-01",
-    mainEntityOfPage: { "@type": "WebPage", "@id": `${BASE}/learn/${slug}/` },
-  };
+  });
 
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${BASE}/` },
-      { "@type": "ListItem", position: 2, name: "Learn", item: `${BASE}/learn/` },
-      { "@type": "ListItem", position: 3, name: section.title, item: `${BASE}/learn/${slug}/` },
-    ],
-  };
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Learn", path: "/learn/" },
+    { name: section.title, path },
+  ]);
 
   return (
     <SiteLayout activeNav="learn" learnDesign>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }}
-      />
+      <JsonLdScripts data={[jsonLd, breadcrumbLd]} />
 
       <div className="learn-article-shell">
         <LearnArticlePage
