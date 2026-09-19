@@ -12,8 +12,7 @@ Formatting, validation and conversion run in your browser. The optional network 
 
 - Automatically upload JSON content you paste or type
 - Collect personal information or create user accounts
-- Use cookies for tracking or advertising
-- Load third-party analytics or advertising scripts
+- Load advertising scripts
 - Use your editor content for analytics
 
 ## Browser storage
@@ -42,7 +41,7 @@ If you click **Create short link** in the Share panel, a compressed, encoded cop
 
 ## Analytics
 
-Google Tag Manager was removed on 15 September 2026. The app does not load analytics or advertising scripts. Cloudflare still processes request metadata to deliver the site and protect its services.
+JSON Prism uses Google Tag Manager (container `GTM-WMZSRR3M`) to load scripts for general usage tracking, product improvements, and standard product functionality. Google Tag Manager and the tags it loads may set cookies and collect aggregate usage data such as pages visited, referrer, and browser and device information, along with an approximate location derived from your IP address. This helps us understand overall usage and improve the app. The JSON content you paste, type, or edit is never sent to these scripts. Cloudflare also processes request metadata to deliver the site and protect its services.
 
 ## Requests and donations
 

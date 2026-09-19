@@ -28,7 +28,7 @@ JSON Prism covers every common JSON task a developer encounters:
 
 ## Privacy
 
-All processing happens locally in your browser. JSON data is never sent to a server unless you explicitly create a short link or send a URL/cURL request. The short link feature stores JSON in Cloudflare Workers KV for 30 days - this is entirely opt-in. We do not load analytics or advertising scripts. Requests you choose to send through URL/cURL and donations use the destination services described in our Privacy Policy.
+All processing happens locally in your browser. JSON data is never sent to a server unless you explicitly create a short link or send a URL/cURL request. The short link feature stores JSON in Cloudflare Workers KV for 30 days - this is entirely opt-in. We use Google Tag Manager to load scripts for general usage tracking, product improvements, and standard product functionality; your JSON content is never included, and we do not load advertising scripts. Requests you choose to send through URL/cURL and donations use the destination services described in our Privacy Policy.
 
 ## Technical details
 
